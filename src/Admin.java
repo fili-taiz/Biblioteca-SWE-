@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Admin {
     private final String userCode;
@@ -23,98 +24,97 @@ public class Admin {
         this.list_of_hirers = list_of_hirers;
     }
 
-    public boolean modify_item(int i, Item oldItem, String newCode, String newTitle, LocalDate newPublicationDate, boolean newIsBorrowable, String newLanguage, String newCategory, String newLink, String newPublishingHouseMagazine, String newAuthor, String newSupervisors, String newUniversity, String newIsbn, String newPublishingHouseBook, int newNumberOfPages, String newAuthors) { // i = 1 Magazine, i = 2 Thesis, i = 3 Book
+    public boolean modifyItem(int i, Item oldItem, String newCode, String newTitle, LocalDate newPublicationDate, boolean newIsBorrowable, String newLanguage, String newCategory, String newLink, String newPublishingHouseMagazine, String newAuthor, String newSupervisors, String newUniversity, String newIsbn, String newPublishingHouseBook, int newNumberOfPages, String newAuthors) { // i = 1 Magazine, i = 2 Thesis, i = 3 Book
         switch (i) {
             case 1:
                 Magazine oldMagazine = (Magazine) oldItem;
                 Magazine newMagazine = new Magazine(newCode, newTitle, newPublicationDate, newLanguage, newCategory, newLink, newIsBorrowable, newPublishingHouseMagazine);
-                oldMagazine.update_magazine(newMagazine);
+                oldMagazine.updateMagazine(newMagazine);
                 return true;
             case 2:
                 Thesis oldThesis = (Thesis) oldItem;
                 Thesis newThesis = new Thesis(newCode, newTitle, newPublicationDate, newLanguage, newCategory, newLink, newIsBorrowable, newAuthor, newSupervisors, newUniversity);
-                oldThesis.update_thesis(newThesis);
+                oldThesis.updateThesis(newThesis);
                 return true;
             case 3:
                 Book oldBook = (Book) oldItem;
                 Book newBook = new Book(newCode, newTitle, newPublicationDate, newLanguage, newCategory, newLink, newIsBorrowable, newIsbn, newPublishingHouseBook, newNumberOfPages, newAuthors);
-                oldBook.update_book(newBook);
+                oldBook.updateBook(newBook);
                 return true;
         }
 
         return false;
     }
 
-    public void add_item(Item item) {
-        this.catalogue.add_item(item);
+    public void addItem(Item item) {
+        this.catalogue.addItem(item);
     }
 
-    public void remove_item(Item item) {
-        this.catalogue.remove_item(item);
+    public void removeItem(Item item) {
+        this.catalogue.removeItem(item);
     }
 
-    public void get_item(Item item) {
-        this.catalogue.get_item(item);
+    public void getItem(Item item) {
+        this.catalogue.getItem(item);
     }
 
-    public void set_number_of_copies(Item item, int newN) {
-        for (Tupla t : item.getPhysicalCopies()) {
-            if (t.get_first().equals(this.workingPlace)) {
-                t.set_second(newN);
+    public void setNumberOfCopies(Item item, int newN) {
+        for(Biblioteca b : item.getPhysicalCopies().keySet()){
+            if(b == this.workingPlace){
+                item.setNumberOfCopies(b, newN);
             }
         }
     }
 
 
-    public void increase_number_of_copies(Item item) {
-        for (Tupla t : item.getPhysicalCopies()) {
-            if (t.get_first().equals(this.workingPlace)) {
-                int n = (int) t.get_second();
-                t.set_second(n + 1);
+    public void increaseNumberOfCopies(Item item) {
+        for(Biblioteca b : item.getPhysicalCopies().keySet()){
+            if(b == this.workingPlace){
+                item.setNumberOfCopies(b, item.getPhysicalCopies().get(b)+1);
             }
         }
     }
 
 
-    public void decrease_number_of_copies(Item item) {
-        for (Tupla t : item.getPhysicalCopies()) {
-            if (t.get_first().equals(this.workingPlace)) {
-                int n = (int) t.get_second();
-                t.set_second(n - 1);
+    public void decreaseNumberOfCopies(Item item) {
+        for(Biblioteca b : item.getPhysicalCopies().keySet()){
+            if(b == this.workingPlace){
+                item.setNumberOfCopies(b, item.getPhysicalCopies().get(b)-1);
             }
         }
     }
 
 
-    public void add_hirer(Hirer hirer) {
+    public void addHirer(Hirer hirer) {
         list_of_hirers.addhirer(hirer);
     }
 
-    public void remove_hirer(Hirer hirer) {
+    public void removeHirer(Hirer hirer) {
         list_of_hirers.removehirer(hirer);
     }
 
-    public Hirer get_hirer(int code) {
+    public Hirer getHirer(int code) {
         return list_of_hirers.hirers.get(code);
     }
 
     public void registerLending(Hirer hirer, Item item, LocalDate lendingDate) {
-        if (item.get_number_of_available_copies(this.workingPlace) > 1) {
+        if (item.getNumberOfAvailableCopies(this.workingPlace, item) > 1) {
             Lending lending = new Lending(lendingDate, hirer, item, this.workingPlace);
-            hirer.lendings.add(lending);
+            hirer.getLendings().add(lending);
         }
 
     }
 
-    public void confirm_reservation(Hirer hirer, Item item, LocalDate reservationDate) {
-        if (item.get_number_of_available_copies(this.workingPlace) > 1) {
+    public void confirmReservation(Hirer hirer, Item item, LocalDate reservationDate) {
+        if (item.getNumberOfAvailableCopies(this.workingPlace, item) > 1) {
             Reservation reservation = new Reservation(reservationDate, hirer, item, this.workingPlace);
-            hirer.reservations.add(reservation);
+            hirer.getReservations().add(reservation);
         }
     }
 
     public void registerItemReturn(Lending l) {
-
+        l.getItem().removeLending(l);
+        l.getHirer().getLendings().remove(l);
 
     }
 }

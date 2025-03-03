@@ -4,33 +4,33 @@ import java.util.Comparator;
 public class Catalogue implements CatalogueSearchable{
     ArrayList<Item> items;
     @Override
-    public void search_item(String keyword, String category, boolean dateSort, boolean asc){
+    public void searchItem(String keyword, String category, boolean dateSort, boolean asc){
         ArrayList<Item> result = new ArrayList<>();
         for(Item i: this.items){
-            if(i.get_title().equals(keyword) && i.get_category().equals(category)){
+            if(i.getTitle().equals(keyword) && i.getCategory().equals(category)){
                 result.add(i);
             }
         }
         if(dateSort){
-            items.sort(Comparator.comparing(Item::get_publication_date));
+            items.sort(Comparator.comparing(Item::getPublicationDate));
         }
 
         if(asc){
-            items.sort(Comparator.comparing(Item::get_title));
+            items.sort(Comparator.comparing(Item::getTitle));
         } else{
-            items.sort(Comparator.comparing(Item::get_title).reversed());
+            items.sort(Comparator.comparing(Item::getTitle).reversed());
         }
     }
 
-    public void add_item(Item item){
+    public void addItem(Item item){
         items.add(item);
     }
 
-    public void remove_item(Item item){
+    public void removeItem(Item item){
         items.remove(item);
     }
 
-    public Item get_item(Item item){
+    public Item getItem(Item item){
         return items.get(items.indexOf(item));
     }
 

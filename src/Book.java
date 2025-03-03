@@ -28,8 +28,8 @@ public class Book extends Item{
     public void set_authors(String newAuthors){ this.authors = newAuthors; }
 
 
-    public void update_book(Book newBook){
-        update_item(newBook);
+    public void updateBook(Book newBook){
+        updateItem(newBook);
         this.isbn = newBook.isbn;
         this.publishingHouseBook = newBook.publishingHouseBook;
         this.numberOfPages = newBook.numberOfPages;

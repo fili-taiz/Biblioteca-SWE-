@@ -1,5 +1,5 @@
 public interface CatalogueSearchable {
-    public void search_item(String keyword, String category, boolean dateSort, boolean asc);
+    public void searchItem(String keyword, String category, boolean dateSort, boolean asc);
 
 }
 

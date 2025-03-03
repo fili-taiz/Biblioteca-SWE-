@@ -1,10 +1,10 @@
 import java.time.LocalDate;
 
 public class Reservation {
-    LocalDate reservationDate;
-    Hirer hirer;
-    Item item;
-    Biblioteca storagePlace;
+    private LocalDate reservationDate;
+    private Hirer hirer;
+    private Item item;
+    private Biblioteca storagePlace;
 
     public Reservation(LocalDate reservationDate, Hirer hirer, Item item, Biblioteca storagePlace){
         this.reservationDate = reservationDate;

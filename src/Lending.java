@@ -1,10 +1,10 @@
 import java.time.LocalDate;
 
 public class Lending {
-    LocalDate lendingDate;
-    Hirer hirer;
-    Item item;
-    Biblioteca storagePlace;
+    private LocalDate lendingDate;
+    private Hirer hirer;
+    private Item item;
+    private Biblioteca storagePlace;
 
     public Lending(LocalDate lendingDate, Hirer hirer, Item item, Biblioteca storagePlace){
         this.lendingDate = lendingDate;
@@ -13,13 +13,13 @@ public class Lending {
         this.storagePlace = storagePlace;
     }
 
-    public LocalDate get_lending_date(){ return this.lendingDate; }
-    public Hirer get_hirer(){ return this.hirer; }
+    public LocalDate getLendingDate(){ return this.lendingDate; }
+    public Hirer getHirer(){ return this.hirer; }
     public Item getItem(){ return this.item; }
     public Biblioteca getStoragePlace(){ return storagePlace; }
 
-    public void set_lending_date(LocalDate newLendingDate) { this.lendingDate = lendingDate; }
-    public void set_hirer(Hirer newHirer){ this.hirer = hirer; }
+    public void setLendingDate(LocalDate newLendingDate) { this.lendingDate = newLendingDate; }
+    public void setHirer(Hirer newHirer){ this.hirer = newHirer; }
     public void setItem(Item newItem){ this.item = newItem; }
 
 

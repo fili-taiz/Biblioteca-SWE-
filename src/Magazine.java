@@ -10,13 +10,13 @@ public class Magazine extends Item{
     }
 
 
-    public String get_publishing_house_magazine(){ return this.publishingHouseMagazine; }
+    public String getPublishingHouseMagazine(){ return this.publishingHouseMagazine; }
 
-    public void set_publishing_house_magazine(String newPublishingHouseMagazine){ this.publishingHouseMagazine = newPublishingHouseMagazine; }
+    public void setPublishingHouseMagazine(String newPublishingHouseMagazine){ this.publishingHouseMagazine = newPublishingHouseMagazine; }
 
 
-    public void update_magazine(Magazine newMagazine){
-        update_item(newMagazine);
+    public void updateMagazine(Magazine newMagazine){
+        updateItem(newMagazine);
         this.publishingHouseMagazine = newMagazine.publishingHouseMagazine;
     }
 

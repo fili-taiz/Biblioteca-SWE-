@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class Thesis extends Item {
     String author;
@@ -14,16 +13,16 @@ public class Thesis extends Item {
     }
 
 
-    public String get_author(){ return this.author; }
-    public String get_supervisors(){ return this.supervisors; }
-    public String get_university(){ return this.university; }
+    public String getAuthor(){ return this.author; }
+    public String getSupervisors(){ return this.supervisors; }
+    public String getUniversity(){ return this.university; }
 
-    public void set_author(String newAuthor){ this.author = newAuthor; }
-    public void set_supervisors(String newSupervisors){ this.supervisors = newSupervisors; }
-    public void set_university(String newUniversity){ this.university = newUniversity; }
+    public void setAuthor(String newAuthor){ this.author = newAuthor; }
+    public void setSupervisors(String newSupervisors){ this.supervisors = newSupervisors; }
+    public void setUniversity(String newUniversity){ this.university = newUniversity; }
 
-    public void update_thesis(Thesis newThesis){
-        update_item(newThesis);
+    public void updateThesis(Thesis newThesis){
+        updateItem(newThesis);
         this.author = newThesis.author;
         this.supervisors = newThesis.supervisors;
         this.university = newThesis.university;
