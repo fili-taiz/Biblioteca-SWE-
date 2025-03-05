@@ -1,17 +1,23 @@
+package domain_model;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Admin {
-    private final String userCode;
-    private final String username;
-    private final String name;
-    private final String surname;
-    private final String eMail;
-    private final String telephoneNumber;
-    private final Biblioteca workingPlace;
-    private final Catalogue catalogue;
-    private final ListOfHirers list_of_hirers;
+    private /*final*/ String userCode;
+    private /*final*/ String username;
+    private /*final*/ String name;
+    private /*final*/ String surname;
+    private /*final*/ String eMail;
+    private /*final*/ String telephoneNumber;
+    private /*final*/ Biblioteca workingPlace;
+    private /*final*/ Catalogue catalogue;
+    private /*final*/ ListOfHirers list_of_hirers;
 
+    public Admin() {
+        /*Da cancellare */
+    }
+    
     public Admin(String userCode, String username, String name, String surname, String eMail, String telephoneNumber, Biblioteca workingPlace, Catalogue catalogue, ListOfHirers list_of_hirers) {
         this.userCode = userCode;
         this.username = username;
@@ -105,7 +111,7 @@ public class Admin {
 
     }
 
-    public void confirmReservation(Hirer hirer, Item item, LocalDate reservationDate) {
+    public void confirmReservationWithdraw(Hirer hirer, Item item, LocalDate reservationDate) {
         if (item.getNumberOfAvailableCopies(this.workingPlace, item) > 1) {
             Reservation reservation = new Reservation(reservationDate, hirer, item, this.workingPlace);
             hirer.getReservations().add(reservation);
@@ -116,6 +122,14 @@ public class Admin {
         l.getItem().removeLending(l);
         l.getHirer().getLendings().remove(l);
 
+    }
+
+    public void updateItem(Item originalItem, Item newItem){
+        originalItem.updateItem(newItem);
+    }
+
+    public ArrayList<Item> searchItem(String keyWord, String category, boolean dateSort, boolean asc){
+        return null;
     }
 }
 

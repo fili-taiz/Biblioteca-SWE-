@@ -1,9 +1,14 @@
+package domain_model;
 import java.time.LocalDate;
 
 public class Thesis extends Item {
     String author;
     String supervisors;
     String university;
+
+    public Thesis() {
+        /*Da cancellare */
+    }
 
     public Thesis(String code, String title, LocalDate publicationDate, String language, String category, String link, boolean isBorrowable, String author, String supervisors, String university){
         super(code, title, publicationDate, language, category, link, isBorrowable);
@@ -28,6 +33,9 @@ public class Thesis extends Item {
         this.university = newThesis.university;
     }
 
-
+    @Override
+    public void updateItem(Item item){
+        
+    }
 
 }

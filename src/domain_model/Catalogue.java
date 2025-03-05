@@ -1,10 +1,11 @@
+package domain_model;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 public class Catalogue implements CatalogueSearchable{
     ArrayList<Item> items;
     @Override
-    public void searchItem(String keyword, String category, boolean dateSort, boolean asc){
+    public ArrayList<Item> searchItem(String keyword, String category, boolean dateSort, boolean asc){
         ArrayList<Item> result = new ArrayList<>();
         for(Item i: this.items){
             if(i.getTitle().equals(keyword) && i.getCategory().equals(category)){
@@ -20,7 +21,10 @@ public class Catalogue implements CatalogueSearchable{
         } else{
             items.sort(Comparator.comparing(Item::getTitle).reversed());
         }
+        /*messo per non avere Error */
+        return null;
     }
+
 
     public void addItem(Item item){
         items.add(item);

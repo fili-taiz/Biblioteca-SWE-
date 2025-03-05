@@ -1,11 +1,16 @@
+package domain_model;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class Book extends Item{
     String isbn;
     String publishingHouseBook;
     int numberOfPages;
     String authors;
+
+    public Book() {
+        /*Da cancellare */
+    }
 
     public Book(String code, String title, LocalDate publicationDate, String language, String category, String link, boolean isBorrowable, String isbn, String publishingHouseBook, int numberOfPages, String authors){
         super(code, title, publicationDate, language, category, link, isBorrowable);
@@ -34,6 +39,11 @@ public class Book extends Item{
         this.publishingHouseBook = newBook.publishingHouseBook;
         this.numberOfPages = newBook.numberOfPages;
         this.authors = newBook.authors;
+    }
+
+    @Override
+    public void updateItem(Item item){
+        
     }
 
 

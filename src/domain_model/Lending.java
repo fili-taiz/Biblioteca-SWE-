@@ -1,3 +1,4 @@
+package domain_model;
 import java.time.LocalDate;
 
 public class Lending {
@@ -6,6 +7,10 @@ public class Lending {
     private Item item;
     private Biblioteca storagePlace;
 
+    public Lending() {
+        /*Da cancellare */
+    }
+    
     public Lending(LocalDate lendingDate, Hirer hirer, Item item, Biblioteca storagePlace){
         this.lendingDate = lendingDate;
         this.hirer = hirer;

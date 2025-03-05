@@ -1,11 +1,8 @@
+package domain_model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-enum Biblioteca{
-    BIBLIOTECA_1, BIBLIOTECA_2, BIBLIOTECA_3, BIBLIOTECA_4, BIBLIOTECA_5
-}
-
-abstract class Item {
+public abstract class Item {
     private String code;
     private String title;
     private LocalDate publicationDate;
@@ -16,6 +13,10 @@ abstract class Item {
     private HashMap<Biblioteca, Integer> physicalCopies = new HashMap<>();
     private ArrayList<Lending> lendings = new ArrayList<>();
     private ArrayList<Reservation> reservations = new ArrayList<>();
+
+    public Item() {
+        /*Da cancellare */
+    }
 
     public Item(String code, String title, LocalDate publicationDate, String language, String category, String link, boolean isBorrowable) {
         this.code = code;

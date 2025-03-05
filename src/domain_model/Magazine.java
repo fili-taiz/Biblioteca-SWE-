@@ -1,8 +1,13 @@
+package domain_model;
 import java.time.LocalDate;
 
 
 public class Magazine extends Item{
     String publishingHouseMagazine;
+
+    public Magazine() {
+        /*Da cancellare */
+    }
 
     public Magazine(String code, String title, LocalDate publicationDate, String language, String category, String link, boolean isBorrowable, String publishingHouseMagazine){
         super(code, title, publicationDate, language, category, link, isBorrowable);
@@ -20,6 +25,9 @@ public class Magazine extends Item{
         this.publishingHouseMagazine = newMagazine.publishingHouseMagazine;
     }
 
-
+    @Override
+    public void updateItem(Item item){
+        
+    }
 
 }

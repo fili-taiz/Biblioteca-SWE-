@@ -1,3 +1,4 @@
+package domain_model;
 import java.time.LocalDate;
 
 public class Reservation {
@@ -5,6 +6,10 @@ public class Reservation {
     private Hirer hirer;
     private Item item;
     private Biblioteca storagePlace;
+
+    public Reservation() {
+        /*Da cancellare */
+    }
 
     public Reservation(LocalDate reservationDate, Hirer hirer, Item item, Biblioteca storagePlace){
         this.reservationDate = reservationDate;
