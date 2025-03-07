@@ -18,7 +18,7 @@ public class HirerController {
         return hirer.searchItem(keyWord, category, dateSort, asc);
     }
 
-    public boolean reserveItem(Hirer hirer, Item item, Biblioteca storagePlace){
+    public boolean reserveItem(Hirer hirer, Item item, Library storagePlace){
         return hirer.reservePhysicalCopy(item, storagePlace);
     }
 

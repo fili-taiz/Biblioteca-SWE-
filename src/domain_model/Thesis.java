@@ -6,12 +6,10 @@ public class Thesis extends Item {
     String supervisors;
     String university;
 
-    public Thesis() {
-        /*Da cancellare */
-    }
+    public Thesis(){}
 
-    public Thesis(String code, String title, LocalDate publicationDate, String language, String category, String link, boolean isBorrowable, String author, String supervisors, String university){
-        super(code, title, publicationDate, language, category, link, isBorrowable);
+    public Thesis(String code, String title, LocalDate publicationDate, Language language, Category category, String link, String author, String supervisors, String university){
+        super(code, title, publicationDate, language, category, link, false);
         this.author = author;
         this.supervisors = supervisors;
         this.university = university;
@@ -26,16 +24,25 @@ public class Thesis extends Item {
     public void setSupervisors(String newSupervisors){ this.supervisors = newSupervisors; }
     public void setUniversity(String newUniversity){ this.university = newUniversity; }
 
-    public void updateThesis(Thesis newThesis){
-        updateItem(newThesis);
-        this.author = newThesis.author;
-        this.supervisors = newThesis.supervisors;
-        this.university = newThesis.university;
+    @Override
+    public boolean updateItem(Item newItem){
+        if (newItem instanceof Thesis){
+            super.updateItem(newItem);
+            this.setAuthor(((Thesis) newItem).getAuthor());
+            this.setSupervisors(((Thesis) newItem).getSupervisors());
+            this.setUniversity(((Thesis) newItem).getUniversity());
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void updateItem(Item item){
-        
+    public boolean equals(Object o){
+        if(super.equals(o)){
+            Thesis t = (Thesis) o;
+            return this.author.equals(t.author) && this.supervisors.equals(t.supervisors) && this.university.equals(t.university);
+        }
+        return false;
     }
 
 }

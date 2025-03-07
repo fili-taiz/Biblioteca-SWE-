@@ -2,7 +2,7 @@ package domain_model;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class Catalogue implements CatalogueSearchable{
+public class Catalogue implements SearchableCatalogue{
     ArrayList<Item> items;
     @Override
     public ArrayList<Item> searchItem(String keyword, String category, boolean dateSort, boolean asc){

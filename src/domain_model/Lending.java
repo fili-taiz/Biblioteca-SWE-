@@ -5,13 +5,13 @@ public class Lending {
     private LocalDate lendingDate;
     private Hirer hirer;
     private Item item;
-    private Biblioteca storagePlace;
+    private Library storagePlace;
 
     public Lending() {
         /*Da cancellare */
     }
     
-    public Lending(LocalDate lendingDate, Hirer hirer, Item item, Biblioteca storagePlace){
+    public Lending(LocalDate lendingDate, Hirer hirer, Item item, Library storagePlace){
         this.lendingDate = lendingDate;
         this.hirer = hirer;
         this.item = item;
@@ -21,7 +21,7 @@ public class Lending {
     public LocalDate getLendingDate(){ return this.lendingDate; }
     public Hirer getHirer(){ return this.hirer; }
     public Item getItem(){ return this.item; }
-    public Biblioteca getStoragePlace(){ return storagePlace; }
+    public Library getStoragePlace(){ return storagePlace; }
 
     public void setLendingDate(LocalDate newLendingDate) { this.lendingDate = newLendingDate; }
     public void setHirer(Hirer newHirer){ this.hirer = newHirer; }

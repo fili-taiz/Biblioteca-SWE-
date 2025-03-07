@@ -10,7 +10,7 @@ public class Hirer {
     private String telephoneNumber;
     private ArrayList<Lending> lendings = new ArrayList<>();
     private ArrayList<Reservation> reservations = new ArrayList<>();
-    private CatalogueSearchable searchableCatalogue = new Catalogue();
+    private SearchableCatalogue searchableCatalogue = new Catalogue();
     
     public Hirer() {
         /*Da cancellare */
@@ -29,7 +29,7 @@ public class Hirer {
         return searchableCatalogue.searchItem(keyWord, category, dateSort, asc);
     }
 
-    public boolean reservePhysicalCopy(Item item, Biblioteca storagePlace){
+    public boolean reservePhysicalCopy(Item item, Library storagePlace){
 
         return false;
     }

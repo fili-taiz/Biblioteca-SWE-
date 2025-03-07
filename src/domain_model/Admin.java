@@ -4,21 +4,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Admin {
-    private /*final*/ String userCode;
-    private /*final*/ String username;
-    private /*final*/ String name;
-    private /*final*/ String surname;
-    private /*final*/ String eMail;
-    private /*final*/ String telephoneNumber;
-    private /*final*/ Biblioteca workingPlace;
-    private /*final*/ Catalogue catalogue;
-    private /*final*/ ListOfHirers list_of_hirers;
+    private String userCode;
+    private String username;
+    private String name;
+    private String surname;
+    private String eMail;
+    private String telephoneNumber;
+    private Library workingPlace;
+    private Catalogue catalogue;
+    private ListOfHirers list_of_hirers;
 
-    public Admin() {
-        /*Da cancellare */
-    }
+    public Admin(){}
+
     
-    public Admin(String userCode, String username, String name, String surname, String eMail, String telephoneNumber, Biblioteca workingPlace, Catalogue catalogue, ListOfHirers list_of_hirers) {
+    public Admin(String userCode, String username, String name, String surname, String eMail, String telephoneNumber, Library workingPlace, Catalogue catalogue, ListOfHirers list_of_hirers) {
         this.userCode = userCode;
         this.username = username;
         this.name = name;
@@ -30,26 +29,8 @@ public class Admin {
         this.list_of_hirers = list_of_hirers;
     }
 
-    public boolean modifyItem(int i, Item oldItem, String newCode, String newTitle, LocalDate newPublicationDate, boolean newIsBorrowable, String newLanguage, String newCategory, String newLink, String newPublishingHouseMagazine, String newAuthor, String newSupervisors, String newUniversity, String newIsbn, String newPublishingHouseBook, int newNumberOfPages, String newAuthors) { // i = 1 Magazine, i = 2 Thesis, i = 3 Book
-        switch (i) {
-            case 1:
-                Magazine oldMagazine = (Magazine) oldItem;
-                Magazine newMagazine = new Magazine(newCode, newTitle, newPublicationDate, newLanguage, newCategory, newLink, newIsBorrowable, newPublishingHouseMagazine);
-                oldMagazine.updateMagazine(newMagazine);
-                return true;
-            case 2:
-                Thesis oldThesis = (Thesis) oldItem;
-                Thesis newThesis = new Thesis(newCode, newTitle, newPublicationDate, newLanguage, newCategory, newLink, newIsBorrowable, newAuthor, newSupervisors, newUniversity);
-                oldThesis.updateThesis(newThesis);
-                return true;
-            case 3:
-                Book oldBook = (Book) oldItem;
-                Book newBook = new Book(newCode, newTitle, newPublicationDate, newLanguage, newCategory, newLink, newIsBorrowable, newIsbn, newPublishingHouseBook, newNumberOfPages, newAuthors);
-                oldBook.updateBook(newBook);
-                return true;
-        }
-
-        return false;
+    public void modifyItem(Item oldItem, Item newItem){
+        oldItem.updateItem(newItem);
     }
 
     public void addItem(Item item) {
@@ -65,7 +46,7 @@ public class Admin {
     }
 
     public void setNumberOfCopies(Item item, int newN) {
-        for(Biblioteca b : item.getPhysicalCopies().keySet()){
+        for(Library b : item.getPhysicalCopies().keySet()){
             if(b == this.workingPlace){
                 item.setNumberOfCopies(b, newN);
             }
@@ -74,7 +55,7 @@ public class Admin {
 
 
     public void increaseNumberOfCopies(Item item) {
-        for(Biblioteca b : item.getPhysicalCopies().keySet()){
+        for(Library b : item.getPhysicalCopies().keySet()){
             if(b == this.workingPlace){
                 item.setNumberOfCopies(b, item.getPhysicalCopies().get(b)+1);
             }
@@ -83,7 +64,7 @@ public class Admin {
 
 
     public void decreaseNumberOfCopies(Item item) {
-        for(Biblioteca b : item.getPhysicalCopies().keySet()){
+        for(Library b : item.getPhysicalCopies().keySet()){
             if(b == this.workingPlace){
                 item.setNumberOfCopies(b, item.getPhysicalCopies().get(b)-1);
             }
@@ -129,7 +110,28 @@ public class Admin {
     }
 
     public ArrayList<Item> searchItem(String keyWord, String category, boolean dateSort, boolean asc){
-        return null;
+        return this.catalogue.searchItem(keyWord, category, dateSort, asc);
     }
+
+    public String getUserCode() { return userCode; }
+    public String getUsername() { return username; }
+    public String getName() { return name; }
+    public String getSurname() { return surname; }
+    public String getEMail() { return eMail; }
+    public String getTelephoneNumber() { return telephoneNumber; }
+    public Library getWorkingPlace() { return workingPlace; }
+    public Catalogue getCatalogue() { return catalogue; }
+    public ListOfHirers getList_of_hirers() { return list_of_hirers; }
+
+
+    public void setUserCode(String userCode) { this.userCode = userCode; }
+    public void setUsername(String username) { this.username = username; }
+    public void setName(String name) { this.name = name; }
+    public void setSurname(String surname) { this.surname = surname; }
+    public void setEMail(String eMail) { this.eMail = eMail; }
+    public void setTelephoneNumber(String telephoneNumber) { this.telephoneNumber = telephoneNumber; }
+    public void setWorkingPlace(Library workingPlace) { this.workingPlace = workingPlace; }
+    public void setCatalogue(Catalogue catalogue) { this.catalogue = catalogue; }
+    public void setListOfHirers(ListOfHirers list_of_hirers) { this.list_of_hirers = list_of_hirers; }
 }
 

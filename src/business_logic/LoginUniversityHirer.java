@@ -4,8 +4,8 @@ import domain_model.Hirer;
 import orm.HirerDAO;
 
 public class LoginUniversityHirer {
-    public Hirer login(String userName, String password){
+    public Hirer login(String username, String password){
         HirerDAO hirerDAO = new HirerDAO();
-        return hirerDAO.login(userName, password);
+        return hirerDAO.login(username, password);
     }
 }

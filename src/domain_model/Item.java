@@ -6,19 +6,15 @@ public abstract class Item {
     private String code;
     private String title;
     private LocalDate publicationDate;
-    private String language;
-    private String category;
+    private Language language;
+    private Category category;
     private String link;
     private boolean isBorrowable;
-    private HashMap<Biblioteca, Integer> physicalCopies = new HashMap<>();
+    private HashMap<Library, Integer> physicalCopies = new HashMap<>();
     private ArrayList<Lending> lendings = new ArrayList<>();
     private ArrayList<Reservation> reservations = new ArrayList<>();
 
-    public Item() {
-        /*Da cancellare */
-    }
-
-    public Item(String code, String title, LocalDate publicationDate, String language, String category, String link, boolean isBorrowable) {
+    public Item(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean isBorrowable) {
         this.code = code;
         this.title = title;
         this.publicationDate = publicationDate;
@@ -28,12 +24,30 @@ public abstract class Item {
         this.isBorrowable = isBorrowable;
     }
 
+    public Item(){}
 
-    public void addMagazine(Biblioteca library, int numberOfCopies){
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        Item item = (Item) o;
+        return this.code.equals(item.code) && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link) && this.isBorrowable == item.isBorrowable;
+    }
+
+
+    public void gettt(){
+        System.out.println(getClass());
+    }
+
+    public void addMagazine(Library library, int numberOfCopies){
         physicalCopies.put(library, numberOfCopies);
     }
 
-    public int getNumberOfLend(Biblioteca library, Item item){
+    public int getNumberOfLend(Library library, Item item){
         int n = 0;
         for(Lending l: lendings){
             if(l.getStoragePlace().equals(library) && l.getItem() == item){
@@ -43,7 +57,7 @@ public abstract class Item {
         return n;
     }
 
-    public int getNumberOfRes(Biblioteca library, Item item){
+    public int getNumberOfRes(Library library, Item item){
         int n = 0;
         for(Reservation r: reservations){
             if(r.getStoragePlace().equals(library) && r.getItem() == item){
@@ -53,11 +67,11 @@ public abstract class Item {
         return n;
     }
 
-    public int getNumberOfAvailableCopies(Biblioteca library, Item item){
+    public int getNumberOfAvailableCopies(Library library, Item item){
         return physicalCopies.get(library) - getNumberOfLend(library, item) - getNumberOfRes(library, item);
     }
 
-    public void removeMagazine(Biblioteca library){
+    public void removeMagazine(Library library){
         physicalCopies.remove(library);
     }
 
@@ -78,7 +92,7 @@ public abstract class Item {
         reservations.remove(r);
     }
 
-    public void updateItem(Item newItem){
+    public boolean updateItem(Item newItem){
         this.code = newItem.code;
         this.title = newItem.title;
         this.publicationDate = newItem.publicationDate;
@@ -86,10 +100,11 @@ public abstract class Item {
         this.category = newItem.category;
         this.link = newItem.link;
         this.isBorrowable = newItem.isBorrowable;
+        return true;
     }
 
-    public void setNumberOfCopies(Biblioteca library, int newN){
-        for(Biblioteca b : physicalCopies.keySet()){
+    public void setNumberOfCopies(Library library, int newN){
+        for(Library b : physicalCopies.keySet()){
             if(library == b){
                 physicalCopies.replace(b, newN);
             }
@@ -99,19 +114,19 @@ public abstract class Item {
     public String getCode(){ return this.code;}
     public String getTitle(){ return this.title;}
     public LocalDate getPublicationDate(){ return this.publicationDate;}
-    public String getLanguage(){ return this.language;}
-    public String getCategory(){ return this.category;}
+    public Language getLanguage(){ return this.language;}
+    public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
     public boolean getIsBorrowable(){ return this.isBorrowable;}
-    public HashMap<Biblioteca, Integer> getPhysicalCopies(){ return this.physicalCopies; }
+    public HashMap<Library, Integer> getPhysicalCopies(){ return this.physicalCopies; }
     public ArrayList<Lending> getLendings(){ return this.lendings; }
     public ArrayList<Reservation> getReservations(){ return this.reservations; }
 
     public void setCode(String newCode){ this.code = newCode; }
     public void setTitle(String newTitle){ this.title = newTitle; }
     public void setPublicationDate(LocalDate newPublicationDate){ this.publicationDate = newPublicationDate; }
-    public void setLanguage(String newLanguage){ this.language = newLanguage; }
-    public void setCategory(String newCategory){ this.category = newCategory;}
+    public void setLanguage(Language newLanguage){ this.language = newLanguage; }
+    public void setCategory(Category newCategory){ this.category = newCategory;}
     public void setLink(String newLink){ this.link = newLink;}
     public void setIsBorrowable(boolean newIsBorrowable){ this.isBorrowable = newIsBorrowable; }
     public void setLendings(ArrayList<Lending> newLendings){ this.lendings = newLendings; }

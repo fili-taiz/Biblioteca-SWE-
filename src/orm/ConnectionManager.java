@@ -25,8 +25,7 @@ public class ConnectionManager {
         try {
             Statement statement = getConnection().createStatement();
 
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
                 System.out.println("Id: " + resultSet.getString("userCode")

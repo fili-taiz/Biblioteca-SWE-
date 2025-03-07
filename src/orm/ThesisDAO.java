@@ -14,8 +14,7 @@ public class ThesisDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -32,8 +31,7 @@ public class ThesisDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -50,8 +48,7 @@ public class ThesisDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -68,8 +65,7 @@ public class ThesisDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 

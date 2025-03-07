@@ -14,8 +14,7 @@ public class AdminDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -32,8 +31,7 @@ public class AdminDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 

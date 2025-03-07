@@ -10,12 +10,11 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public Lending getLending(String itemCode, Biblioteca biblioteca, String hirerCode){
+    public Lending getLending(String itemCode, Library LIBRARY, String hirerCode){
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -32,8 +31,7 @@ public class LendingDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -50,8 +48,7 @@ public class LendingDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -68,8 +65,7 @@ public class LendingDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 

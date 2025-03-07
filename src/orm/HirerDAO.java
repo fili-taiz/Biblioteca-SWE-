@@ -14,8 +14,7 @@ public class HirerDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -37,8 +36,7 @@ public class HirerDAO {
         try {
             String query = "query ricerca un utente da codice";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -54,8 +52,7 @@ public class HirerDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
@@ -90,8 +87,7 @@ public class HirerDAO {
         try {
             String query = "query";
             Statement statement = connection.createStatement();
-            ResultSet resultSet;
-            resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
 
             resultSet.next();
 
