@@ -39,15 +39,10 @@ public abstract class Item {
     }
 
 
-    public void gettt(){
-        System.out.println(getClass());
-    }
-
-    public void addMagazine(Library library, int numberOfCopies){
-        physicalCopies.put(library, numberOfCopies);
-    }
-
-    public int getNumberOfLend(Library library, Item item){
+    public int getNumberOfLendings(Library library, Item item){
+        if(item instanceof Thesis){
+            return 0;
+        }
         int n = 0;
         for(Lending l: lendings){
             if(l.getStoragePlace().equals(library) && l.getItem() == item){
@@ -57,7 +52,10 @@ public abstract class Item {
         return n;
     }
 
-    public int getNumberOfRes(Library library, Item item){
+    public int getNumberOfReservation(Library library, Item item){
+        if(item instanceof Thesis){
+            return 0;
+        }
         int n = 0;
         for(Reservation r: reservations){
             if(r.getStoragePlace().equals(library) && r.getItem() == item){
@@ -68,13 +66,11 @@ public abstract class Item {
     }
 
     public int getNumberOfAvailableCopies(Library library, Item item){
-        return physicalCopies.get(library) - getNumberOfLend(library, item) - getNumberOfRes(library, item);
+        if(item instanceof Thesis) {
+            return 1;
+        }
+        return physicalCopies.get(library) - getNumberOfLendings(library, item) - getNumberOfReservation(library, item);
     }
-
-    public void removeMagazine(Library library){
-        physicalCopies.remove(library);
-    }
-
 
     public void addLending(Lending l){
         lendings.add(l);
@@ -92,21 +88,21 @@ public abstract class Item {
         reservations.remove(r);
     }
 
-    public boolean updateItem(Item newItem){
-        this.code = newItem.code;
-        this.title = newItem.title;
-        this.publicationDate = newItem.publicationDate;
-        this.language = newItem.language;
-        this.category = newItem.category;
-        this.link = newItem.link;
-        this.isBorrowable = newItem.isBorrowable;
+    public boolean updateItem(Item new_item){
+        this.code = new_item.code;
+        this.title = new_item.title;
+        this.publicationDate = new_item.publicationDate;
+        this.language = new_item.language;
+        this.category = new_item.category;
+        this.link = new_item.link;
+        this.isBorrowable = new_item.isBorrowable;
         return true;
     }
 
-    public void setNumberOfCopies(Library library, int newN){
+    public void setNumberOfCopies(Library library, int new_n){
         for(Library b : physicalCopies.keySet()){
             if(library == b){
-                physicalCopies.replace(b, newN);
+                physicalCopies.replace(b, new_n);
             }
         }
     }

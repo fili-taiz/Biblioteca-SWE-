@@ -25,12 +25,12 @@ public class Thesis extends Item {
     public void setUniversity(String newUniversity){ this.university = newUniversity; }
 
     @Override
-    public boolean updateItem(Item newItem){
-        if (newItem instanceof Thesis){
-            super.updateItem(newItem);
-            this.setAuthor(((Thesis) newItem).getAuthor());
-            this.setSupervisors(((Thesis) newItem).getSupervisors());
-            this.setUniversity(((Thesis) newItem).getUniversity());
+    public boolean updateItem(Item new_item){
+        if (new_item instanceof Thesis){
+            super.updateItem(new_item);
+            this.setAuthor(((Thesis) new_item).getAuthor());
+            this.setSupervisors(((Thesis) new_item).getSupervisors());
+            this.setUniversity(((Thesis) new_item).getUniversity());
             return true;
         }
         return false;

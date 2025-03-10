@@ -23,19 +23,16 @@ public class Magazine extends Item{
 
 
     @Override
-    public boolean updateItem(Item newItem){
-        if (newItem instanceof Magazine){
-            super.updateItem(newItem);
-            this.setPublishingHouseMagazine(((Magazine)newItem).getPublishingHouseMagazine());
+    public boolean updateItem(Item new_item){
+        if (new_item instanceof Magazine){
+            super.updateItem(new_item);
+            this.setPublishingHouseMagazine(((Magazine)new_item).getPublishingHouseMagazine());
             return true;
         }
         return false;
     }
 
-    @Override
-    public void gettt(){
-        super.gettt();
-    }
+
 
     @Override
     public boolean equals(Object o){

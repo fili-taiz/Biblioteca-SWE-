@@ -2,27 +2,17 @@ package domain_model;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class Catalogue implements SearchableCatalogue{
+public class Catalogue{
     ArrayList<Item> items;
-    @Override
-    public ArrayList<Item> searchItem(String keyword, String category, boolean dateSort, boolean asc){
+
+    public ArrayList<Item> searchItem(String keyword, Category category) {
         ArrayList<Item> result = new ArrayList<>();
-        for(Item i: this.items){
-            if(i.getTitle().equals(keyword) && i.getCategory().equals(category)){
+        for (Item i : this.items) {
+            if (i.getTitle().equals(keyword) && i.getCategory().equals(category)) {
                 result.add(i);
             }
         }
-        if(dateSort){
-            items.sort(Comparator.comparing(Item::getPublicationDate));
-        }
-
-        if(asc){
-            items.sort(Comparator.comparing(Item::getTitle));
-        } else{
-            items.sort(Comparator.comparing(Item::getTitle).reversed());
-        }
-        /*messo per non avere Error */
-        return null;
+        return result;
     }
 
 
