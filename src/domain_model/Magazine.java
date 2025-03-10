@@ -1,18 +1,14 @@
 package domain_model;
 import java.time.LocalDate;
-import java.util.Objects;
 
 
 public class Magazine extends Item{
     String publishing_house_magazine;
 
-    public Magazine(){
-
-    }
 
 
-    public Magazine(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean isBorrowable, String publishing_house_magazine){
-        super(code, title, publicationDate, language, category, link, isBorrowable);
+    public Magazine(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable, String publishing_house_magazine){
+        super(code, title, publicationDate, language, category, link, borrowable);
         this.publishing_house_magazine = publishing_house_magazine;
     }
 

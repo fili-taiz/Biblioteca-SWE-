@@ -1,8 +1,8 @@
 package domain_model;
 
 public class UserProfile {
-    String username;
-    String password;
+    private String username;
+    private String password;
 
     public UserProfile(String username, String password){
         this.username = username;

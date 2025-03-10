@@ -9,15 +9,14 @@ public class Book extends Item{
     String authors;
 
 
-    public Book(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean isBorrowable, String isbn, String publishing_house_book, int number_of_pages, String authors){
-        super(code, title, publicationDate, language, category, link, isBorrowable);
+    public Book(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable, String isbn, String publishing_house_book, int number_of_pages, String authors){
+        super(code, title, publicationDate, language, category, link, borrowable);
         this.isbn = isbn;
         this.publishing_house_book = publishing_house_book;
         this.number_of_pages = number_of_pages;
         this.authors = authors;
     }
 
-    public Book(){}
 
 
 

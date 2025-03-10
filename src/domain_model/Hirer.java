@@ -1,4 +1,5 @@
 package domain_model;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Hirer extends SoftwareUser{
@@ -15,14 +16,12 @@ public class Hirer extends SoftwareUser{
     }
 
     public boolean reservePhysicalCopy(Item item, Library storagePlace){
-
-        return false;
+        Reservation r = new Reservation(LocalDate.now(), this, item, storagePlace);
+        return reservations.add(r) && item.addReservation(r);
     }
 
     public ArrayList<Lending> getLendings() { return lendings; }
     public ArrayList<Reservation> getReservations() { return reservations; }
 
-    public void setLendings(ArrayList<Lending> lendings) { this.lendings = lendings; }
-    public void setReservations(ArrayList<Reservation> reservations) { this.reservations = reservations; }
 
 }

@@ -3,28 +3,28 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 public abstract class Item {
-    private String code;
-    private String title;
-    private LocalDate publicationDate;
-    private Language language;
-    private Category category;
-    private String link;
-    private boolean isBorrowable;
-    private HashMap<Library, Integer> physicalCopies = new HashMap<>();
-    private ArrayList<Lending> lendings = new ArrayList<>();
-    private ArrayList<Reservation> reservations = new ArrayList<>();
+    String code;
+    String title;
+    LocalDate publicationDate;
+    Language language;
+    Category category;
+    String link;
+    boolean borrowable;
+    HashMap<Library, Integer> physicalCopies = new HashMap<>();
+    ArrayList<Lending> lendings = new ArrayList<>();
+    ArrayList<Reservation> reservations = new ArrayList<>();
 
-    public Item(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean isBorrowable) {
+    public Item(String code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable) {
         this.code = code;
         this.title = title;
         this.publicationDate = publicationDate;
         this.language = language;
         this.category = category;
         this.link = link;
-        this.isBorrowable = isBorrowable;
+        this.borrowable = borrowable;
     }
 
-    public Item(){}
+
 
     @Override
     public boolean equals(Object o) {
@@ -35,7 +35,7 @@ public abstract class Item {
             return false;
         }
         Item item = (Item) o;
-        return this.code.equals(item.code) && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link) && this.isBorrowable == item.isBorrowable;
+        return this.code.equals(item.code) && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link) && this.borrowable == item.borrowable;
     }
 
 
@@ -52,7 +52,7 @@ public abstract class Item {
         return n;
     }
 
-    public int getNumberOfReservation(Library library, Item item){
+    public int getNumberOfReservations(Library library, Item item){
         if(item instanceof Thesis){
             return 0;
         }
@@ -66,26 +66,32 @@ public abstract class Item {
     }
 
     public int getNumberOfAvailableCopies(Library library, Item item){
-        if(item instanceof Thesis) {
-            return 1;
+
+        return physicalCopies.get(library) - getNumberOfLendings(library, item) - getNumberOfReservations(library, item);
+    }
+
+    public boolean addLending(Lending l){
+        if(getNumberOfAvailableCopies(l.getStoragePlace(), l.getItem()) == 0){
+            return false;
         }
-        return physicalCopies.get(library) - getNumberOfLendings(library, item) - getNumberOfReservation(library, item);
-    }
-
-    public void addLending(Lending l){
         lendings.add(l);
+        return true;
     }
 
-    public void addReservation(Reservation r){
+    public boolean addReservation(Reservation r){
+        if(getNumberOfAvailableCopies(r.getStoragePlace(), r.getItem()) == 0){
+            return false;
+        }
         reservations.add(r);
+        return true;
     }
 
-    public void removeLending(Lending l){
-        lendings.remove(l);
+    public boolean removeLending(Lending l){
+        return lendings.remove(l);
     }
 
-    public void removeReservation(Reservation r){
-        reservations.remove(r);
+    public boolean removeReservation(Reservation r){
+        return reservations.remove(r);
     }
 
     public boolean updateItem(Item new_item){
@@ -95,17 +101,10 @@ public abstract class Item {
         this.language = new_item.language;
         this.category = new_item.category;
         this.link = new_item.link;
-        this.isBorrowable = new_item.isBorrowable;
+        this.borrowable = new_item.borrowable;
         return true;
     }
 
-    public void setNumberOfCopies(Library library, int new_n){
-        for(Library b : physicalCopies.keySet()){
-            if(library == b){
-                physicalCopies.replace(b, new_n);
-            }
-        }
-    }
 
     public String getCode(){ return this.code;}
     public String getTitle(){ return this.title;}
@@ -113,10 +112,7 @@ public abstract class Item {
     public Language getLanguage(){ return this.language;}
     public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
-    public boolean getIsBorrowable(){ return this.isBorrowable;}
-    public HashMap<Library, Integer> getPhysicalCopies(){ return this.physicalCopies; }
-    public ArrayList<Lending> getLendings(){ return this.lendings; }
-    public ArrayList<Reservation> getReservations(){ return this.reservations; }
+    public boolean isBorrowable(){ return this.borrowable;}
 
     public void setCode(String newCode){ this.code = newCode; }
     public void setTitle(String newTitle){ this.title = newTitle; }
@@ -124,8 +120,6 @@ public abstract class Item {
     public void setLanguage(Language newLanguage){ this.language = newLanguage; }
     public void setCategory(Category newCategory){ this.category = newCategory;}
     public void setLink(String newLink){ this.link = newLink;}
-    public void setIsBorrowable(boolean newIsBorrowable){ this.isBorrowable = newIsBorrowable; }
-    public void setLendings(ArrayList<Lending> newLendings){ this.lendings = newLendings; }
-    public void setReservations(ArrayList<Reservation> newReservations){ this.reservations = newReservations; }
+
 
 }

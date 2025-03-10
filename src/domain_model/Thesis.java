@@ -6,7 +6,6 @@ public class Thesis extends Item {
     String supervisors;
     String university;
 
-    public Thesis(){}
 
     public Thesis(String code, String title, LocalDate publicationDate, Language language, Category category, String link, String author, String supervisors, String university){
         super(code, title, publicationDate, language, category, link, false);

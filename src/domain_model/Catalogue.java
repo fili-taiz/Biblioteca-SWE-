@@ -1,6 +1,5 @@
 package domain_model;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class Catalogue{
     ArrayList<Item> items;
@@ -23,11 +22,5 @@ public class Catalogue{
     public void removeItem(Item item){
         items.remove(item);
     }
-
-    public Item getItem(Item item){
-        return items.get(items.indexOf(item));
-    }
-
-
 
 }

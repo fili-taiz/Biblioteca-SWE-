@@ -15,9 +15,6 @@ public class Admin extends SoftwareUser{
         this.list_of_hirers = list_of_hirers;
     }
 
-    public void modifyItem(Item old_item, Item new_item){
-        old_item.updateItem(new_item);
-    }
 
     public void addItem(Item item) {
         this.catalogue.addItem(item);
@@ -28,36 +25,39 @@ public class Admin extends SoftwareUser{
     }
 
 
-    public void setNumberOfCopies(Item item, int new_n) {
-        for(Library b : item.getPhysicalCopies().keySet()){
-            if(b == this.working_place){
-                item.setNumberOfCopies(b, new_n);
-            }
-        }
-    }
-
     public void addHirer(Hirer hirer) {
         list_of_hirers.addhirer(hirer);
     }
 
-    public void registerLending(Hirer hirer, Item item, LocalDate lending_date) {
-        if (item.getNumberOfAvailableCopies(this.working_place, item) > 1) {
-            Lending lending = new Lending(lending_date, hirer, item, this.working_place);
+    public void registerLending(Hirer hirer, Item item) {
+        if (item.getNumberOfAvailableCopies(this.working_place, item) > 1 && item.isBorrowable()) {
+            Lending lending = new Lending(LocalDate.now(), hirer, item, this.working_place);
             hirer.getLendings().add(lending);
+            item.addLending(lending);
         }
 
     }
 
-    public void confirmReservationWithdraw(Hirer hirer, Item item, LocalDate reservation_date) {
-        if (item.getNumberOfAvailableCopies(this.working_place, item) > 1) {
-            Reservation reservation = new Reservation(reservation_date, hirer, item, this.working_place);
-            hirer.getReservations().add(reservation);
+    public boolean confirmReservationWithdraw(Hirer hirer, Item item) {
+        if (item.getNumberOfAvailableCopies(this.working_place, item) > 1 && item.isBorrowable()) {
+            ArrayList<Reservation> rs = hirer.getReservations();
+            for (Reservation r : rs) {
+                if(r.getItem().equals(item) && r.getHirer().equals(hirer) && r.getStoragePlace().equals(this.working_place)){
+                    rs.remove(r);
+                    item.removeReservation(r);
+                    registerLending(hirer, item);
+                    return true;
+
+                }
+            }
         }
+        return false;
     }
 
     public void registerItemReturn(Lending l) {
         l.getItem().removeLending(l);
         l.getHirer().getLendings().remove(l);
+        l = null;
     }
 
     public void updateItem(Item original_item, Item new_item){
@@ -68,17 +68,5 @@ public class Admin extends SoftwareUser{
         return this.catalogue.searchItem(keyword, category);
     }
 
-
-    public Library getWorkingPlace() { return this.working_place; }
-    public Catalogue getCatalogue() { return this.catalogue; }
-    public ListOfHirers getList_of_hirers() { return this.list_of_hirers; }
-    public Item getItem(Item item) {
-        return this.catalogue.getItem(item);
-    }
-
-
-    public void setWorkingPlace(Library workingPlace) { this.working_place = workingPlace; }
-    public void setCatalogue(Catalogue catalogue) { this.catalogue = catalogue; }
-    public void setListOfHirers(ListOfHirers list_of_hirers) { this.list_of_hirers = list_of_hirers; }
 }
 
