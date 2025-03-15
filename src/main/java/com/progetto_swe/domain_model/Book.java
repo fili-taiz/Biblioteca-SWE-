@@ -16,9 +16,6 @@ public class Book extends Item{
         this.authors = authors;
     }
 
-
-
-
     public String getIsbn(){ return this.isbn; }
     public String getPublishingHouse(){ return this.publishingHouse; }
     public int getNumberOfPages(){ return this.numberOfPages; }

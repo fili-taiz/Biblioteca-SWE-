@@ -11,6 +11,7 @@ import com.progetto_swe.domain_model.Catalogue;
 import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.Library;
+import com.progetto_swe.domain_model.ListOfHirers;
 import com.progetto_swe.domain_model.UserProfile;
 
 public class AdminDAO {
@@ -87,6 +88,11 @@ public class AdminDAO {
         ThesisDAO thesisDAO = new ThesisDAO();
         newCatalogue.addAll(thesisDAO.getAllThesis());
         return new Catalogue(newCatalogue);
+    }
+
+    public ListOfHirers refreshHirers(){
+        HirerDAO hirerDAO = new HirerDAO();
+        return new ListOfHirers(hirerDAO.getAllHirers());
     }
 
     public Hirer updatAdmin(Admin admin){

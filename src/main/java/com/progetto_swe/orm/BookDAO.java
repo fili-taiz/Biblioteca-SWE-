@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.progetto_swe.domain_model.Book;
 import com.progetto_swe.domain_model.Category;
@@ -238,28 +239,64 @@ public class BookDAO {
         ArrayList<Item> result = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
-            String query 
+            String query
                     = "SELECT * "
                     + "FROM Item I JOIN Book B ON I.code = B.code";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            while(resultSet.next()){
-                Item i = new Book(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")), 
-                Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getBoolean("borrowable"), resultSet.getString("isbn"), 
-                resultSet.getString("publishingHouse"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
-                query 
-                    = "SELECT * "
-                    + "FROM Physical_copies P "
-                    + "WHERE P.code = " + resultSet.getInt("code");
-                    ResultSet copiesSet = statement.executeQuery(query);
-                    while(copiesSet.next()){
-                        i.addCopies(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
-                    }
-                    result.add(i);
+            while (resultSet.next()) {
+                Item i = new Book(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
+                        Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getBoolean("borrowable"), resultSet.getString("isbn"),
+                        resultSet.getString("publishing_house"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
+                query
+                        = "SELECT * "
+                        + "FROM Physical_copies P "
+                        + "WHERE P.code = " + resultSet.getInt("code");
+                ResultSet copiesSet = statement.executeQuery(query);
+                while (copiesSet.next()) {
+                    i.addCopies(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
+                }
+                result.add(i);
             }
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
         return result;
+    }
+
+    public HashMap<Library, Integer> getBookCopies(Statement statement, int code) {
+        HashMap<Library, Integer> copies = new HashMap<>();
+        connection = ConnectionManager.getConnection();
+        try {
+            String query
+                    = "SELECT * "
+                    + "FROM Physical_copies P "
+                    + "WHERE P.code = " + code;
+            ResultSet copiesSet = statement.executeQuery(query);
+            while (copiesSet.next()) {
+                copies.put(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
+            }
+            return copies;
+        } catch (SQLException e) {
+        }
+        return copies;
+    }
+
+    public HashMap<Library, Integer> getBookLendings(Statement statement, int code) {
+        HashMap<Library, Integer> copies = new HashMap<>();
+        connection = ConnectionManager.getConnection();
+        try {
+            String query
+                    = "SELECT * "
+                    + "FROM Physical_copies P "
+                    + "WHERE P.code = " + code;
+            ResultSet copiesSet = statement.executeQuery(query);
+            while (copiesSet.next()) {
+                copies.put(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
+            }
+            return copies;
+        } catch (SQLException e) {
+        }
+        return copies;
     }
 }

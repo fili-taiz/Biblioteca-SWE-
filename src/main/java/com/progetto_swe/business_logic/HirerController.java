@@ -9,6 +9,7 @@ import com.progetto_swe.domain_model.Lending;
 import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.domain_model.Reservation;
 import com.progetto_swe.orm.HirerDAO;
+import com.progetto_swe.orm.ReservationDAO;
 
 public class HirerController {
     Hirer hirer;
@@ -25,6 +26,8 @@ public class HirerController {
 
 
     public boolean reserveItem(Hirer hirer, Item item, Library storagePlace){
+        ReservationDAO reservationDAO = new ReservationDAO();
+        reservationDAO.addReservation(hirer.getUserCode(), item.getCode(), storagePlace.name());
         return hirer.reservePhysicalCopy(item, storagePlace);
     }
 

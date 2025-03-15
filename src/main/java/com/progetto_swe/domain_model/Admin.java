@@ -3,8 +3,6 @@ package com.progetto_swe.domain_model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import com.progetto_swe.orm.AdminDAO;
-
 public class Admin extends User{
     private final Library workingPlace;
     private Catalogue catalogue;
@@ -26,12 +24,9 @@ public class Admin extends User{
         return this.catalogue.addItem(item) && item.addCopies(workingPlace, numberOfCopies);
     }
 
-    public void removeItem(Item item) {
-        this.catalogue.removeItem(item);
-    }
-
-    public boolean removeCopies(int code, Library library) {
-        return this.catalogue.getItem(code).removeCopies(library);
+    //admin nonn può cancellare un book, magazine, thesis ma solo le copie presenti nella biblioteca in cui è presente
+    public boolean removeItem(int itemCode) {
+        return this.catalogue.removeCopies(itemCode, workingPlace);
     }
 
 
@@ -49,13 +44,13 @@ public class Admin extends User{
         }
 
         Lending lending = new Lending(LocalDate.now(), hirer, item, this.workingPlace);
-        hirer.addLending(lending);
+        hirer.getLendings().add(lending);
         item.addLending(lending);
         return true;
     }
 
     public boolean confirmReservationWithdraw(Reservation reservation) {
-        reservation.getHirer().removeReservation(reservation);
+        reservation.getHirer().getReservations().remove(reservation);
         reservation.getItem().removeReservation(reservation);
         registerLending(reservation.getHirer(), reservation.getItem());
         return false;
@@ -66,13 +61,11 @@ public class Admin extends User{
         l.getHirer().getLendings().remove(l);
     }
 
-    public boolean updateItem(Item original_item, Item new_item, int numberOfCopies){
-        return original_item.updateItem(new_item) && original_item.setCopies(workingPlace, numberOfCopies);
+    public boolean updateItem(Item originalItem, Item newItem, int numberOfCopies){
+        return originalItem.updateItem(newItem) && originalItem.setCopies(workingPlace, numberOfCopies);
     }
 
     public ArrayList<Item> searchItem(String keyWords, Category category){
-        AdminDAO adminDAO = new AdminDAO();
-        adminDAO.refreshCatalogue();
         return this.catalogue.searchItem(keyWords, category);
     }
 
@@ -80,12 +73,20 @@ public class Admin extends User{
         return this.catalogue.getItem(itemCode);
     }
 
+    public ArrayList<Hirer> searchHirer(String keyWords){
+        return this.listOfHirers.searchHirer(keyWords);
+    }
+
     public Library getWorkingPlace() {
         return workingPlace;
     }
 
-    public void setCatalogue(ArrayList<Item> items) {
-        catalogue.setItems(items);
+    public void setCatalogue(Catalogue catalogue) {
+        this.catalogue = catalogue;
+    }
+
+    public void setHirers(ListOfHirers newListOfHirers) {
+        this.listOfHirers = newListOfHirers;
     }
 
 }

@@ -171,4 +171,25 @@ public class HirerDAO {
         }
         return "";
     }
+
+    public ArrayList<Hirer> getAllHirers() {
+        ArrayList<Hirer> result = new ArrayList<>();
+        connection = ConnectionManager.getConnection();
+        try {
+            String query
+                    = "SELECT * "
+                    + "FROM Item I JOIN Book B ON I.code = B.code";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                Hirer h = new Hirer(resultSet.getString("user_code"), resultSet.getString("name"),
+                        resultSet.getString("surname"), resultSet.getString("email"), resultSet.getString("telephone_number"), null);
+                result.add(h);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+        }
+        return result;
+    }
+
 }

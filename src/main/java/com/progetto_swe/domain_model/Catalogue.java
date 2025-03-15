@@ -25,8 +25,14 @@ public class Catalogue{
         return result;
     }
 
+
     public Item getItem(int code) {
-        return items.get(code);
+        for(Item item : items){
+            if(item.getCode()==code){
+                return item;
+            }
+        }
+        return null;
     }
 
 
@@ -34,12 +40,8 @@ public class Catalogue{
         return items.add(item);
     }
 
-    public void removeItem(Item item){
-        items.remove(item);
+    public boolean removeCopies(int itemCode, Library storagePlace){
+        getItem(itemCode).removeCopies(storagePlace);
+        return false;
     }
-
-    public void setItems(ArrayList<Item> items) {
-        this.items = items;
-    }
-
 }

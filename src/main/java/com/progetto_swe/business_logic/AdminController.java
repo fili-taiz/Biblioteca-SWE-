@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.Admin;
 import com.progetto_swe.domain_model.Book;
+import com.progetto_swe.domain_model.Catalogue;
 import com.progetto_swe.domain_model.Category;
 import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.Item;
@@ -38,8 +39,17 @@ public class AdminController {
         this.admin = newAdmin;
     }
      */
+    private void refreshCatalogue() {
+        AdminDAO adminDAO = new AdminDAO();
+        this.admin.setCatalogue(adminDAO.refreshCatalogue());
+    }
 
- /*da riguardare i parametri */
+    private void refreshHirers() {
+        AdminDAO adminDAO = new AdminDAO();
+        this.admin.setHirers(adminDAO.refreshHirers());
+    }
+
+    /*da riguardare i parametri */ //la password non è inserita dall'utente è il codice di verifica dell'email ottenuto in fase di registrazione
     public boolean registerExternalHirer(String password, String name, String surname, String eMail, String telephoneNumber) {
         HirerDAO hirerDAO = new HirerDAO();
         String userCode = hirerDAO.addExternalHirer(name, password, surname, eMail, telephoneNumber);
@@ -139,7 +149,7 @@ public class AdminController {
     public boolean removeBook(int code) {
         BookDAO bookDAO = new BookDAO();
         if (bookDAO.removeBook(code, this.admin.getWorkingPlace().name())) {
-            return this.admin.removeCopies(code, this.admin.getWorkingPlace());
+            return this.admin.removeItem(code);
         }
         return false;
     }
@@ -147,7 +157,7 @@ public class AdminController {
     public boolean removeMagazine(int code) {
         MagazineDAO magazineDAO = new MagazineDAO();
         if (magazineDAO.removeMagazine(code, this.admin.getWorkingPlace().name())) {
-            return this.admin.removeCopies(code, this.admin.getWorkingPlace());
+            return this.admin.removeItem(code);
         }
         return false;
     }
@@ -155,7 +165,7 @@ public class AdminController {
     public boolean removeThesis(int code) {
         ThesisDAO thesisDAO = new ThesisDAO();
         if (thesisDAO.removeThesis(code, this.admin.getWorkingPlace().name())) {
-            return this.admin.removeCopies(code, this.admin.getWorkingPlace());
+            return this.admin.removeItem(code);
         }
         return false;
     }
@@ -219,7 +229,7 @@ public class AdminController {
         Hirer hirer = reservation.getHirer();
         Item item = reservation.getItem();
         /*cancella reservation */
-        if(!reservationDAO.removeReservation(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())){
+        if (!reservationDAO.removeReservation(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())) {
             return false;
         }
         admin.confirmReservationWithdraw(reservation);
@@ -239,6 +249,11 @@ public class AdminController {
         AdminDAO adminDAO = new AdminDAO();
         adminDAO.refreshCatalogue();
         return admin.searchItem(keyWords, Category.valueOf(category));
+    }
+
+    public ArrayList<Hirer> searchHirer(String keyWords) {
+
+        return admin.searchHirer(keyWords);
     }
 
 }

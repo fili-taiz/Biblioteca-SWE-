@@ -4,6 +4,13 @@ import java.util.ArrayList;
 public class ListOfHirers {
     ArrayList<Hirer> hirers = new ArrayList<>();
 
+    public ListOfHirers(){
+    }
+
+    public ListOfHirers(ArrayList<Hirer> hirers){
+        this.hirers = hirers;
+    }
+
     public boolean addHirer(Hirer hirer){
        return hirers.add(hirer);
     }
@@ -12,11 +19,16 @@ public class ListOfHirers {
         hirers.remove(hirer);
     }
 
-    public Hirer gethirer(Hirer hirer){
-        return hirers.get(hirers.indexOf(hirer));
+    public ArrayList<Hirer> searchHirer(String keyWords) {
+        String[] splittedKeyWord = keyWords.split(" ");
+        ArrayList<Hirer> result = new ArrayList<>();
+        for (Hirer h : this.hirers) {
+            for (String keyWord : splittedKeyWord){
+                if (h.contains(keyWord)) {
+                    result.add(h);
+                }
+            }
+        }
+        return result;
     }
-
-
-
-
 }

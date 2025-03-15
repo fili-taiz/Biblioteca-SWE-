@@ -93,7 +93,7 @@ public class ReservationDAO {
                 return false;
             }
 
-            String query = "INSERT INTO Reservation (user_code, code, storage_place, lenfing_date)"
+            String query = "INSERT INTO Reservation (user_code, code, storage_place, lending_date)"
             + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
             return resultSet.next();

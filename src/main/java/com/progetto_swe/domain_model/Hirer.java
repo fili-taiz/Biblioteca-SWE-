@@ -8,35 +8,17 @@ public class Hirer extends User{
     ArrayList<Reservation> reservations = new ArrayList<>();
     Catalogue catalogue = new Catalogue();
 
-    public Hirer(String userCode, String name, String surname, String eMail, String telephoneNumber, 
+    public Hirer(String userCode, String name, String surname, String email, String telephoneNumber, 
                 UserProfile userProfile, ArrayList<Lending> lendings, ArrayList<Reservation> reservations, Catalogue catalogue) {
 
-        super(userCode, name, surname, eMail, telephoneNumber, userProfile);
+        super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.lendings = lendings;
         this.reservations = reservations;
         this.catalogue = catalogue;
     }
 
-    public Hirer(String userCode, String name, String surname, String eMail, String telephoneNumber, UserProfile userProfile) {
-        super(userCode, name, surname, eMail, telephoneNumber, userProfile);
-    }
-
-    //lascia poi sistemo
-    public boolean addLending(Lending lending){
-        //controllo autorizzazione
-        return lendings.add(lending);
-    }
-    public boolean removeLending(Lending lending){
-        //controllo autorizzazione
-        return lendings.remove(lending);
-    }
-    public boolean addReservation(Reservation reservation){
-        //controllo autorizzazione
-        return reservations.add(reservation);
-    }
-    public boolean removeReservation(Reservation reservation){
-        //controllo autorizzazione
-        return reservations.remove(reservation);
+    public Hirer(String userCode, String name, String surname, String email, String telephoneNumber, UserProfile userProfile) {
+        super(userCode, name, surname, email, telephoneNumber, userProfile);
     }
 
     public ArrayList<Item> searchItem(String keyWords, Category category){
@@ -48,6 +30,26 @@ public class Hirer extends User{
         return reservations.add(r) && item.addReservation(r);
     }
 
+    public boolean contains(String keyWord){
+        if(userCode.toUpperCase().contains(keyWord)){
+            return true;
+        }
+        if(name.toUpperCase().contains(keyWord)){
+            return true;
+        }
+        if(surname.toUpperCase().contains(keyWord)){
+            return true;
+        }
+        if(email.toUpperCase().contains(keyWord)){
+            return true;
+        }
+        if(telephoneNumber.toUpperCase().contains(keyWord)){
+            return true;
+        }
+        return false;
+    }
+
+    //controllo autorizzazione
     public ArrayList<Lending> getLendings() { return lendings; }
     public ArrayList<Reservation> getReservations() { return reservations; }
 
