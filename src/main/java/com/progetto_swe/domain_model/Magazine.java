@@ -7,9 +7,29 @@ public class Magazine extends Item {
     String publishingHouse;
 
     public Magazine(int code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable,
-             String publishingHouse) {
+                    String publishingHouse) {
         super(code, title, publicationDate, language, category, link, borrowable);
         this.publishingHouse = publishingHouse;
+    }
+
+    public Magazine(String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable,
+                    String publishingHouse) {
+        super(-1, title, publicationDate, language, category, link, borrowable);
+        this.publishingHouse = publishingHouse;
+    }
+
+
+    @Override
+    public boolean sameField(Item itemsCopy) {
+        if (!super.sameField(itemsCopy)) {
+            return false;
+        }
+
+        Magazine magazinesCopy = (Magazine) itemsCopy;
+        if (!this.publishingHouse.equals(magazinesCopy.getPublishingHouse())) {
+            return false;
+        }
+        return true;
     }
 
     public String getPublishingHouse() {
@@ -31,8 +51,8 @@ public class Magazine extends Item {
     }
 
     @Override
-    public boolean contains(String keyword){
-        if(publishingHouse.toUpperCase().contains(keyword.toUpperCase())){
+    public boolean contains(String keyword) {
+        if (publishingHouse.toUpperCase().contains(keyword.toUpperCase())) {
             return true;
         }
         return super.contains(keyword);
@@ -40,17 +60,12 @@ public class Magazine extends Item {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
+        if (!super.equals(o)) {
             return false;
         }
-        if (o.getClass() != this.getClass()) {
-            return false;
-        }
-        if (super.equals(o)) {
-            Magazine m = (Magazine) o;
-            return this.publishingHouse.equals(m.publishingHouse);
-        }
-        return false;
+
+        Magazine m = (Magazine) o;
+        return this.publishingHouse.equals(m.publishingHouse);
     }
 
     //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei 

@@ -69,10 +69,6 @@ public class Admin extends User{
         return this.catalogue.searchItem(keyWords, category);
     }
 
-    public Item getItem(int itemCode) {
-        return this.catalogue.getItem(itemCode);
-    }
-
     public ArrayList<Hirer> searchHirer(String keyWords){
         return this.listOfHirers.searchHirer(keyWords);
     }
@@ -83,6 +79,10 @@ public class Admin extends User{
 
     public void setCatalogue(Catalogue catalogue) {
         this.catalogue = catalogue;
+    }
+
+    public Catalogue getCatalogue() {
+        return catalogue;
     }
 
     public void setHirers(ListOfHirers newListOfHirers) {

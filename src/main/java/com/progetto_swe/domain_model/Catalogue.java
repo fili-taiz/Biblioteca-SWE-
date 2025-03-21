@@ -1,4 +1,5 @@
 package com.progetto_swe.domain_model;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Catalogue{
@@ -25,6 +26,14 @@ public class Catalogue{
         return result;
     }
 
+    public boolean contains(Item itemsCopy) {
+        for(Item item : items){
+            if(item.sameField(itemsCopy)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public Item getItem(int code) {
         for(Item item : items){

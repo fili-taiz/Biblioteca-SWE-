@@ -16,7 +16,7 @@ public class LoginAdminController{
         if (map == null) { 
             return null;
         }
-
+        //TODO implementare grafica controllo che non sia nullo
 
         AdminDAO adminDAO = new AdminDAO();
         Admin admin = adminDAO.getAdmin(userCode);
@@ -32,11 +32,5 @@ public class LoginAdminController{
 
         //riconosciuto dal sistema universitario e presente nel db della biblioteca
         return admin;
-
-
-
-
-
-
     }
 }

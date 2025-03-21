@@ -15,6 +15,13 @@ public class Thesis extends Item {
         this.university = university;
     }
 
+    public Thesis(String title, LocalDate publicationDate, boolean borrowable, Language language, Category category, String link, String author, String supervisors, String university) {
+        super(-1, title, publicationDate, language, category, link, borrowable);
+        this.author = author;
+        this.supervisors = supervisors;
+        this.university = university;
+    }
+
     public String getAuthor() {
         return this.author;
     }
@@ -52,14 +59,33 @@ public class Thesis extends Item {
     }
 
     @Override
-    public boolean contains(String keyword){
-        if(author.toUpperCase().contains(keyword.toUpperCase())){
+    public boolean sameField(Item itemsCopy){
+        if (!super.sameField(itemsCopy)) {
+            return false;
+        }
+
+        Thesis thesisCopy = (Thesis) itemsCopy;
+        if (!this.author.equals(thesisCopy.getAuthor())) {
+            return false;
+        }
+        if (!this.supervisors.equals(thesisCopy.getSupervisors())) {
+            return false;
+        }
+        if (!this.university.equals(thesisCopy.getUniversity())) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean contains(String keyword) {
+        if (author.toUpperCase().contains(keyword.toUpperCase())) {
             return true;
         }
-        if(supervisors.toUpperCase().contains(keyword.toUpperCase())){
+        if (supervisors.toUpperCase().contains(keyword.toUpperCase())) {
             return true;
         }
-        if(university.toUpperCase().contains(keyword.toUpperCase())){
+        if (university.toUpperCase().contains(keyword.toUpperCase())) {
             return true;
         }
         return super.contains(keyword);
@@ -67,17 +93,12 @@ public class Thesis extends Item {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
+        if (!super.equals(o)) {
             return false;
         }
-        if (o.getClass() != this.getClass()) {
-            return false;
-        }
-        if (super.equals(o)) {
-            Thesis t = (Thesis) o;
-            return this.author.equals(t.author) && this.supervisors.equals(t.supervisors) && this.university.equals(t.university);
-        }
-        return false;
+
+        Thesis t = (Thesis) o;
+        return this.author.equals(t.author) && this.supervisors.equals(t.supervisors) && this.university.equals(t.university);
     }
 
     //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei 

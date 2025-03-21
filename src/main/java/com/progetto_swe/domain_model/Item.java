@@ -34,6 +34,28 @@ public class Item {
         return language.name().toUpperCase().contains(keyword.toUpperCase());
     }
 
+    public boolean sameField(Item itemsCopy){
+        if(!itemsCopy.getTitle().equals(this.title)){
+            return false;
+        }
+        if(!itemsCopy.getPublicationDate().equals(this.publicationDate)){
+            return false;
+        }
+        if(itemsCopy.getLanguage() != this.language){
+            return false;
+        }
+        if(itemsCopy.getCategory() != this.category){
+            return false;
+        }
+        if (!itemsCopy.getLink().equals(this.link)) {
+            return false;
+        }
+        if(itemsCopy.isBorrowable() != this.borrowable){
+            return false;
+        }
+        return true;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -54,6 +76,8 @@ public class Item {
     public int hashCode () {
         return super.hashCode();
     }
+
+
 
     public int getNumberOfLendings(Library library, Item item){
         if(item instanceof Thesis){

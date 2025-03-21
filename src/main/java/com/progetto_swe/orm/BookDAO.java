@@ -22,6 +22,19 @@ public class BookDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
+    public void addBook(int code, String isbn, String publishingHouse, int numberOfPages, String authors) {
+
+        connection = ConnectionManager.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+
+            String query = "INSERT INTO Book (code, isbn, publishing_house, number_of_pages, authors)"
+                    + "VALUES ('" + code + "', '" + isbn + "', " + publishingHouse + ", " + numberOfPages + ", '" + authors + "');";
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+        }
+    }
+
     public Book getBook(String itemId) {
         connection = ConnectionManager.getConnection();
         try {
@@ -39,7 +52,7 @@ public class BookDAO {
     }
 
     public boolean updateBook(int originalItemCode, String title, String publicationDate, String borrowable, String language, String category, String link, String isbn,
-            String publishingHouse, int numberOfPages, String authors, String storagePlace, int numberOfCopies) {
+                              String publishingHouse, int numberOfPages, String authors, String storagePlace, int numberOfCopies) {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
@@ -91,7 +104,7 @@ public class BookDAO {
     }
 
     private int containsBook(Statement statement, String title, String publicationDate, String borrowable, String language, String category, String link,
-            String isbn, String publishingHouse, int numberOfPages, String authors) {
+                             String isbn, String publishingHouse, int numberOfPages, String authors) {
 
         try {
             String query
@@ -126,20 +139,14 @@ public class BookDAO {
     }
 
 
-    /*
-     * Aggiunta libro
-     * 2. controllo esistenza del libro
-     * 3. controllo esistenza libro nella biblioteca
-     * 4. aggiunta
-     * 
-     * 
-     * 1. non c'e libro -> aggiungo item libro e creo copies
+    /*  1. non c'e libro -> aggiungo item libro e creo copies
      * 2. c'e il libro ma non c'è copies -> creo copied
      * 3. c'è il libro c'è il copied -> update copies
-     * 
-     */
-    public int addBook(String title, String publicationDate, String borrowable, String language, String category, String link, String isbn,
-            String publishingHouse, int numberOfPages, String authors, String storagePlace, int numberOfCopies) {
+     * */
+
+    // dividere i try per eseguire controlli di eccezioni più dettagliatamente
+    public void addBook(String title, String publicationDate, String borrowable, String language, String category, String link, String isbn,
+                        String publishingHouse, int numberOfPages, String authors, String storagePlace, int numberOfCopies) {
 
         connection = ConnectionManager.getConnection();
         try {
@@ -153,28 +160,19 @@ public class BookDAO {
                 String query = "INSERT INTO Item (title, publication_date, borrowable, language, category, link)"
                         + "VALUES ('" + title + "', '" + publicationDate + "', " + borrowable + ", '" + language + "', '" + category + "', '" + link + "') "
                         + "RETURNING code;";
-                ResultSet resultSet = statement.executeQuery(query);
-                if (!resultSet.next()) {
-                    return -1;
-                }
-                code = resultSet.getInt("code");
+                statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
                 query = "INSERT INTO Book (code, isbn, publishing_house, number_of_pages, authors)"
                         + "VALUES ('" + code + "', '" + isbn + "', " + publishingHouse + ", " + numberOfPages + ", '" + authors + "');";
-                statement.executeQuery(query);
+                statement.executeUpdate(query);
             }
 
             //Copia non presente
             if (copiesStored <= -1) {
                 //Creazione copia
                 String query = "INSERT INTO Physical_copies (code, storage_place, number_of_copies)"
-                        + "VALUES ('" + code + "', '" + storagePlace + "', " + numberOfCopies + "');";
-                ResultSet resultSet = statement.executeQuery(query);
-                if (resultSet.next()) {
-                    code = resultSet.getInt("code");
-                    return code;
-                } else {
-                    return -1;
-                }
+                        + "VALUES ('" + code + "', '" + storagePlace + "', " + numberOfCopies + ");";
+                statement.executeUpdate(query);
             }
 
             //Copia presente
@@ -183,13 +181,10 @@ public class BookDAO {
                         = "UPDATE Physical_copies "
                         + "SET number_of_copies = " + (copiesStored + numberOfCopies)
                         + "WHERE code = '" + code + "' AND storage_place = '" + storagePlace + "'; ";
-                ResultSet resultSet = statement.executeQuery(query);
-                resultSet.next();
-                return code;
+                statement.executeUpdate(query);
             }
         } catch (SQLException e) {
         }
-        return -1;
     }
 
     public boolean removeBook(int code, String storagePlace) {

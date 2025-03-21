@@ -16,6 +16,7 @@ public class LoginUniversityHirer {
         if (map == null) { 
             return null;
         }
+        //TODO implementare grafica controllo che non sia nullo
 
         HirerDAO hirerDAO = new HirerDAO();
         Hirer hirer = hirerDAO.getHirer(userCode);

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.progetto_swe.domain_model.Category;
 import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.Language;
+import com.progetto_swe.domain_model.Magazine;
 import com.progetto_swe.orm.ConnectionManager;
 
 
@@ -18,15 +19,15 @@ a.add("C");
 a.add("c");
 a.add("a");
 a.add("A");
-        //Item magazine = new Magazine("code", "title", LocalDate.of(2012, 2, 20), Language.LANGUAGE_1, Category.CATEGORY_1, "link", true, "publishing_house_magazine");
-        a.sort(String::compareTo);
-System.out.println(a.toString());
-        Magazine newMagazine = new Magazine("code_1", "title_1", LocalDate.of(2012, 2, 19), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", false, "publishing_house_magazine_1");
-        */
+        */Item magazine = new Magazine(1, "title", LocalDate.of(2012, 2, 20), Language.LANGUAGE_1, Category.CATEGORY_1, "link", true, "publishing_house_magazine");
+
+        Item newMagazine = new Magazine(1, "title_1", LocalDate.of(2012, 2, 19), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", false, "publishing_house_magazine_1");
+
+        /*
         Item i1 = new Item(1, "null", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "null", false);
         Item i2 = new Item(1, "null", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "null", false);
-        
-        System.out.println(i1.equals(i2));
+        */
+        System.out.println(magazine.equals(newMagazine));
     }
 
     public static void clearScreen() {  
