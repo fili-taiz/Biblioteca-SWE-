@@ -6,12 +6,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import com.progetto_swe.domain_model.Category;
-import com.progetto_swe.domain_model.Item;
-import com.progetto_swe.domain_model.Language;
-import com.progetto_swe.domain_model.Library;
-import com.progetto_swe.domain_model.Magazine;
+import com.progetto_swe.domain_model.*;
 
 public class MagazineDAO {
 
@@ -20,6 +17,56 @@ public class MagazineDAO {
     public MagazineDAO() {
         this.connection = ConnectionManager.getConnection();
     }
+
+    public int addMagazine(String title, String publicationDate, String language, String category, String link,
+                           String publishingHouse) {
+
+        connection = ConnectionManager.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+
+            //Creazione Item e Magazine
+            String query
+                    = "INSERT INTO Item (title, publication_date, language, category, link)"
+                    + "VALUES ('" + title + "', '" + publicationDate + "', '" + language + "', '" + category + "', '" + link + "') "
+                    + "RETURNING code;";
+            ResultSet resultSet = statement.executeQuery(query);
+            int code = resultSet.getInt("code");
+
+            query
+                    = "INSERT INTO Magazine (code, publishing_house)"
+                    + "VALUES ('" + code + "', '" + publishingHouse + "');";
+            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
+            return code;
+        } catch (SQLException e) {
+        }
+        return -1;
+    }
+
+    public boolean removeMagazine(int code) {
+
+        connection = ConnectionManager.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+
+            //Creazione Item e Book
+            String query
+                    = "DELETE FROM Item "
+                    + "WHERE code = '" + code + "';";
+            statement.executeUpdate(query);
+
+            query
+                    = "DELETE FROM Magazine "
+                    + "where code = '" + code + "';";
+            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
 
     public Magazine getMagazine(String itemId) {
         try {
@@ -37,8 +84,8 @@ public class MagazineDAO {
         return null;
     }
 
-    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, String borrowable, String language, String category, String link,
-            String publishingHouse, String storagePlace, int numberOfCopies) {
+    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category, String link,
+                                  String publishingHouse) {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
@@ -47,29 +94,15 @@ public class MagazineDAO {
             }
             String query
                     = "UPDATE Item "
-                    + "SET title = '" + title + "', publication_date = '" + publicationDate + "', borrowable = " + borrowable
-                    + ", language = '" + language + "', category = '" + category + "', link = '" + link + "' "
+                    + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "' "
                     + "WHERE code = '" + originalItemCode + "';";
-            ResultSet resultSet = statement.executeQuery(query);
-            resultSet.next();
+            statement.executeQuery(query);
 
             query
                     = "UPDATE Magazine "
                     + "SET publishing_house = '" + publishingHouse + "' "
                     + "WHERE code = '" + originalItemCode + "';";
             statement.executeQuery(query);
-            resultSet.next();
-
-            if (containsCopies(statement, numberOfCopies, storagePlace) <= -1) {
-                return true;
-            }
-
-            query
-                    = "UPDATE Physical_copies "
-                    + "SET number_of_copies = " + numberOfCopies
-                    + "WHERE code = '" + originalItemCode + "' AND storage_place = '" + storagePlace + "'; ";
-            resultSet = statement.executeQuery(query);
-            resultSet.next();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
@@ -89,7 +122,7 @@ public class MagazineDAO {
     }
 
     private int cointainsMagazine(Statement statement, String title, String publicationDate, String borrowable, String language, String category,
-            String link, String publishingHouse) {
+                                  String link, String publishingHouse) {
         try {
             String query
                     = "SELECT code"
@@ -122,7 +155,7 @@ public class MagazineDAO {
     }
 
     public int addMagazine(String title, String publicationDate, String borrowable, String language, String category, String link,
-            String publishingHouse, String storagePlace, int numberOfCopies) {
+                           String publishingHouse, String storagePlace, int numberOfCopies) {
 
         connection = ConnectionManager.getConnection();
         try {
@@ -142,7 +175,7 @@ public class MagazineDAO {
                 }
                 code = resultSet.getInt("code");
                 query = "INSERT INTO Magazine (code, publishing_house)"
-                        + "VALUES ('" + code + "', " + publishingHouse + "');";
+                        + "VALUES ('" + code + "', '" + publishingHouse + "');";
                 statement.executeQuery(query);
             }
 
@@ -221,6 +254,7 @@ public class MagazineDAO {
 
     public ArrayList<Item> getAllMagazine() {
         ArrayList<Item> result = new ArrayList<>();
+        HashMap<Library,PhysicalCopies> physicalCopies;
         connection = ConnectionManager.getConnection();
         try {
             String query
@@ -230,16 +264,18 @@ public class MagazineDAO {
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 Item i = new Magazine(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
-                        Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getBoolean("borrowable"),
+                        Category.valueOf(resultSet.getString("category")), resultSet.getString("link"),
                         resultSet.getString("publishingHouse"));
                 query
                         = "SELECT * "
                         + "FROM Physical_copies P "
                         + "WHERE P.code = " + resultSet.getInt("code");
                 ResultSet copiesSet = statement.executeQuery(query);
+                physicalCopies = new HashMap<>();
                 while (copiesSet.next()) {
-                    i.addCopies(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
+                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
                 }
+                i.setPhysicalCopies(physicalCopies);
                 result.add(i);
             }
         } catch (SQLException e) {

@@ -8,16 +8,16 @@ public class Book extends Item {
     int numberOfPages;
     String authors;
 
-    public Book(int code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable, String isbn, String publishingHouse, int numberOfPages, String authors) {
-        super(code, title, publicationDate, language, category, link, borrowable);
+    public Book(int code, String title, LocalDate publicationDate, Language language, Category category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
+        super(code, title, publicationDate, language, category, link);
         this.isbn = isbn;
         this.publishingHouse = publishingHouse;
         this.numberOfPages = numberOfPages;
         this.authors = authors;
     }
 
-    public Book(String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable, String isbn, String publishingHouse, int numberOfPages, String authors) {
-        super(-1, title, publicationDate, language, category, link, borrowable);
+    public Book(String title, LocalDate publicationDate, Language language, Category category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
+        super(-1, title, publicationDate, language, category, link);
         this.isbn = isbn;
         this.publishingHouse = publishingHouse;
         this.numberOfPages = numberOfPages;

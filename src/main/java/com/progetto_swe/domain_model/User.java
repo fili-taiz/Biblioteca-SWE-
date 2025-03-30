@@ -6,15 +6,15 @@ public abstract class User {
     String surname;
     String email;
     String telephoneNumber;
-    UserProfile userProfile;
+    UserCredentials userCredentials;
 
-    public User(String userCode, String name, String surname, String email, String telephoneNumber, UserProfile userProfile){
+    public User(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userCredentials){
         this.userCode = userCode;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.telephoneNumber = telephoneNumber;
-        this.userProfile = userProfile;
+        this.userCredentials = userCredentials;
     }
 
     public String getUserCode() { return this.userCode; }
@@ -22,12 +22,12 @@ public abstract class User {
     public String getSurname() { return this.surname; }
     public String getEmail() { return this.email; }
     public String getTelephoneNumber() { return this.telephoneNumber; }
-    public UserProfile getUserProfile() { return this.userProfile; }
+    public UserCredentials getUserProfile() { return this.userCredentials; }
 
     public void setUserCode(String userCode) { this.userCode = userCode; }
     public void setName(String name) { this.name = name; }
     public void setSurname(String surname) { this.surname = surname; }
     public void setEMail(String email) { this.email = email; }
     public void setTelephoneNumber(String telephoneNumber) { this.telephoneNumber = telephoneNumber; }
-    public void setUserProfile(UserProfile newUserProfile){ this.userProfile = newUserProfile; }
+    public void setUserCredentials(UserCredentials newUserCredentials){ this.userCredentials = newUserCredentials; }
 }

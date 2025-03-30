@@ -6,12 +6,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import com.progetto_swe.domain_model.Category;
-import com.progetto_swe.domain_model.Item;
-import com.progetto_swe.domain_model.Language;
-import com.progetto_swe.domain_model.Library;
-import com.progetto_swe.domain_model.Thesis;
+import com.progetto_swe.domain_model.*;
 
 public class ThesisDAO {
 
@@ -19,6 +16,54 @@ public class ThesisDAO {
 
     public ThesisDAO() {
         this.connection = ConnectionManager.getConnection();
+    }
+
+    public int addThesis(String title, String publicationDate, String language, String category, String link, String author, String supervisors, String university) {
+
+        connection = ConnectionManager.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+
+            //Creazione Item e Thesis
+            String query
+                    = "INSERT INTO Item (title, publication_date, borrowable, language, category, link)"
+                    + "VALUES ('" + title + "', '" + publicationDate + "', '" + language + "', '" + category + "', '" + link + "') "
+                    + "RETURNING code;";
+            ResultSet resultSet = statement.executeQuery(query);
+            int code = resultSet.getInt("code");
+
+            query
+                    = "INSERT INTO Thesis (code, author, supervisors, university)"
+                    + "VALUES ('" + code + "', '" + author + "', '" + supervisors + "', '" + university + "');";
+            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
+            return code;
+        } catch (SQLException e) {
+        }
+        return -1;
+    }
+
+    public boolean removeThesis(int code) {
+
+        connection = ConnectionManager.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+
+            //Creazione Item e Book
+            String query
+                    = "DELETE FROM Item "
+                    + "WHERE code = '" + code + "';";
+            statement.executeUpdate(query);
+
+            query
+                    = "DELETE FROM Thesis "
+                    + "where code = '" + code + "';";
+            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public Thesis getThesis(String itemId) {
@@ -36,8 +81,8 @@ public class ThesisDAO {
         return null;
     }
 
-    public boolean updateThesis(int originalItemCode,String title, String publicationDate, String borrowable, String language, String category, String link, String author,
-    String supervisors, String university, String storagePlace, int numberOfCopies) {
+    public boolean updateThesis(int originalItemCode,String title, String publicationDate, String language, String category, String link, String author,
+    String supervisors, String university) {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
@@ -46,27 +91,13 @@ public class ThesisDAO {
             }
             String query
                     = "UPDATE Item "
-                    + "SET title = '" + title + "', publication_date = '" + publicationDate + "', borrowable = " + borrowable
-                    + ", language = '" + language + "', category = '" + category + "', link = '" + link + "';";
-            ResultSet resultSet = statement.executeQuery(query);
-            resultSet.next();
+                    + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "';";
+            statement.executeUpdate(query);
 
             query
                     = "UPDATE Thesis "
                     + "SET author = '" + author + "', supervisors = '" + supervisors + "', university = '" + university + "';";
-            statement.executeQuery(query);
-            resultSet.next();
-
-            if (containsCopies(statement, numberOfCopies, storagePlace) <= -1) {
-                return true;
-            }
-
-            query
-                    = "UPDATE Physical_copies "
-                    + "SET number_of_copies = " + numberOfCopies
-                    + "WHERE code = '" + originalItemCode + "' AND storage_place = '" + storagePlace + "'; ";
-            resultSet = statement.executeQuery(query);
-            resultSet.next();
+            statement.executeUpdate(query);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
@@ -175,6 +206,7 @@ public class ThesisDAO {
 
     public ArrayList<Item> getAllThesis() {
         ArrayList<Item> result = new ArrayList<>();
+        HashMap<Library,PhysicalCopies> physicalCopies;
         connection = ConnectionManager.getConnection();
         try {
             String query
@@ -183,7 +215,7 @@ public class ThesisDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
-                Item i = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), resultSet.getBoolean("borrowable"), 
+                Item i = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
                 Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("author"), 
                         resultSet.getString("supervisors"), resultSet.getString("university"));
                 query
@@ -191,9 +223,11 @@ public class ThesisDAO {
                         + "FROM Physical_copies P "
                         + "WHERE P.code = " + resultSet.getInt("code");
                 ResultSet copiesSet = statement.executeQuery(query);
+                physicalCopies = new HashMap<>();
                 while (copiesSet.next()) {
-                    i.addCopies(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
+                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
                 }
+                i.setPhysicalCopies(physicalCopies);
                 result.add(i);
             }
         } catch (SQLException e) {

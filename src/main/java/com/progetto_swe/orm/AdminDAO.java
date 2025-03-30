@@ -12,36 +12,13 @@ import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.domain_model.ListOfHirers;
-import com.progetto_swe.domain_model.UserProfile;
+import com.progetto_swe.domain_model.UserCredentials;
 
 public class AdminDAO {
     private Connection connection;
 
     public AdminDAO(){
         this.connection = ConnectionManager.getConnection();
-    }
-
-        //creazione Hirer con profilo
-    public Admin login(String userCode, String password) {
-        try {
-            connection = ConnectionManager.getConnection();
-            String query
-                    = "SELECT * "
-                    + "FROM UniveristyPeople U"
-                    + "WHERE U.usercode = '" + userCode + "'";
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            if (resultSet.next()) {
-                return new Admin(userCode, resultSet.getString("name"), resultSet.getString("surname")
-                        , resultSet.getString("email"), resultSet.getString("telephone_number")
-                        , Library.valueOf(resultSet.getString("working_place")), new UserProfile(userCode, password));
-            }
-            return null;
-        } catch (SQLException e) {
-            //e.printStackTrace();
-        }
-        return null;
     }
 
     public Admin getAdmin(String userCode){
@@ -63,11 +40,11 @@ public class AdminDAO {
         return null;
     }
 
-    public boolean addAdmin(String userCode, String password, String name, String surname, String email, String telephoneNumber, String workingPlace) {
+    public boolean addAdmin(String userCode, String name, String surname, String email, String telephoneNumber, String workingPlace) {
         connection = ConnectionManager.getConnection();
         try {
-            String query = "INSERT INTO Admin (user_code, hashed_password, name, surname, email, telephone_number, working_place)"
-                    + "VALUES ('" + userCode + "', '" + password + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "', '"
+            String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place)"
+                    + "VALUES ('" + userCode + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "', '"
                     + workingPlace + "');";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -93,23 +70,5 @@ public class AdminDAO {
     public ListOfHirers refreshHirers(){
         HirerDAO hirerDAO = new HirerDAO();
         return new ListOfHirers(hirerDAO.getAllHirers());
-    }
-
-    public Hirer updatAdmin(Admin admin){
-        connection = ConnectionManager.getConnection();
-        try {
-            String query = "query";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            resultSet.next();
-
-        /**/
-
-        
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-        }
-        return null;
     }
 }

@@ -26,13 +26,13 @@ public class Catalogue{
         return result;
     }
 
-    public boolean contains(Item itemsCopy) {
+    public int contains(Item itemsCopy) {
         for(Item item : items){
             if(item.sameField(itemsCopy)){
-                return true;
+                return item.getCode();
             }
         }
-        return false;
+        return -1;
     }
 
     public Item getItem(int code) {

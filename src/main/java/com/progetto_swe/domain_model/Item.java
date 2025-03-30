@@ -9,19 +9,17 @@ public class Item {
     Language language;
     Category category;
     String link;
-    boolean borrowable;
-    HashMap<Library, Integer> physicalCopies = new HashMap<>();
+    HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
     ArrayList<Lending> lendings = new ArrayList<>();
     ArrayList<Reservation> reservations = new ArrayList<>();
 
-    public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, boolean borrowable) {
+    public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link) {
         this.code = code;
         this.title = title;
         this.publicationDate = publicationDate;
         this.language = language;
         this.category = category;
         this.link = link;
-        this.borrowable = borrowable;
     }
 
     public boolean contains(String keyword){
@@ -50,10 +48,25 @@ public class Item {
         if (!itemsCopy.getLink().equals(this.link)) {
             return false;
         }
-        if(itemsCopy.isBorrowable() != this.borrowable){
-            return false;
-        }
         return true;
+    }
+
+    public boolean haveReservation(Reservation reservation){
+        for(Reservation r : reservations){
+            if(r.equals(reservation)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean haveLending(Lending lending){
+        for(Lending l : lendings){
+            if(l.equals(lending)){
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -66,7 +79,7 @@ public class Item {
             return false;
         }
         Item item = (Item) o;
-        return this.code == item.code && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link) && this.borrowable == item.borrowable;
+        return this.code == item.code && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link);
     }
 
     //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei 
@@ -77,57 +90,41 @@ public class Item {
         return super.hashCode();
     }
 
+    public boolean isBorrowable(Library library) {
+        if(physicalCopies.get(library) != null)
+            return physicalCopies.get(library).isBorrowable();
+        return false;
+    }
 
-
-    public int getNumberOfLendings(Library library, Item item){
-        if(item instanceof Thesis){
-            return 0;
-        }
+    public int getNumberOfLendingsInLibrary(Library library){
         int n = 0;
-        for(Lending l: lendings){
-            if(l.getStoragePlace().equals(library) && l.getItem() == item){
+        for(Lending l: this.lendings){
+            if(l.getStoragePlace().equals(library)){
                 n += 1;
             }
         }
         return n;
     }
 
-    public int getNumberOfReservations(Library library, Item item){
-        if(item instanceof Thesis){
-            return 0;
-        }
+    public int getNumberOfLibraries(){
+        return physicalCopies.size();
+    }
+
+    public int getNumberOfReservationsInLibrary(Library library){
         int n = 0;
-        for(Reservation r: reservations){
-            if(r.getStoragePlace().equals(library) && r.getItem() == item){
+        for(Reservation r: this.reservations){
+            if(r.getStoragePlace().equals(library)){
                 n += 1;
             }
         }
         return n;
     }
 
-    public int getNumberOfAvailableCopies(Library library, Item item){
-        return physicalCopies.get(library) - getNumberOfLendings(library, item) - getNumberOfReservations(library, item);
-    }
-
-    public boolean addLending(Lending lending){
-        lendings.add(lending);
-        return true;
-    }
-
-    public boolean addReservation(Reservation r){
-        if(getNumberOfAvailableCopies(r.getStoragePlace(), r.getItem()) == 0){
-            return false;
+    public int getNumberOfAvailableCopiesInLibrary(Library library){
+        if(physicalCopies.get(library) == null){
+            return -1;
         }
-        reservations.add(r);
-        return true;
-    }
-
-    public boolean removeLending(Lending l){
-        return lendings.remove(l);
-    }
-
-    public boolean removeReservation(Reservation r){
-        return reservations.remove(r);
+        return physicalCopies.get(library).getNumberOfPhysicalCopies() - getNumberOfLendingsInLibrary(library) - getNumberOfReservationsInLibrary(library);
     }
 
     public boolean updateItem(Item new_item){
@@ -137,29 +134,7 @@ public class Item {
         this.language = new_item.language;
         this.category = new_item.category;
         this.link = new_item.link;
-        this.borrowable = new_item.borrowable;
         return true;
-    }
-
-    public boolean addCopies(Library library, int numberOfCopies){
-        if(!physicalCopies.containsKey(library)){
-            physicalCopies.put(library, numberOfCopies);
-            return true;
-        }
-        physicalCopies.put(library, physicalCopies.get(library)+numberOfCopies);
-        return true;
-    }
-
-    public boolean setCopies(Library library, int numberOfCopies){
-        if(!physicalCopies.containsKey(library)){
-            return false;
-        }
-        physicalCopies.put(library, numberOfCopies);
-        return true;
-    }
-
-    public boolean removeCopies(Library library){
-        return physicalCopies.remove(library) >= 0;
     }
 
     public int getCode(){ return this.code;}
@@ -168,7 +143,10 @@ public class Item {
     public Language getLanguage(){ return this.language;}
     public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
-    public boolean isBorrowable(){ return this.borrowable;}
+
+    public void setPhysicalCopies(HashMap<Library, PhysicalCopies> physicalCopies) {
+        this.physicalCopies = physicalCopies;
+    }
 
     public void setCode(int newCode){ this.code = newCode; }
     public void setTitle(String newTitle){ this.title = newTitle; }
@@ -176,6 +154,5 @@ public class Item {
     public void setLanguage(Language newLanguage){ this.language = newLanguage; }
     public void setCategory(Category newCategory){ this.category = newCategory;}
     public void setLink(String newLink){ this.link = newLink;}
-
 
 }

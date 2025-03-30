@@ -15,6 +15,13 @@ public class ListOfHirers {
        return hirers.add(hirer);
     }
 
+    public Hirer getHirer(String userCode){
+        if(!this.hirers.contains(userCode)){
+            return null;
+        }
+        return this.hirers.get(this.hirers.indexOf(userCode));
+    }
+
     public void removehirer(Hirer hirer){
         hirers.remove(hirer);
     }

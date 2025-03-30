@@ -25,10 +25,13 @@ public class HirerController {
     }
 
 
-    public boolean reserveItem(Hirer hirer, Item item, Library storagePlace){
+    public boolean reserveItem(Item item, Library storagePlace){
+        if(this.hirer.getUnbannedDate() != null){
+            return false;
+        }
         ReservationDAO reservationDAO = new ReservationDAO();
-        reservationDAO.addReservation(hirer.getUserCode(), item.getCode(), storagePlace.name());
-        return hirer.reservePhysicalCopy(item, storagePlace);
+        reservationDAO.addReservation(this.hirer.getUserCode(), item.getCode(), storagePlace.name());
+        return this.hirer.reservePhysicalCopy(item, storagePlace);
     }
 
     public ArrayList<Lending> getLendings(Hirer hirer){

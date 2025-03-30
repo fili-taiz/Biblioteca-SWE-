@@ -52,13 +52,6 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-            if(!containsHirer(statement, userCode)){
-                return false;
-            }
-
-            if(containsCopies(statement, itemCode, storagePlace) <= 1){
-                return false;
-            }
 
             String query = "INSERT INTO Lendings (user_code, code, storage_place, lenfing_date)"
             + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";

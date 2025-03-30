@@ -1,13 +1,11 @@
 package com.progetto_swe.business_logic;
 
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.Admin;
 import com.progetto_swe.domain_model.Book;
-import com.progetto_swe.domain_model.Catalogue;
 import com.progetto_swe.domain_model.Category;
 import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.Item;
@@ -33,131 +31,381 @@ public class AdminController {
         do { //generazione codice univoco per chiave primaria con prefisso E per non occupare future possibili matricole
             userCode = "E" + Math.round((Math.random() * 1000000));
         } while (hirerDAO.getHirer(userCode) != null);
+        String salt = String.valueOf(Math.round(Math.random()*100000));
+        String hashedPassword = Hasher.hash(password, salt);
 
-        return hirerDAO.addHirer(userCode, name, password, surname, eMail, telephoneNumber);
-    }
-
-
-    public boolean addBook(String title, String publicationDate, String borrowable, String language, String category, String link, String isbn,
-                           String publishingHouse, int numberOfPages, String authors, int numberOfCopies) {
-        //spostare nella cli
-        //convalida data
-        if (!checkParametersValidity(publicationDate, language, category, borrowable)) {
+        //controllo non sia gia' presente
+        if(hirerDAO.getHirer(userCode) != null) {
             return false;
         }
-        Book booksCopy = new Book(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, Boolean.getBoolean(borrowable), isbn, publishingHouse, numberOfPages, authors);
-        ItemDAO itemDAO = new ItemDAO();
+
+        //avvio transazione per prevenire problemi causati dal successo della sola prima operazione
+        ConnectionManager.closeAutoCommit();
+        if(!hirerDAO.addHirer(userCode, name, surname, eMail, telephoneNumber)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        if(!hirerDAO.addHirerPassword(userCode, salt, hashedPassword)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        ConnectionManager.openAutoCommit();
+
+        return true;
+    }
+
+    public boolean addBook(String title, String publicationDate, String language, String category, String link, String isbn,
+                           String publishingHouse, int numberOfPages, String authors, int numberOfCopies, boolean borrowable) {
+        //spostare nella cli
+        //convalida data
+        if (!checkParametersValidity(publicationDate, language, category)) {
+            return false;
+        }
+
+        Book bookCopy = new Book(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, isbn, publishingHouse, numberOfPages, authors);
         BookDAO bookDAO = new BookDAO();
 
-        try{
-            int code = -1;
-            if(!this.admin.getCatalogue().contains(booksCopy)){
-                code = itemDAO.addItem(title, publicationDate, language, category, link, borrowable);
-                bookDAO.addBook(code, isbn, publishingHouse, numberOfPages, authors);
-            }
-            if (this.admin.getCatalogue().getItem(code) == null){
+        refreshCatalogue();
 
+        try{
+            ConnectionManager.closeAutoCommit();
+            int code = this.admin.getCatalogue().contains(bookCopy);
+            if(code ==  -1){
+                code = bookDAO.addBook(title, publicationDate, language, category, link, isbn, publishingHouse, numberOfPages, authors);
+
+                if(code == -1){
+                    ConnectionManager.rollback();
+                    return false;
+                }
             }
+
+            if(!addPhysicalCopies(code, numberOfCopies, borrowable)){
+                ConnectionManager.rollback();
+                return false;
+            }
+            ConnectionManager.commit();
+            return true;
         } catch (Exception e) {
 
         }
-
-
-
         return false;
     }
 
-    public boolean addMagazine(String title, String publicationDate, String language, String category, String link, String borrowable, String publishingHouse,
-                               int numberOfCopies) {
+    private boolean addPhysicalCopies(int code, int numberOfCopies, boolean borrowable) {
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        int physicalCopies = this.admin.getCatalogue().getItem(code).getNumberOfAvailableCopiesInLibrary(this.admin.getWorkingPlace());
+        if (physicalCopies == 0){
+            physicalCopiesDAO.addPhysicalCopies(code, this.admin.getWorkingPlace().name(), numberOfCopies, borrowable);
+        }else {
+            physicalCopiesDAO.updatePhysicalCopies(code, this.admin.getWorkingPlace().name(), (physicalCopies + numberOfCopies), borrowable);
+        }
+        return true;
+    }
+
+    public boolean addMagazine(String title, String publicationDate, String language, String category, String link, String publishingHouse,
+                               int numberOfCopies, boolean borrowable) {
         //spostare nella cli
         //convalida data
-        if (!checkParametersValidity(publicationDate, language, category, borrowable)) {
+        if (!checkParametersValidity(publicationDate, language, category)) {
             return false;
         }
 
+        Magazine magazineCopy = new Magazine(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, publishingHouse);
         MagazineDAO magazineDAO = new MagazineDAO();
-        magazineDAO.addMagazine(title, publicationDate, language, category, link, borrowable, publishingHouse, this.admin.getWorkingPlace().name(), numberOfCopies);
+
+        refreshCatalogue();
+
+        try{
+            ConnectionManager.closeAutoCommit();
+            int code = this.admin.getCatalogue().contains(magazineCopy);
+            if(code ==  -1){
+                code = magazineDAO.addMagazine(title, publicationDate, language, category, link, publishingHouse);
+
+                if(code == -1){
+                    ConnectionManager.rollback();
+                    return false;
+                }
+            }
+
+            if(!addPhysicalCopies(code, numberOfCopies, borrowable)){
+                ConnectionManager.rollback();
+                return false;
+            }
+            ConnectionManager.commit();
+            return true;
+        } catch (Exception e) {
+
+        }
         return false;
     }
 
-    public boolean addThesis(String title, String publicationDate, String borrowable, String language, String category, String link, String author,
-                             String supervisors, String university, int numberOfCopies) {
+    public boolean addThesis(String title, String publicationDate, String language, String category, String link, String author,
+                             String supervisors, String university, int numberOfCopies, boolean borrowable) {
+
         //spostare nella cli
         //convalida data
-        if (!checkParametersValidity(publicationDate, language, category, borrowable)) {
+        if (!checkParametersValidity(publicationDate, language, category)) {
             return false;
         }
 
+        Thesis thesisCopy = new Thesis(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, author, supervisors, university);
         ThesisDAO thesisDAO = new ThesisDAO();
-        thesisDAO.addThesis(title, publicationDate, borrowable, language, category, link, author, supervisors, university,
-                this.admin.getWorkingPlace().name(), numberOfCopies);
+
+        refreshCatalogue();
+
+        try{
+            ConnectionManager.closeAutoCommit();
+            int code = this.admin.getCatalogue().contains(thesisCopy);
+            if(code ==  -1){
+                code = thesisDAO.addThesis(title, publicationDate, language, category, link, author, supervisors, university);
+
+                if(code == -1){
+                    ConnectionManager.rollback();
+                    return false;
+                }
+            }
+
+            if(!addPhysicalCopies(code, numberOfCopies, borrowable)){
+                ConnectionManager.rollback();
+                return false;
+            }
+            ConnectionManager.commit();
+            return true;
+        } catch (Exception e) {
+
+        }
         return false;
     }
 
     public boolean removeBook(int code) {
+        refreshCatalogue();
+        if(this.admin.getCatalogue().getItem(code).getNumberOfAvailableCopiesInLibrary(this.admin.getWorkingPlace()) == -1){
+            return false;
+        }
+        removePhysicalCopies(code);
+
+        if(this.admin.getCatalogue().getItem(code).getNumberOfLibraries() > 1){
+            return true;
+        }
+
         BookDAO bookDAO = new BookDAO();
-        return bookDAO.removeBook(code, this.admin.getWorkingPlace().name());
+        ConnectionManager.closeAutoCommit();
+        if(!bookDAO.removeBook(code)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
+    }
+
+    private void removePhysicalCopies(int code) {
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        physicalCopiesDAO.removePhysicalCopies(code, this.admin.getWorkingPlace().name());
+    }
+
+
+    public boolean removeThesis(int code) {
+        refreshCatalogue();
+        if(this.admin.getCatalogue().getItem(code).getNumberOfAvailableCopiesInLibrary(this.admin.getWorkingPlace()) == -1){
+            return false;
+        }
+        removePhysicalCopies(code);
+
+        if(this.admin.getCatalogue().getItem(code).getNumberOfLibraries() > 1){
+            return true;
+        }
+
+        ThesisDAO thesisDAO = new ThesisDAO();
+        ConnectionManager.closeAutoCommit();
+        if(!thesisDAO.removeThesis(code)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
     }
 
     public boolean removeMagazine(int code) {
+        refreshCatalogue();
+        if(this.admin.getCatalogue().getItem(code).getNumberOfAvailableCopiesInLibrary(this.admin.getWorkingPlace()) == -1){
+            return false;
+        }
+        removePhysicalCopies(code);
+
+        if(this.admin.getCatalogue().getItem(code).getNumberOfLibraries() > 1){
+            return true;
+        }
+
         MagazineDAO magazineDAO = new MagazineDAO();
-        return magazineDAO.removeMagazine(code, this.admin.getWorkingPlace().name());
+        ConnectionManager.closeAutoCommit();
+        if(!magazineDAO.removeMagazine(code)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
     }
 
-    public boolean removeThesis(int code) {
-        ThesisDAO thesisDAO = new ThesisDAO();
-        return thesisDAO.removeThesis(code, this.admin.getWorkingPlace().name());
-    }
-
-    public boolean updateBook(int originalItemCode, String title, String publicationDate, String borrowable, String language, String category, String link,
+    public boolean updateBook(int originalItemCode, String title, String publicationDate, boolean borrowable, String language, String category, String link,
                               String isbn, String publishingHouse, int numberOfPages, String authors, int numberOfCopies) {
-        BookDAO bookDAO = new BookDAO();
-        return bookDAO.updateBook(originalItemCode, title, publicationDate, borrowable, language, category, link, isbn, publishingHouse,
-                numberOfPages, authors, this.admin.getWorkingPlace().name(), numberOfCopies);
-    }
-
-    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category, String link, String borrowable, String publishingHouse, int numberOfCopies) {
-        MagazineDAO magazineDAO = new MagazineDAO();
-        return magazineDAO.updateMagazine(originalItemCode, title, publicationDate, language, category, link, borrowable, publishingHouse,
-                this.admin.getWorkingPlace().name(), numberOfCopies);
-    }
-
-    public boolean updateThesis(int originalItemCode, String title, String publicationDate, String borrowable, String language, String category,
-                                String link, String author, String supervisors, String university, int numberOfCopies) {
-        ThesisDAO thesisDAO = new ThesisDAO();
-        return thesisDAO.updateThesis(originalItemCode, title, publicationDate, borrowable, language, category, link, author, supervisors, university,
-                this.admin.getWorkingPlace().name(), numberOfCopies);
-    }
-
-    public boolean registerLending(Hirer hirer, Item item) {
-        if (!item.isBorrowable()) {
+        refreshCatalogue();
+        if(this.admin.getCatalogue().getItem(originalItemCode) == null){
             return false;
         }
 
+        BookDAO bookDAO = new BookDAO();
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+
+        ConnectionManager.closeAutoCommit();
+        if(!bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn, publishingHouse, numberOfPages,
+                authors)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, borrowable)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
+    }
+
+    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, boolean borrowable, String language, String category, String link,
+                              String isbn, String publishingHouse, int numberOfCopies) {
+        refreshCatalogue();
+        if(this.admin.getCatalogue().getItem(originalItemCode) == null){
+            return false;
+        }
+
+        MagazineDAO magazineDAO = new MagazineDAO();
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+
+        ConnectionManager.closeAutoCommit();
+        if(!magazineDAO.updateMagazine(originalItemCode, title, publicationDate, language, category, link, publishingHouse)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, borrowable)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
+    }
+
+    public boolean updateThesis(int originalItemCode, String title, String publicationDate, boolean borrowable, String language, String category, String link,
+                              String author, String supervisors, String univeristy, int numberOfCopies) {
+        refreshCatalogue();
+        if(this.admin.getCatalogue().getItem(originalItemCode) == null){
+            return false;
+        }
+
+        ThesisDAO thesisDAO = new ThesisDAO();
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+
+        ConnectionManager.closeAutoCommit();
+        if(!thesisDAO.updateThesis(originalItemCode, title, publicationDate, language, category, link, author, supervisors, univeristy)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, borrowable)){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
+    }
+
+
+    public boolean registerLending(String userCode, int itemCode) {
+        refreshCatalogue();
+        refreshHirers();
+        if(this.admin.getListOfHirers().getHirer(userCode) == null){
+            return false;
+        }
+
+        if(this.admin.getListOfHirers().getHirer(userCode).getUnbannedDate() != null){
+            return false;
+        }
+
+        if (!this.admin.getCatalogue().getItem(itemCode).isBorrowable(this.admin.getWorkingPlace())) {
+            return false;
+        }
+
+        if(this.admin.getCatalogue().getItem(itemCode).getNumberOfAvailableCopiesInLibrary(this.admin.getWorkingPlace()) <= 1){
+            return false;
+        }
+
+
+
         LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.addLending(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name());
+        return lendingDAO.addLending(userCode, itemCode, this.admin.getWorkingPlace().name());
     }
 
     public boolean confirmReservationWithdraw(Reservation reservation) {
-        LendingDAO lendingDAO = new LendingDAO();
-        ReservationDAO reservationDAO = new ReservationDAO();
-        Hirer hirer = reservation.getHirer();
-        Item item = reservation.getItem();
-        /*cancella reservation */
-        if (!reservationDAO.removeReservation(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())) {
+        refreshCatalogue();
+        refreshHirers();
+        Hirer hirer = this.admin.getListOfHirers().getHirer(reservation.getHirer().getUserCode());
+        Item item = this.admin.getCatalogue().getItem(reservation.getItem().getCode());
+
+        if(hirer == null){
             return false;
         }
-        admin.confirmReservationWithdraw(reservation);
-        return lendingDAO.addLending(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name());
+
+        if(item != null){
+            return false;
+        }
+
+        if(hirer.haveReservation(reservation)){
+            return false;
+        }
+
+        if (item.haveReservation(reservation)){
+            return false;
+        }
+
+        LendingDAO lendingDAO = new LendingDAO();
+        ReservationDAO reservationDAO = new ReservationDAO();
+
+        /*cancella reservation */
+        ConnectionManager.closeAutoCommit();
+        if (!reservationDAO.removeReservation(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())) {
+            ConnectionManager.rollback();
+            return false;
+        }
+        if(!lendingDAO.addLending(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())){
+            ConnectionManager.rollback();
+            return false;
+        }
+        ConnectionManager.commit();
+        return true;
     }
 
     public boolean registerItemReturn(Lending lending) {
+        refreshCatalogue();
+        refreshHirers();
+        Hirer hirer = this.admin.getListOfHirers().getHirer(lending.getHirer().getUserCode());
+        Item item = this.admin.getCatalogue().getItem(lending.getItem().getCode());
+
+        if(hirer == null){
+            return false;
+        }
+        if(item == null){
+            return false;
+        }
+
+        if(hirer.haveLending(lending)){
+            return false;
+        }
+
+        if (item.haveLending(lending)){
+            return false;
+        }
+
         LendingDAO lendingDAO = new LendingDAO();
         /*cancella reservation */
-        if (lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name())) {
-            admin.registerItemReturn(lending);
-        }
-        return false;
+        return lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name());
     }
 
     public ArrayList<Item> searchItem(String keyWords, String category) {
@@ -167,18 +415,10 @@ public class AdminController {
     }
 
     public ArrayList<Hirer> searchHirer(String keyWords) {
-
+        refreshHirers();
         return admin.searchHirer(keyWords);
     }
 
-    /*
-    private Admin refreshAdmin(){
-        AdminDAO adminDAO = new AdminDAO();
-        Admin newAdmin = adminDAO.getAdmin(admin.getUserCode());
-        newAdmin.setUserProfile(this.admin.getUserProfile());
-        this.admin = newAdmin;
-    }
-     */
     private void refreshCatalogue() {
         AdminDAO adminDAO = new AdminDAO();
         this.admin.setCatalogue(adminDAO.refreshCatalogue());
@@ -191,7 +431,7 @@ public class AdminController {
 
     //controllo validità parametri;
     //da spostare nella cli
-    private boolean checkParametersValidity(String publicationDate, String language, String category, String borrowable) {
+    private boolean checkParametersValidity(String publicationDate, String language, String category) {
         //convalida data
         try {
             LocalDate.parse(publicationDate);
@@ -199,12 +439,6 @@ public class AdminController {
             return false;
         }
 
-        //convalida borrowable
-        try {
-            Boolean.valueOf(borrowable);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
 
         //convalida lingua
         try {

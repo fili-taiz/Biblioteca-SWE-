@@ -109,8 +109,8 @@ public class ReservationDAO {
             String query = "DELETE FROM Reservation R "
             + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            return statement.executeUpdate(query) == 1;
+
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
