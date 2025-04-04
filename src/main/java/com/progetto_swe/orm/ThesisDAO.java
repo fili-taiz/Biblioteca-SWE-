@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class ThesisDAO {
 
@@ -39,8 +42,8 @@ public class ThesisDAO {
 
             return code;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return -1;
     }
 
     public boolean removeThesis(int code) {
@@ -58,11 +61,14 @@ public class ThesisDAO {
             query
                     = "DELETE FROM Thesis "
                     + "where code = '" + code + "';";
-            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
 
             return true;
         } catch (SQLException e) {
-            return false;
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -76,13 +82,13 @@ public class ThesisDAO {
 
             /**/
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }
 
     public boolean updateThesis(int originalItemCode,String title, String publicationDate, String language, String category, String link, String author,
-    String supervisors, String university) {
+                                String supervisors, String university) {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
@@ -97,27 +103,33 @@ public class ThesisDAO {
             query
                     = "UPDATE Thesis "
                     + "SET author = '" + author + "', supervisors = '" + supervisors + "', university = '" + university + "';";
-            statement.executeUpdate(query);
+
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
-    
+
     private boolean containsThesis(Statement statement, int code) {
         try {
             String query
                     = "SELECT *"
                     + "FROM (SELECT * FROM Item WHERE I.code = " + code + ") I JOIN Thesis T ON I.code = T.code; ";
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error", null);
         }
-        return false;
     }
 
-    private int cointainsThesis(Statement statement, String title, String publicationDate, String borrowable, String language, String category, String link,
-            String author, String supervisors, String university) {
+    private int containsThesis(Statement statement, String title, String publicationDate, String borrowable, String language, String category, String link,
+                               String author, String supervisors, String university) {
 
         try {
             String query
@@ -129,34 +141,39 @@ public class ThesisDAO {
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 return resultSet.getInt("code");
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error", null);
         }
-        return -1;
     }
 
     private int containsCopies(Statement statement, int code, String storagePlace) {
         try {
             String query
                     = "SELECT P.number_of_copies"
-                    + "FROM Phisical_copies P"
+                    + "FROM Physical_copies P"
                     + "WHERE P.code = '" + code + "' AND i.storage_place = '" + storagePlace + "'; ";
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 resultSet.getInt("number_of_copies");
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return -1;
     }
 
     public int addThesis(String title, String publicationDate, String borrowable, String language, String category, String link, String author,
-            String supervisors, String university, String storagePlace, int numberOfCopies) {
+                         String supervisors, String university, String storagePlace, int numberOfCopies) {
 
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-            int code = cointainsThesis(statement, title, publicationDate, borrowable, language, category, link, author, supervisors, university);
+            int code = containsThesis(statement, title, publicationDate, borrowable, language, category, link, author, supervisors, university);
             int copiesStored = containsCopies(statement, code, storagePlace);
 
             //libro non presente
@@ -196,10 +213,13 @@ public class ThesisDAO {
                         + "SET number_of_copies = " + (copiesStored + numberOfCopies)
                         + "WHERE code = '" + code + "' AND storage_place = '" + storagePlace + "'; ";
                 ResultSet resultSet = statement.executeQuery(query);
-                resultSet.next();
+                if(!resultSet.next()){
+                    throw new CRUD_exception("Error executing query!", null);
+                }
                 return code;
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", null);
         }
         return -1;
     }
@@ -214,15 +234,21 @@ public class ThesisDAO {
                     + "FROM Item I JOIN Thesis T ON I.code = T.code";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
                 Item i = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
-                Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("author"), 
+                        Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("author"),
                         resultSet.getString("supervisors"), resultSet.getString("university"));
                 query
                         = "SELECT * "
                         + "FROM Physical_copies P "
                         + "WHERE P.code = " + resultSet.getInt("code");
                 ResultSet copiesSet = statement.executeQuery(query);
+                if(!copiesSet.next()){
+                    throw new DataAccessException("Error executing query!", null);
+                }
                 physicalCopies = new HashMap<>();
                 while (copiesSet.next()) {
                     physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
@@ -231,7 +257,7 @@ public class ThesisDAO {
                 result.add(i);
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return result;
     }
@@ -248,7 +274,7 @@ public class ThesisDAO {
                 return false;
             }
 
-            String query = "DELETE FROM Phisycal_copies "
+            String query = "DELETE FROM Physical_copies "
                     + "WHERE code = " + code + ";";
             ResultSet resultSet = statement.executeQuery(query);
             if (!resultSet.next()) {
@@ -257,26 +283,27 @@ public class ThesisDAO {
 
             query
                     = "SELECT P.number_of_copies"
-                    + "FROM Phisical_copies P"
+                    + "FROM Physical_copies P"
                     + "WHERE P.code = '" + code + "'; ";
             resultSet = statement.executeQuery(query);
 
             if (resultSet.next()) {
                 return true;
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
 
-            query = "DELETE FROM Book "
-                    + "WHERE code = " + code + ";";
-            statement.executeQuery(query);
-            query = "DELETE FROM Thesis "
-                    + "WHERE code = " + code + ";";
-            statement.executeQuery(query);
-            return true;
-
         } catch (SQLException e) {
-
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
 }
+
+/*query = "DELETE FROM Book "
+        + "WHERE code = " + code + ";";
+        statement.executeQuery(query);
+query = "DELETE FROM Thesis "
+        + "WHERE code = " + code + ";";
+        statement.executeQuery(query);
+            return true;*/

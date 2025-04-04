@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class MagazineDAO {
 
@@ -31,6 +34,9 @@ public class MagazineDAO {
                     + "VALUES ('" + title + "', '" + publicationDate + "', '" + language + "', '" + category + "', '" + link + "') "
                     + "RETURNING code;";
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new CRUD_exception("Error executing query!", null);
+            }
             int code = resultSet.getInt("code");
 
             query
@@ -40,8 +46,8 @@ public class MagazineDAO {
 
             return code;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return -1;
     }
 
     public boolean removeMagazine(int code) {
@@ -54,16 +60,22 @@ public class MagazineDAO {
             String query
                     = "DELETE FROM Item "
                     + "WHERE code = '" + code + "';";
-            statement.executeUpdate(query);
+
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
 
             query
                     = "DELETE FROM Magazine "
                     + "where code = '" + code + "';";
-            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
 
             return true;
         } catch (SQLException e) {
-            return false;
+            throw new DatabaseConnectionException("Connection error", e);
         }
     }
 
@@ -79,7 +91,7 @@ public class MagazineDAO {
 
             /**/
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }
@@ -96,15 +108,22 @@ public class MagazineDAO {
                     = "UPDATE Item "
                     + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "' "
                     + "WHERE code = '" + originalItemCode + "';";
-            statement.executeQuery(query);
+
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
 
             query
                     = "UPDATE Magazine "
                     + "SET publishing_house = '" + publishingHouse + "' "
                     + "WHERE code = '" + originalItemCode + "';";
-            statement.executeQuery(query);
+
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return false;
     }
@@ -115,14 +134,17 @@ public class MagazineDAO {
                     = "SELECT *"
                     + "FROM (SELECT * FROM Item WHERE I.code = " + code + ") I JOIN Magazine M ON I.code = M.code ";
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
-    private int cointainsMagazine(Statement statement, String title, String publicationDate, String borrowable, String language, String category,
-                                  String link, String publishingHouse) {
+    private int containsMagazine(Statement statement, String title, String publicationDate, String borrowable, String language, String category,
+                                 String link, String publishingHouse) {
         try {
             String query
                     = "SELECT code"
@@ -133,23 +155,28 @@ public class MagazineDAO {
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 return resultSet.getInt("code");
+            }else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return -1;
     }
 
     private int containsCopies(Statement statement, int code, String storagePlace) {
         try {
             String query
                     = "SELECT P.number_of_copies"
-                    + "FROM Phisical_copies P"
+                    + "FROM Physical_copies P"
                     + "WHERE P.code = '" + code + "' AND i.storage_place = '" + storagePlace + "'; ";
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 resultSet.getInt("number_of_copies");
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return -1;
     }
@@ -160,7 +187,7 @@ public class MagazineDAO {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-            int code = cointainsMagazine(statement, title, publicationDate, borrowable, language, category, link, publishingHouse);
+            int code = containsMagazine(statement, title, publicationDate, borrowable, language, category, link, publishingHouse);
             int copiesStored = containsCopies(statement, code, storagePlace);
 
             //libro non presente
@@ -171,12 +198,16 @@ public class MagazineDAO {
                         + "RETURNING code;";
                 ResultSet resultSet = statement.executeQuery(query);
                 if (!resultSet.next()) {
-                    return -1;
+                    throw new DataAccessException("Error executing query!", null);
                 }
                 code = resultSet.getInt("code");
                 query = "INSERT INTO Magazine (code, publishing_house)"
                         + "VALUES ('" + code + "', '" + publishingHouse + "');";
-                statement.executeQuery(query);
+                ResultSet rs = statement.executeQuery(query);
+                if(!rs.next()){
+                    throw new CRUD_exception("Error executing query!", null);
+                }
+                return code;
             }
 
             //Copia non presente
@@ -189,7 +220,7 @@ public class MagazineDAO {
                     code = resultSet.getInt("code");
                     return code;
                 } else {
-                    return -1;
+                    throw new CRUD_exception("Error executing query!", null);
                 }
             }
 
@@ -200,10 +231,13 @@ public class MagazineDAO {
                         + "SET number_of_copies = " + (copiesStored + numberOfCopies)
                         + "WHERE code = '" + code + "' AND storage_place = '" + storagePlace + "'; ";
                 ResultSet resultSet = statement.executeQuery(query);
-                resultSet.next();
+                if(!resultSet.next()){
+                    throw new CRUD_exception("Error executing query!", null);
+                }
                 return code;
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return -1;
     }
@@ -224,17 +258,17 @@ public class MagazineDAO {
                     + "WHERE code = " + code + ";";
             ResultSet resultSet = statement.executeQuery(query);
             if (!resultSet.next()) {
-                return false;
+                throw new CRUD_exception("Error executing query!", null);
             }
 
             query
                     = "SELECT P.number_of_copies"
-                    + "FROM Phisical_copies P"
+                    + "FROM Physical_copies P"
                     + "WHERE P.code = '" + code + "'; ";
             resultSet = statement.executeQuery(query);
 
-            if (resultSet.next()) {
-                return true;
+            if (!resultSet.next()) {
+                throw new DataAccessException("Error executing query!", null);
             }
 
             query = "DELETE FROM Magazine "
@@ -242,13 +276,15 @@ public class MagazineDAO {
             statement.executeQuery(query);
             query = "DELETE FROM Item "
                     + "WHERE code = " + code + ";";
+
             statement.executeQuery(query);
             return true;
+            //QUI NON SO SE METTERE L'ECCEZIONE
 
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
 
         }
-        return false;
     }
 
 
@@ -262,6 +298,9 @@ public class MagazineDAO {
                     + "FROM Item I JOIN Magazine M ON I.code = M.code";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
                 Item i = new Magazine(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                         Category.valueOf(resultSet.getString("category")), resultSet.getString("link"),
@@ -271,6 +310,9 @@ public class MagazineDAO {
                         + "FROM Physical_copies P "
                         + "WHERE P.code = " + resultSet.getInt("code");
                 ResultSet copiesSet = statement.executeQuery(query);
+                if(!copiesSet.next()){
+                    throw new DataAccessException("Error executing query!", null);
+                }
                 physicalCopies = new HashMap<>();
                 while (copiesSet.next()) {
                     physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
@@ -279,7 +321,7 @@ public class MagazineDAO {
                 result.add(i);
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return result;
     }

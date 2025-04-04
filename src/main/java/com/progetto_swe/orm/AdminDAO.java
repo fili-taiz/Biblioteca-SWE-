@@ -13,6 +13,9 @@ import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.domain_model.ListOfHirers;
 import com.progetto_swe.domain_model.UserCredentials;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class AdminDAO {
     private Connection connection;
@@ -31,13 +34,15 @@ public class AdminDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
-                return new Admin(userCode, resultSet.getString("name"), resultSet.getString("surname"), 
-                        resultSet.getString("email"), resultSet.getString("telephone_number"), 
+                return new Admin(userCode, resultSet.getString("name"), resultSet.getString("surname"),
+                        resultSet.getString("email"), resultSet.getString("telephone_number"),
                         Library.valueOf(resultSet.getString("working_place")), null);
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return null;
     }
 
     public boolean addAdmin(String userCode, String name, String surname, String email, String telephoneNumber, String workingPlace) {
@@ -48,18 +53,19 @@ public class AdminDAO {
                     + workingPlace + "');";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-
-            return resultSet.next();
+            if(resultSet.next()){
+                return true;
+            }else{
+                throw new CRUD_exception("Error executing query!", null);
+            }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
     public Catalogue refreshCatalogue(){
-        ArrayList<Item> newCatalogue = new ArrayList<>(); 
         BookDAO bookDAO = new BookDAO();
-        newCatalogue.addAll(bookDAO.getAllBook());
+        ArrayList<Item> newCatalogue = new ArrayList<>(bookDAO.getAllBook());
         MagazineDAO magazineDAO = new MagazineDAO();
         newCatalogue.addAll(magazineDAO.getAllMagazine());
         ThesisDAO thesisDAO = new ThesisDAO();

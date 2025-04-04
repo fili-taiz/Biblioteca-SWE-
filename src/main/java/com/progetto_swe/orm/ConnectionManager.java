@@ -1,5 +1,8 @@
 package com.progetto_swe.orm;
 
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -18,7 +21,7 @@ public class ConnectionManager {
             String password = "HU12HUI26TAO";
             connection = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DatabaseConnectionException("Connection error!", e);
         }
 
     }
@@ -31,7 +34,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            System.out.println("Errore durante accesso al database");
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -39,7 +42,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
-            System.out.println("Errore durante accesso al database");
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -48,7 +51,7 @@ public class ConnectionManager {
             connection.commit();
             openAutoCommit();
         } catch (SQLException e) {
-            System.out.println("Errore durante accesso al database");
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -57,7 +60,7 @@ public class ConnectionManager {
             connection.rollback();
             openAutoCommit();
         } catch (SQLException e) {
-            System.out.println("Errore durante accesso al database");
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -67,6 +70,10 @@ public class ConnectionManager {
 
             ResultSet resultSet = statement.executeQuery(query);
 
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
+
             while (resultSet.next()) {
                 System.out.println("Id: " + resultSet.getString("userCode")
                         + ", Name: " + resultSet.getString("name")
@@ -74,8 +81,7 @@ public class ConnectionManager {
                         + ";");
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 

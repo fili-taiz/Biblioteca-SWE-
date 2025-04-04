@@ -2,40 +2,33 @@ package com.progetto_swe.domain_model;
 import java.util.ArrayList;
 
 public class ListOfHirers {
-    ArrayList<Hirer> hirers = new ArrayList<>();
-
-    public ListOfHirers(){
-    }
+    ArrayList<Hirer> hirers;
 
     public ListOfHirers(ArrayList<Hirer> hirers){
         this.hirers = hirers;
     }
 
-    public boolean addHirer(Hirer hirer){
-       return hirers.add(hirer);
-    }
-
-    public Hirer getHirer(String userCode){
-        if(!this.hirers.contains(userCode)){
-            return null;
+    public Hirer getHirer(String usercode){
+        for(Hirer h : this.hirers){
+            if(h.getUserCode().equals(usercode)){
+                return h;
+            }
         }
-        return this.hirers.get(this.hirers.indexOf(userCode));
+        return null;
     }
 
-    public void removehirer(Hirer hirer){
-        hirers.remove(hirer);
-    }
-
-    public ArrayList<Hirer> searchHirer(String keyWords) {
-        String[] splittedKeyWord = keyWords.split(" ");
+    public ArrayList<Hirer> searchHirer(String keywords) {
+        String[] splittedKeyword = keywords.split(" ");
         ArrayList<Hirer> result = new ArrayList<>();
         for (Hirer h : this.hirers) {
-            for (String keyWord : splittedKeyWord){
-                if (h.contains(keyWord)) {
+            for (String keyword : splittedKeyword){
+                if (h.contains(keyword)) {
                     result.add(h);
                 }
             }
         }
         return result;
     }
+
+    public ArrayList<Hirer> getHirers() { return hirers; }
 }

@@ -22,30 +22,6 @@ public class Thesis extends Item {
         this.university = university;
     }
 
-    public String getAuthor() {
-        return this.author;
-    }
-
-    public String getSupervisors() {
-        return this.supervisors;
-    }
-
-    public String getUniversity() {
-        return this.university;
-    }
-
-    public void setAuthor(String newAuthor) {
-        this.author = newAuthor;
-    }
-
-    public void setSupervisors(String newSupervisors) {
-        this.supervisors = newSupervisors;
-    }
-
-    public void setUniversity(String newUniversity) {
-        this.university = newUniversity;
-    }
-
     @Override
     public boolean updateItem(Item new_item) {
         if (new_item instanceof Thesis thesis) {
@@ -64,17 +40,17 @@ public class Thesis extends Item {
             return false;
         }
 
-        Thesis thesisCopy = (Thesis) itemsCopy;
-        if (!this.author.equals(thesisCopy.getAuthor())) {
+        if(itemsCopy instanceof Thesis thesisCopy) {
+            if (!this.author.equals(thesisCopy.getAuthor())) {
+                return false;
+            }
+            if (!this.supervisors.equals(thesisCopy.getSupervisors())) {
+                return false;
+            }
+            return this.university.equals(thesisCopy.getUniversity());
+        } else{
             return false;
         }
-        if (!this.supervisors.equals(thesisCopy.getSupervisors())) {
-            return false;
-        }
-        if (!this.university.equals(thesisCopy.getUniversity())) {
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -101,12 +77,36 @@ public class Thesis extends Item {
         return this.author.equals(t.author) && this.supervisors.equals(t.supervisors) && this.university.equals(t.university);
     }
 
-    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei 
-    //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato 
+    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei
+    //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato
     //dalle hashmap e hashset per metterli come chiave di una tupla, se sono uguali metterli nello stesso pair se no metterlo in una posizione diversa;
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public String getSupervisors() {
+        return this.supervisors;
+    }
+
+    public String getUniversity() {
+        return this.university;
+    }
+
+    public void setAuthor(String newAuthor) {
+        this.author = newAuthor;
+    }
+
+    public void setSupervisors(String newSupervisors) {
+        this.supervisors = newSupervisors;
+    }
+
+    public void setUniversity(String newUniversity) {
+        this.university = newUniversity;
     }
 
 }

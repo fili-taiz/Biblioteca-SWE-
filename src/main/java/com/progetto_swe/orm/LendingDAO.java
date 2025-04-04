@@ -8,6 +8,9 @@ import java.time.LocalDate;
 
 import com.progetto_swe.domain_model.Lending;
 import com.progetto_swe.domain_model.Library;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class LendingDAO {
 
@@ -21,18 +24,20 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
         try {
             String query
-                    = "SELECT P.number_of_copies - " 
+                    = "SELECT P.number_of_copies - "
                     + " - (SELECT COUNT(*) FROM Lendings L WHERE L.code = " + code + " AND L.storage_place = '" + storagePlace + "')"
                     + " - (SELECT COUNT(*) FROM Reservation R WHERE R.code = " + code + " AND R.storage_place = '" + storagePlace + "')"
-                    + "FROM Phisical_copies P"
+                    + "FROM Physical_copies P"
                     + "WHERE P.code = '" + code + "' AND i.storage_place = '" + storagePlace + "'; ";
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
-                resultSet.getInt("number_of_copies");
+                return resultSet.getInt("number_of_copies");
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return -1;
     }
 
     private boolean containsHirer(Statement statement, String userCode) {
@@ -42,10 +47,13 @@ public class LendingDAO {
                     + "FROM Hirer H "
                     + "WHERE H.user_code = " + userCode + "; ";
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()) {
+                throw new DataAccessException("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
     public boolean addLending(String userCode, int itemCode, String storagePlace) {
@@ -54,13 +62,15 @@ public class LendingDAO {
             Statement statement = connection.createStatement();
 
             String query = "INSERT INTO Lendings (user_code, code, storage_place, lenfing_date)"
-            + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
+                    + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
     public Lending getLending(String itemCode, Library LIBRARY, String hirerCode) {
@@ -74,7 +84,7 @@ public class LendingDAO {
 
             /**/
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }
@@ -90,7 +100,7 @@ public class LendingDAO {
 
             /**/
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return false;
     }
@@ -101,13 +111,15 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "DELETE FROM Lending L "
-            + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
+                    + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 }

@@ -24,21 +24,13 @@ public class Magazine extends Item {
         if (!super.sameField(itemsCopy)) {
             return false;
         }
-
-        Magazine magazinesCopy = (Magazine) itemsCopy;
-        if (!this.publishingHouse.equals(magazinesCopy.getPublishingHouse())) {
+        if(itemsCopy instanceof Magazine magazineCopy) {
+            return this.publishingHouse.equals(magazineCopy.getPublishingHouse());
+        } else{
             return false;
         }
-        return true;
     }
 
-    public String getPublishingHouse() {
-        return this.publishingHouse;
-    }
-
-    public void setPublishingHouse(String newPublishingHouse) {
-        this.publishingHouse = newPublishingHouse;
-    }
 
     @Override
     public boolean updateItem(Item newItem) {
@@ -68,12 +60,16 @@ public class Magazine extends Item {
         return this.publishingHouse.equals(m.publishingHouse);
     }
 
-    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei 
-    //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato 
+    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei
+    //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato
     //dalle hashmap e hashset per metterli come chiave di una tupla, se sono uguali metterli nello stesso pair se no metterlo in una posizione diversa;
     @Override
     public int hashCode() {
         return super.hashCode();
     }
+
+    public String getPublishingHouse() { return this.publishingHouse; }
+
+    public void setPublishingHouse(String newPublishingHouse) { this.publishingHouse = newPublishingHouse; }
 
 }

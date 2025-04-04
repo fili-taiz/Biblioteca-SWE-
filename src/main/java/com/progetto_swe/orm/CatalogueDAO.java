@@ -7,6 +7,7 @@ import java.sql.Statement;
 
 import com.progetto_swe.domain_model.Catalogue;
 import com.progetto_swe.domain_model.Hirer;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 /* probabile che non possa servire */
 public class CatalogueDAO {
@@ -25,16 +26,16 @@ public class CatalogueDAO {
 
             resultSet.next();
 
-        /**/
+            /**/
 
-        
+
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return new Catalogue();
+        return new Catalogue(null);
     }
 
-    public Hirer updatCatalogue(Catalogue Catalogue){
+    public Hirer updateCatalogue(Catalogue Catalogue){
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "query";
@@ -43,11 +44,11 @@ public class CatalogueDAO {
 
             resultSet.next();
 
-        /**/
+            /**/
 
-        
+
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }

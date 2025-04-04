@@ -27,7 +27,5 @@ public abstract class User {
     public void setUserCode(String userCode) { this.userCode = userCode; }
     public void setName(String name) { this.name = name; }
     public void setSurname(String surname) { this.surname = surname; }
-    public void setEMail(String email) { this.email = email; }
-    public void setTelephoneNumber(String telephoneNumber) { this.telephoneNumber = telephoneNumber; }
     public void setUserCredentials(UserCredentials newUserCredentials){ this.userCredentials = newUserCredentials; }
 }

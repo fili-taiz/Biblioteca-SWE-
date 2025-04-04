@@ -8,6 +8,9 @@ import java.time.LocalDate;
 
 import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.domain_model.Reservation;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class ReservationDAO {
     private Connection connection;
@@ -24,11 +27,11 @@ public class ReservationDAO {
 
             resultSet.next();
 
-        /**/
+            /**/
 
-        
+
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }
@@ -41,11 +44,11 @@ public class ReservationDAO {
 
             resultSet.next();
 
-        /**/
+            /**/
 
-        
+
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }
@@ -54,7 +57,7 @@ public class ReservationDAO {
         this.connection = ConnectionManager.getConnection();
         try {
             String query
-                    = "SELECT P.number_of_copies - " 
+                    = "SELECT P.number_of_copies - "
                     + " - (SELECT COUNT(*) FROM Lendings L WHERE L.code = " + code + " AND L.storage_place = '" + storagePlace + "')"
                     + " - (SELECT COUNT(*) FROM Reservation R WHERE R.code = " + code + " AND R.storage_place = '" + storagePlace + "')"
                     + "FROM Phisical_copies P"
@@ -62,8 +65,11 @@ public class ReservationDAO {
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 resultSet.getInt("number_of_copies");
+            }else{
+                throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return -1;
     }
@@ -75,10 +81,13 @@ public class ReservationDAO {
                     + "FROM Hirer H "
                     + "WHERE H.user_code = " + userCode + "; ";
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
     public boolean addReservation(String userCode, int itemCode, String storagePlace) {
@@ -94,26 +103,30 @@ public class ReservationDAO {
             }
 
             String query = "INSERT INTO Reservation (user_code, code, storage_place, lending_date)"
-            + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
+                    + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
     public boolean removeReservation(String userCode, int itemCode, String storagePlace){
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "DELETE FROM Reservation R "
-            + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
+                    + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
             Statement statement = connection.createStatement();
-            return statement.executeUpdate(query) == 1;
+            if(statement.executeUpdate(query) != 1){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+            return true;
 
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 }

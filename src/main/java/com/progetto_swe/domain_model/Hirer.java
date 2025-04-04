@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Hirer extends User{
-    ArrayList<Lending> lendings = new ArrayList<>();
-    ArrayList<Reservation> reservations = new ArrayList<>();
-    Catalogue catalogue = new Catalogue();
+    ArrayList<Lending> lendings;
+    ArrayList<Reservation> reservations;
+    Catalogue catalogue;
     LocalDate unbannedDate;
 
     public Hirer(String userCode, String name, String surname, String email, String telephoneNumber,
@@ -18,19 +18,20 @@ public class Hirer extends User{
         this.unbannedDate = unbannedDate;
     }
 
-    public Hirer(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userProfile, LocalDate unbannedDate) {
+    /*public Hirer(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userProfile, LocalDate unbannedDate) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.unbannedDate = unbannedDate;
-    }
+    }*/
 
-    public ArrayList<Item> searchItem(String keyWords, Category category){
-        return catalogue.searchItem(keyWords, category);
-    }
+
+    public ArrayList<Item> searchItem(String keywords, Category category){
+        return catalogue.searchItem(keywords, category);
+    } //HO GIA' TESTATO catalogue.searchitem...
 
     public boolean reservePhysicalCopy(Item item, Library storagePlace){
         Reservation r = new Reservation(LocalDate.now(), this, item, storagePlace);
         return reservations.add(r) /*&& item.addReservation(r)*/;
-    }
+    }//E' semplicemente un add...
 
     public boolean haveReservation(Reservation reservation){
         for(Reservation r : reservations){
@@ -39,7 +40,7 @@ public class Hirer extends User{
             }
         }
         return false;
-    }
+    } //GIA' TESTATO NELLA CLASSE ITEM
 
     public boolean haveLending(Lending lending){
         for(Lending l : lendings){
@@ -48,34 +49,32 @@ public class Hirer extends User{
             }
         }
         return false;
+    } //GIA' TESTATO NELLA CLASSE ITEM
+
+    public boolean contains(String keyword){
+        if(userCode.toUpperCase().contains(keyword.toUpperCase())){
+            return true;
+        }
+        if(name.toUpperCase().contains(keyword.toUpperCase())){
+            return true;
+        }
+        if(surname.toUpperCase().contains(keyword.toUpperCase())){
+            return true;
+        }
+        if(email.toUpperCase().contains(keyword.toUpperCase())){
+            return true;
+        }
+        return telephoneNumber.toUpperCase().contains(keyword.toUpperCase());
     }
 
-    public boolean contains(String keyWord){
-        if(userCode.toUpperCase().contains(keyWord)){
-            return true;
-        }
-        if(name.toUpperCase().contains(keyWord)){
-            return true;
-        }
-        if(surname.toUpperCase().contains(keyWord)){
-            return true;
-        }
-        if(email.toUpperCase().contains(keyWord)){
-            return true;
-        }
-        if(telephoneNumber.toUpperCase().contains(keyWord)){
-            return true;
-        }
-        return false;
-    }
-
-    public LocalDate getUnbannedDate() {
-        return unbannedDate;
-    }
 
     //controllo autorizzazione
-    public ArrayList<Lending> getLendings() { return lendings; }
-    public ArrayList<Reservation> getReservations() { return reservations; }
+    public ArrayList<Lending> getLendings() { return this.lendings; }
+    public ArrayList<Reservation> getReservations() { return this.reservations; }
+    public Catalogue getCatalogue(){ return this.catalogue; }
+    public LocalDate getUnbannedDate() {
+        return this.unbannedDate;
+    }
 
 
 }

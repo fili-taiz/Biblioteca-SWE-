@@ -1,6 +1,10 @@
 package com.progetto_swe.orm;
 
 
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,9 +26,8 @@ public class PhysicalCopiesDAO {
             ResultSet resultSet = statement.executeQuery(query);
             return resultSet.next();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
     public void removePhysicalCopies(int code, String storagePlace){
@@ -36,7 +39,7 @@ public class PhysicalCopiesDAO {
             Statement statement = connection.createStatement();
             statement.execute(query);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -49,12 +52,14 @@ public class PhysicalCopiesDAO {
                     + "WHERE code = '" + code + "' AND storage_place = '" + storagePlace + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             resultSet.next();
             return resultSet.getInt("number_of_copies");
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return 0;
     }
 
     public boolean updatePhysicalCopies(int code, String storagePlace, int newNumberOfCopies, boolean borrowable) {
@@ -65,10 +70,12 @@ public class PhysicalCopiesDAO {
                     + "SET number_of_copies = " + newNumberOfCopies
                     + "WHERE code = " + code + " AND storage_place = '" + storagePlace + "' AND borrowable = " + borrowable + "; ";
             Statement statement = connection.createStatement();
-            return statement.executeUpdate(query) == 0;
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
+            return true;
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 }

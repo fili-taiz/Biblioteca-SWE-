@@ -10,7 +10,5 @@ public class PhysicalCopies {
     }
 
     public int getNumberOfPhysicalCopies() {return this.numberOfPhysicalCopies;}
-    public void setNumberOfPhysicalCopies(int numberOfPhysicalCopies) {this.numberOfPhysicalCopies = numberOfPhysicalCopies;}
-    public boolean isBorrowable() {return this.borrowable;}
-    public void setBorrowable(boolean borrowable) {this.borrowable = borrowable;}
+    public boolean isBorrowable() { return this.borrowable; }
 }

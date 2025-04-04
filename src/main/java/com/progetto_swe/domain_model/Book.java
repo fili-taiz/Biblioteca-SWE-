@@ -75,17 +75,20 @@ public class Book extends Item {
         if (!super.sameField(itemsCopy)) {
             return false;
         }
-        Book booksCopy = (Book) itemsCopy;
-        if (!this.isbn.equals(booksCopy.getIsbn())) {
+        if(itemsCopy instanceof Book booksCopy) {
+            if (!this.isbn.equals(booksCopy.getIsbn())) {
+                return false;
+            }
+            if (!this.publishingHouse.equals(booksCopy.getPublishingHouse())) {
+                return false;
+            }
+            if (this.numberOfPages != booksCopy.getNumberOfPages()) {
+                return false;
+            }
+            return this.authors.equals(booksCopy.getAuthors());
+        } else{
             return false;
         }
-        if (!this.publishingHouse.equals(booksCopy.getPublishingHouse())) {
-            return false;
-        }
-        if (this.numberOfPages != booksCopy.getNumberOfPages()) {
-            return false;
-        }
-        return this.getAuthors().equals(booksCopy.getAuthors());
     }
 
     @Override

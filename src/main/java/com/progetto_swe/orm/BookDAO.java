@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class BookDAO {
 
@@ -31,17 +34,21 @@ public class BookDAO {
                     + "VALUES ('" + title + "', '" + publicationDate + "', '" + language + "', '" + category + "', '" + link + "') "
                     + "RETURNING code;";
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new CRUD_exception("Error executing query!", null);
+            }
             int code = resultSet.getInt("code");
 
             query
                     = "INSERT INTO Book (code, isbn, publishing_house, number_of_pages, authors)"
                     + "VALUES ('" + code + "', '" + isbn + "', " + publishingHouse + ", " + numberOfPages + ", '" + authors + "');";
-            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
-
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
             return code;
         } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return -1;
     }
 
     public boolean removeBook(int code) {
@@ -50,20 +57,24 @@ public class BookDAO {
         try {
             Statement statement = connection.createStatement();
 
-            //Creazione Item e Book
             String query
                     = "DELETE FROM Item "
                     + "WHERE code = '" + code + "';";
-            statement.executeUpdate(query);
+            if (statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            };
 
             query
                     = "DELETE FROM Book "
                     + "where code = '" + code + "';";
-            statement.executeUpdate(query); //si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
 
-            return true;
+            if (statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }else{
+                return true;
+            }
         } catch (SQLException e) {
-            return false;
+            throw new DatabaseConnectionException("Connection error!", e);
         }
     }
 
@@ -78,7 +89,7 @@ public class BookDAO {
 
             /**/
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return null;
     }
@@ -92,18 +103,24 @@ public class BookDAO {
                     = "UPDATE Item "
                     + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "'"
                     + "WHERE code = '" + originalItemCode + "';";
-            statement.executeUpdate(query);
+            if(statement.executeUpdate(query) <= 0){
+                throw new CRUD_exception("Error executing query!", null);
+            }
 
             query
                     = "UPDATE Book "
                     + "SET isbn = '" + isbn + "', publishing_house = '" + publishingHouse + "', number_of_pages = " + numberOfPages
                     + ", authors = '" + authors + "' "
                     + "WHERE code = '" + originalItemCode + "';";
-            statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery(query);
+            if(resultSet.next()){
+                return true;
+            } else{
+                throw new CRUD_exception("Error executing query!", null);
+            }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return false;
     }
 
 
@@ -117,6 +134,9 @@ public class BookDAO {
                     + "FROM Item I JOIN Book B ON I.code = B.code";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
                 Item i = new Book(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                         Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
@@ -126,6 +146,9 @@ public class BookDAO {
                         + "FROM Physical_copies P "
                         + "WHERE P.code = " + resultSet.getInt("code");
                 ResultSet copiesSet = statement.executeQuery(query);
+                if(!copiesSet.next()){
+                    throw new DataAccessException("Error executing query!", null);
+                }
                 physicalCopies = new HashMap<>();
                 while (copiesSet.next()) {
                     physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
@@ -133,10 +156,10 @@ public class BookDAO {
                 i.setPhysicalCopies(physicalCopies);
                 result.add(i);
             }
+            return result;
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            throw new DatabaseConnectionException("Connection error!", e);
         }
-        return result;
     }
 
     /*

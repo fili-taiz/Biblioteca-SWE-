@@ -9,6 +9,6 @@ public class UserCredentials {
         this.HashedPassword = HashedPassword;
     }
 
-    public String getuserCode(){ return this.userCode; }
+    public String getUserCode(){ return this.userCode; }
     public String getHashedPassword(){ return this.HashedPassword; }
 }

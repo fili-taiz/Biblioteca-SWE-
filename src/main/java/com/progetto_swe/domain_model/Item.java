@@ -96,6 +96,10 @@ public class Item {
         return false;
     }
 
+    public int getNumberOfLibraries(){
+        return physicalCopies.size();
+    }
+
     public int getNumberOfLendingsInLibrary(Library library){
         int n = 0;
         for(Lending l: this.lendings){
@@ -106,9 +110,6 @@ public class Item {
         return n;
     }
 
-    public int getNumberOfLibraries(){
-        return physicalCopies.size();
-    }
 
     public int getNumberOfReservationsInLibrary(Library library){
         int n = 0;
@@ -143,16 +144,14 @@ public class Item {
     public Language getLanguage(){ return this.language;}
     public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
-
-    public void setPhysicalCopies(HashMap<Library, PhysicalCopies> physicalCopies) {
-        this.physicalCopies = physicalCopies;
-    }
+    public ArrayList<Reservation> getReservations() { return this.reservations; }
+    public ArrayList<Lending> getLendings() { return this.lendings; }
+    public HashMap<Library, PhysicalCopies> getPhysicalCopies() { return this.physicalCopies; }
 
     public void setCode(int newCode){ this.code = newCode; }
-    public void setTitle(String newTitle){ this.title = newTitle; }
-    public void setPublicationDate(LocalDate newPublicationDate){ this.publicationDate = newPublicationDate; }
-    public void setLanguage(Language newLanguage){ this.language = newLanguage; }
     public void setCategory(Category newCategory){ this.category = newCategory;}
-    public void setLink(String newLink){ this.link = newLink;}
+    public void setReservations(ArrayList<Reservation> newReservations) {this.reservations = newReservations; }
+    public void setLendings(ArrayList<Lending> newLendings){this.lendings = newLendings; }
+    public void setPhysicalCopies(HashMap<Library, PhysicalCopies> physicalCopies) { this.physicalCopies = physicalCopies; }
 
 }
