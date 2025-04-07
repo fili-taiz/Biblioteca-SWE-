@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 
-public class ThesisDAO {
+/*public class ThesisDAO {
 
     private Connection connection;
 
@@ -74,7 +74,7 @@ public class ThesisDAO {
 
             resultSet.next();
 
-            /**/
+
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
@@ -280,3 +280,4 @@ public class ThesisDAO {
     }
 
 }
+*/

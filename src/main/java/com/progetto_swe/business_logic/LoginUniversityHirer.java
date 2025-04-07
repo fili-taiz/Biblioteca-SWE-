@@ -9,7 +9,7 @@ import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
 public class LoginUniversityHirer {
-
+/*
     public Hirer loginUniversityHirer(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
 
@@ -41,4 +41,5 @@ public class LoginUniversityHirer {
         //riconosciuto dal sistema universitario e presente nel database della biblioteca
         return hirer;
     }
+ */
 }

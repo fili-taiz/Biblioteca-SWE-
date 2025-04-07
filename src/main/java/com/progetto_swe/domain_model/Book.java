@@ -5,22 +5,19 @@ import java.time.LocalDate;
 public class Book extends Item {
     String isbn;
     String publishingHouse;
-    int numberOfPages;
     String authors;
 
     public Book(int code, String title, LocalDate publicationDate, Language language, Category category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
-        super(code, title, publicationDate, language, category, link);
+        super(code, title, publicationDate, language, category, link, numberOfPages);
         this.isbn = isbn;
         this.publishingHouse = publishingHouse;
-        this.numberOfPages = numberOfPages;
         this.authors = authors;
     }
 
     public Book(String title, LocalDate publicationDate, Language language, Category category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
-        super(-1, title, publicationDate, language, category, link);
+        super(-1, title, publicationDate, language, category, link, numberOfPages);
         this.isbn = isbn;
         this.publishingHouse = publishingHouse;
-        this.numberOfPages = numberOfPages;
         this.authors = authors;
     }
 
@@ -75,17 +72,19 @@ public class Book extends Item {
         if (!super.sameField(itemsCopy)) {
             return false;
         }
-        Book booksCopy = (Book) itemsCopy;
-        if (!this.isbn.equals(booksCopy.getIsbn())) {
-            return false;
+        if(itemsCopy instanceof Book booksCopy) {
+            if (!this.isbn.equals(booksCopy.getIsbn())) {
+                return false;
+            }
+            if (!this.publishingHouse.equals(booksCopy.getPublishingHouse())) {
+                return false;
+            }
+            if (this.numberOfPages != booksCopy.getNumberOfPages()) {
+                return false;
+            }
+            return this.getAuthors().equals(booksCopy.getAuthors());
         }
-        if (!this.publishingHouse.equals(booksCopy.getPublishingHouse())) {
-            return false;
-        }
-        if (this.numberOfPages != booksCopy.getNumberOfPages()) {
-            return false;
-        }
-        return this.getAuthors().equals(booksCopy.getAuthors());
+        return false;
     }
 
     @Override
@@ -108,7 +107,10 @@ public class Book extends Item {
             return false;
         }
 
-        Book b = (Book) o;
+        if(!(o instanceof Book b)) {
+            return false;
+        }
+
         return this.isbn.equals(b.getIsbn()) && this.publishingHouse.equals(b.getPublishingHouse()) && this.numberOfPages == b.getNumberOfPages() && this.authors.equals(b.getAuthors());
     }
 

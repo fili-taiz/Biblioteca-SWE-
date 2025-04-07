@@ -1,24 +1,21 @@
 package com.progetto_swe.domain_model;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Catalogue{
     ArrayList<Item> items;
 
-    public Catalogue() {
-        this.items = new ArrayList<>();
-    }
-
     public Catalogue(ArrayList<Item> items) {
-        this.items = items;
-    }
+        this.items = Objects.requireNonNullElseGet(items, ArrayList::new);
+    } //se items è non nullo mette this.items = items, altrimenti lo crea, l'ho fatto per togliere l'altro costruttore
 
-    public ArrayList<Item> searchItem(String keyWords, Category category) {
-        String[] splittedKeyWord = keyWords.split(" ");
+    public ArrayList<Item> searchItem(String keywords, Category category) {
+        String[] splittedKeyword = keywords.split(" ");
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : this.items) {
-            for (String keyWord : splittedKeyWord){
-                if (i.getCategory().equals(category) && i.contains(keyWord)) {
+            for (String keyword : splittedKeyword){
+                if (i.getCategory().equals(category) && i.contains(keyword)) {
                     result.add(i);
                 }
             }
@@ -47,7 +44,9 @@ public class Catalogue{
 
     public boolean addItem(Item item){
         return items.add(item);
-    }
+    } //non lo testo perché è semplicemente un add
+
+    public ArrayList<Item> getItems(){ return this.items; }
 
    /* public boolean removeCopies(int itemCode, Library storagePlace){
         getItem(itemCode).removeCopies(storagePlace);

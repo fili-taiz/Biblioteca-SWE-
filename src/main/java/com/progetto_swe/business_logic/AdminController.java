@@ -17,7 +17,7 @@ import com.progetto_swe.domain_model.Thesis;
 import com.progetto_swe.orm.*;
 
 public class AdminController {
-
+/*
     Admin admin;
 
     public AdminController(Admin admin) {
@@ -367,8 +367,9 @@ public class AdminController {
 
         LendingDAO lendingDAO = new LendingDAO();
         ReservationDAO reservationDAO = new ReservationDAO();
-
-        /*cancella reservation */
+*/
+    /*
+        cancella reservation
         ConnectionManager.closeAutoCommit();
         if (!reservationDAO.removeReservation(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())) {
             ConnectionManager.rollback();
@@ -404,8 +405,8 @@ public class AdminController {
         }
 
         LendingDAO lendingDAO = new LendingDAO();
-        /*cancella reservation */
-        return lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name());
+        *//*cancella reservation */
+        /*return lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name());
     }
 
     public ArrayList<Item> searchItem(String keyWords, String category) {
@@ -455,7 +456,7 @@ public class AdminController {
         }
         return true;
     }
-
+*/
 }
 
 /**

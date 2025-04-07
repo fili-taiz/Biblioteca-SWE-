@@ -11,7 +11,7 @@ import java.util.HashMap;
 import com.progetto_swe.domain_model.*;
 
 public class MagazineDAO {
-
+/*
     private Connection connection;
 
     public MagazineDAO() {
@@ -77,7 +77,7 @@ public class MagazineDAO {
 
             resultSet.next();
 
-            /**/
+
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
@@ -283,5 +283,5 @@ public class MagazineDAO {
         }
         return result;
     }
-
+*/
 }

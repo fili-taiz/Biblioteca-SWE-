@@ -4,8 +4,6 @@ import java.util.ArrayList;
 public class ListOfHirers {
     ArrayList<Hirer> hirers = new ArrayList<>();
 
-    public ListOfHirers(){
-    }
 
     public ListOfHirers(ArrayList<Hirer> hirers){
         this.hirers = hirers;
@@ -22,7 +20,7 @@ public class ListOfHirers {
         return this.hirers.get(this.hirers.indexOf(userCode));
     }
 
-    public void removehirer(Hirer hirer){
+    public void removeHirer(Hirer hirer){
         hirers.remove(hirer);
     }
 

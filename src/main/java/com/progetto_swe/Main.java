@@ -16,11 +16,11 @@ import java.nio.charset.StandardCharsets;
 
 
 public class Main {
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         CommandLineInterface cli = new CommandLineInterface();
         cli.start();
         //ConnectionManager.query("Select * From Hirer");
-        System.out.println(Math.round((Math.random()*1000000)) + "\033[1mInsert your String here\033[0m");
+        System.out.println(Math.round((Math.random() * 1000000)) + "\033[1mInsert your String here\033[0m");
 /*ArrayList<String> a = new ArrayList<>();
 a.add("C");
 a.add("c");
@@ -30,11 +30,11 @@ a.add("A");
 
         Item i1 = new Item(1, "null", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "null", false);
         Item i2 = new Item(1, "null", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "null", false);
-        */
+
         Integer i = 1;
-        System.out.println(i-8);
+        System.out.println(i - 8);
         HirerDAO dao = new HirerDAO();
-        System.out.println(dao.getHirer("1")==null);
+        System.out.println(dao.getHirer("1") == null);
 
         String input = "as";
         MessageDigest md = null;
@@ -45,6 +45,7 @@ a.add("A");
         }
 
         md.digest(input.getBytes(StandardCharsets.UTF_8));
-    }
+
+    }*/
 
 }

@@ -9,17 +9,19 @@ public class Item {
     Language language;
     Category category;
     String link;
+    int numberOfPages;
     HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
     ArrayList<Lending> lendings = new ArrayList<>();
     ArrayList<Reservation> reservations = new ArrayList<>();
 
-    public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link) {
+    public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int numberOfPages) {
         this.code = code;
         this.title = title;
         this.publicationDate = publicationDate;
         this.language = language;
         this.category = category;
         this.link = link;
+        this.numberOfPages = numberOfPages;
     }
 
     public boolean contains(String keyword){
@@ -45,10 +47,10 @@ public class Item {
         if(itemsCopy.getCategory() != this.category){
             return false;
         }
-        if (!itemsCopy.getLink().equals(this.link)) {
+        if(!(itemsCopy.getLink().equals(this.link))){
             return false;
         }
-        return true;
+        return itemsCopy.getNumberOfPages() == this.numberOfPages;
     }
 
     public boolean haveReservation(Reservation reservation){
@@ -143,6 +145,7 @@ public class Item {
     public Language getLanguage(){ return this.language;}
     public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
+    public int getNumberOfPages(){ return this.numberOfPages;}
 
     public void setPhysicalCopies(HashMap<Library, PhysicalCopies> physicalCopies) {
         this.physicalCopies = physicalCopies;
@@ -154,5 +157,7 @@ public class Item {
     public void setLanguage(Language newLanguage){ this.language = newLanguage; }
     public void setCategory(Category newCategory){ this.category = newCategory;}
     public void setLink(String newLink){ this.link = newLink;}
+    public void setLendings(ArrayList<Lending> newLendings){ this.lendings = newLendings; }
+    public void setReservations(ArrayList<Reservation> newReservations){ this.reservations = newReservations; }
 
 }

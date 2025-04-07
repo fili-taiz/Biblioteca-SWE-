@@ -11,16 +11,17 @@ public class Admin extends User{
     public Admin(String userCode, String name, String surname, String email, String telephoneNumber, Library workingPlace, UserCredentials userProfile) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.workingPlace = workingPlace;
-    }
+    } //TESTATO
 
 
-    public ArrayList<Item> searchItem(String keyWords, Category category){
-        return this.catalogue.searchItem(keyWords, category);
-    }
+    public ArrayList<Item> searchItem(String keywords, Category category){
+        return this.catalogue.searchItem(keywords, category);
+    } //TESTO DIRETTAMENTE searchItem nella classe Catalogue
 
-    public ArrayList<Hirer> searchHirer(String keyWords){
-        return this.listOfHirers.searchHirer(keyWords);
+    public ArrayList<Hirer> searchHirer(String keywords){
+        return this.listOfHirers.searchHirer(keywords);
     }
+    //TESTO DIRETTAMENTE searchHirer nella classe ListOfHirers
 
     public ListOfHirers getListOfHirers() {
         return listOfHirers;

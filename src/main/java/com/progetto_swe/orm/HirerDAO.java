@@ -14,7 +14,7 @@ import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.UserCredentials;
 
 public class HirerDAO {
-
+/*
     private Connection connection;
 
     //creazione Hirer con solo i dati inerenti hirer
@@ -75,11 +75,11 @@ public class HirerDAO {
         return false;
     }
 
-    public boolean addHirerPassword(String userCode, String salt, String hashedPasswor) {
+    public boolean addHirerPassword(String userCode, String salt, String hashedPassword) {
         try {
             connection = ConnectionManager.getConnection();
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number)"
-                    + "VALUES ('" + userCode + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "');";
+                    + "VALUES ('" + userCode + "', '" + salt + "', + hashedPassword);";
             Statement statement = connection.createStatement();
             return statement.executeUpdate(query) > 0;
         } catch (SQLException e) {
@@ -100,7 +100,7 @@ public class HirerDAO {
     }
 
 
-
+*/
 
     /*
     public boolean addHirer(String userCode, String password, String name, String surname, String email, String telephoneNumber) {
@@ -118,7 +118,7 @@ public class HirerDAO {
         return false;
     }
 */
-
+/*
 
     public ArrayList<Hirer> getAllHirers() {
         ArrayList<Hirer> result = new ArrayList<>();
@@ -131,7 +131,7 @@ public class HirerDAO {
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 Hirer h = new Hirer(resultSet.getString("user_code"), resultSet.getString("name"),
-                        resultSet.getString("surname"), resultSet.getString("email"), resultSet.getString("telephone_number"), null);
+                        resultSet.getString("surname"), resultSet.getString("email"), resultSet.getString("telephone_number"), null, null);
                 result.add(h);
             }
         } catch (SQLException e) {
@@ -139,5 +139,5 @@ public class HirerDAO {
         }
         return result;
     }
-
+*/
 }

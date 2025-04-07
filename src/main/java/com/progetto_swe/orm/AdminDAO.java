@@ -15,6 +15,7 @@ import com.progetto_swe.domain_model.ListOfHirers;
 import com.progetto_swe.domain_model.UserCredentials;
 
 public class AdminDAO {
+    /*
     private Connection connection;
 
     public AdminDAO(){
@@ -71,4 +72,6 @@ public class AdminDAO {
         HirerDAO hirerDAO = new HirerDAO();
         return new ListOfHirers(hirerDAO.getAllHirers());
     }
+
+     */
 }

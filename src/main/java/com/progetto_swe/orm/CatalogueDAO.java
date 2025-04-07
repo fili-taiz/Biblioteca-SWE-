@@ -31,7 +31,7 @@ public class CatalogueDAO {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
-        return new Catalogue();
+        return new Catalogue(null);
     }
 
     public Hirer updatCatalogue(Catalogue Catalogue){

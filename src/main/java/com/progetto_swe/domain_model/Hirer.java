@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Hirer extends User{
-    ArrayList<Lending> lendings = new ArrayList<>();
-    ArrayList<Reservation> reservations = new ArrayList<>();
-    Catalogue catalogue = new Catalogue();
+    ArrayList<Lending> lendings;
+    ArrayList<Reservation> reservations;
+    Catalogue catalogue;
     LocalDate unbannedDate;
 
     public Hirer(String userCode, String name, String surname, String email, String telephoneNumber,
@@ -18,19 +18,19 @@ public class Hirer extends User{
         this.unbannedDate = unbannedDate;
     }
 
-    public Hirer(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userProfile, LocalDate unbannedDate) {
+    /*public Hirer(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userProfile, LocalDate unbannedDate) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.unbannedDate = unbannedDate;
-    }
+    }*/
 
-    public ArrayList<Item> searchItem(String keyWords, Category category){
-        return catalogue.searchItem(keyWords, category);
-    }
+    public ArrayList<Item> searchItem(String keywords, Category category){
+        return catalogue.searchItem(keywords, category);
+    } //testo direttamente searchItem() della classe Catalogue
 
     public boolean reservePhysicalCopy(Item item, Library storagePlace){
         Reservation r = new Reservation(LocalDate.now(), this, item, storagePlace);
         return reservations.add(r) /*&& item.addReservation(r)*/;
-    }
+    } //non lo testo in quanto è semplicemente un add su un ArrayList
 
     public boolean haveReservation(Reservation reservation){
         for(Reservation r : reservations){
@@ -50,32 +50,33 @@ public class Hirer extends User{
         return false;
     }
 
-    public boolean contains(String keyWord){
-        if(userCode.toUpperCase().contains(keyWord)){
+    public boolean contains(String keyword){
+        if(userCode.toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(name.toUpperCase().contains(keyWord)){
+        if(name.toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(surname.toUpperCase().contains(keyWord)){
+        if(surname.toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(email.toUpperCase().contains(keyWord)){
+        if(email.toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(telephoneNumber.toUpperCase().contains(keyWord)){
-            return true;
-        }
-        return false;
+        return telephoneNumber.toUpperCase().contains(keyword.toUpperCase());
     }
 
     public LocalDate getUnbannedDate() {
-        return unbannedDate;
+        return this.unbannedDate;
     }
 
     //controllo autorizzazione
-    public ArrayList<Lending> getLendings() { return lendings; }
-    public ArrayList<Reservation> getReservations() { return reservations; }
+    public ArrayList<Lending> getLendings() { return this.lendings; }
+    public ArrayList<Reservation> getReservations() { return this.reservations; }
 
+    public Catalogue getCatalogue(){ return this.catalogue; }
+
+    public void setLendings(ArrayList<Lending> newLendings){ this.lendings = newLendings; }
+    public void setReservations(ArrayList<Reservation> newReservations){ this.reservations = newReservations; }
 
 }

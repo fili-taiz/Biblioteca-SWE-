@@ -9,7 +9,7 @@ import com.progetto_swe.orm.AdminDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
 public class LoginAdminController{
-
+/*
     public Admin login(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
 
@@ -41,4 +41,5 @@ public class LoginAdminController{
         //riconosciuto dal sistema universitario e presente nel database della biblioteca
         return admin;
     }
+ */
 }

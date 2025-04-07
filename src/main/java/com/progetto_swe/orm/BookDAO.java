@@ -11,7 +11,7 @@ import java.util.HashMap;
 import com.progetto_swe.domain_model.*;
 
 public class BookDAO {
-
+/*
     private Connection connection;
 
     public BookDAO() {
@@ -76,7 +76,7 @@ public class BookDAO {
 
             resultSet.next();
 
-            /**/
+
         } catch (SQLException e) {
             // TODO Auto-generated catch block
         }
@@ -139,7 +139,7 @@ public class BookDAO {
         return result;
     }
 
-    /*
+
     public HashMap<Library, Integer> getBookCopies(Statement statement, int code) {
         HashMap<Library, Integer> copies = new HashMap<>();
         connection = ConnectionManager.getConnection();

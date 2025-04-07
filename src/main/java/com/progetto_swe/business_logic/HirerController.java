@@ -12,6 +12,7 @@ import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.ReservationDAO;
 
 public class HirerController {
+    /*
     Hirer hirer;
 
     public HirerController(Hirer hirer){
@@ -42,7 +43,7 @@ public class HirerController {
         return hirer.getReservations();
     }
 
-
+*/
 
 
 }

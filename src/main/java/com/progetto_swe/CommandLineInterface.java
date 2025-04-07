@@ -18,7 +18,7 @@ import jakarta.mail.internet.MimeMessage;
  * data of any type.
  */
 
-public class CommandLineInterface {
+/*public class CommandLineInterface {
     int screenWidth = 90;
 
     public void start() {
@@ -68,4 +68,4 @@ public class CommandLineInterface {
         printBiblioteca();
     }
 
-}
+}*/

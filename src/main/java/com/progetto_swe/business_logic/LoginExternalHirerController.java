@@ -7,6 +7,7 @@ import com.progetto_swe.orm.HirerDAO;
 import java.util.HashMap;
 
 public class LoginExternalHirerController {
+    /*
     public Hirer login(String userCode, String password){
         HirerDAO hirerDAO = new HirerDAO();
         HashMap<String, String> saltAndHashedPassword = hirerDAO.getSaltAndHashedPassword(userCode);
@@ -21,4 +22,5 @@ public class LoginExternalHirerController {
         hirer.setUserCredentials(new UserCredentials(userCode,saltAndHashedPassword.get("hashedPassword")));
         return hirer;
     }
+     */
 }
