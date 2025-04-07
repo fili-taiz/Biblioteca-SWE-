@@ -1,6 +1,7 @@
 package com.progetto_swe.domain_model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Thesis extends Item {
 
@@ -23,6 +24,26 @@ public class Thesis extends Item {
     }
 
     @Override
+    public String[] getValues() {
+        return new String[]{this.title, this.author, this.category.name(), this.publicationDate.toString()};
+    }
+
+    @Override
+    public ArrayList<String[]> toStringValues() {
+        ArrayList<String[]> data = new ArrayList<>();
+        data.add(new String[]{"Codice: ", Integer.toString(this.code)});
+        data.add(new String[]{"Titolo: ", this.title});
+        data.add(new String[]{"Autore: ", this.author});
+        data.add(new String[]{"Data pubblicazione: ", this.publicationDate.toString()});
+        data.add(new String[]{"Università: ", this.university});
+        data.add(new String[]{"Supervisori: ", this.supervisors});
+        data.add(new String[]{"Lingua: ", this.language.toString()});
+        data.add(new String[]{"Categoria: ", this.category.toString()});
+        data.add(new String[]{"Link: ", this.link});
+        return data;
+    }
+
+    @Override
     public boolean updateItem(Item new_item) {
         if (new_item instanceof Thesis thesis) {
             super.updateItem(new_item);
@@ -35,12 +56,12 @@ public class Thesis extends Item {
     }
 
     @Override
-    public boolean sameField(Item itemsCopy){
+    public boolean sameField(Item itemsCopy) {
         if (!super.sameField(itemsCopy)) {
             return false;
         }
 
-        if(itemsCopy instanceof Thesis thesisCopy) {
+        if (itemsCopy instanceof Thesis thesisCopy) {
             if (!this.author.equals(thesisCopy.getAuthor())) {
                 return false;
             }
@@ -48,7 +69,7 @@ public class Thesis extends Item {
                 return false;
             }
             return this.university.equals(thesisCopy.getUniversity());
-        } else{
+        } else {
             return false;
         }
     }

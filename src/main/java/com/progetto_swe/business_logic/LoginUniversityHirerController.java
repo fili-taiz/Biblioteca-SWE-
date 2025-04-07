@@ -8,7 +8,7 @@ import com.progetto_swe.domain_model.UserCredentials;
 import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
-public class LoginUniversityHirer {
+public class LoginUniversityHirerController {
 
     public Hirer loginUniversityHirer(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();

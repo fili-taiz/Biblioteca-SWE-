@@ -1,5 +1,6 @@
 package com.progetto_swe.domain_model;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -17,6 +18,20 @@ public class Catalogue{
         for (Item i : this.items) {
             for (String keyword : splittedKeyword){
                 if (i.getCategory().equals(category) && i.contains(keyword)) {
+                    result.add(i);
+                }
+            }
+        }
+        return result;
+    }
+
+    public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
+        String[] splittedKeyword = keywords.split(" ");
+        ArrayList<Item> result = new ArrayList<>();
+        for (Item i : this.items) {
+            for (String keyword : splittedKeyword){
+                if (i.getCategory().equals(category) && i.getLanguage().equals(language) && i.isBorrowable() == borrowable &&
+                        i.getPublicationDate().isAfter(startDate) && i.getPublicationDate().isBefore(endDate) && i.contains(keyword)) {
                     result.add(i);
                 }
             }

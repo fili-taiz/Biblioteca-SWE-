@@ -28,6 +28,10 @@ public class Hirer extends User{
         return catalogue.searchItem(keywords, category);
     } //HO GIA' TESTATO catalogue.searchitem...
 
+    public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
+        return catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+    }
+
     public boolean reservePhysicalCopy(Item item, Library storagePlace){
         Reservation r = new Reservation(LocalDate.now(), this, item, storagePlace);
         return reservations.add(r) /*&& item.addReservation(r)*/;

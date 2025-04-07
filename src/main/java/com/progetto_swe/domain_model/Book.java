@@ -1,6 +1,7 @@
 package com.progetto_swe.domain_model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Book extends Item {
     String isbn;
@@ -89,6 +90,27 @@ public class Book extends Item {
         } else{
             return false;
         }
+    }
+
+    @Override
+    public String[] getValues(){
+        return new String[]{this.title, this.authors, this.category.name(), this.publicationDate.toString()};
+    }
+
+    @Override
+    public ArrayList<String[]> toStringValues() {
+        ArrayList<String[]> data = new ArrayList<>();
+        data.add(new String[]{"Codice: ", Integer.toString(this.code)});
+        data.add(new String[]{"Titolo: ", this.title});
+        data.add(new String[]{"Autori: ", this.authors});
+        data.add(new String[]{"Data pubblicazione: ", this.publicationDate.toString()});
+        data.add(new String[]{"Categoria: ", this.category.toString()});
+        data.add(new String[]{"Lingua: ", this.language.toString()});
+        data.add(new String[]{"Link: ", this.link});
+        data.add(new String[]{"ISBN: ", this.isbn});
+        data.add(new String[]{"Casa editrice: ", this.publishingHouse});
+        data.add(new String[]{"Numero pagine: ", Integer.toString(this.numberOfPages)});
+        return data;
     }
 
     @Override

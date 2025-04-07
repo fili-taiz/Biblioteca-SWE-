@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.Lending;
 import com.progetto_swe.domain_model.Library;
@@ -73,14 +74,18 @@ public class LendingDAO {
         }
     }
 
-    public Lending getLending(String itemCode, Library LIBRARY, String hirerCode) {
+    public ArrayList<Lending> getLendings(String hirerCode) {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "query";
+            String query = "SELECT * FROM Lendings WHERE userCode = '" + hirerCode + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-
             resultSet.next();
+            ArrayList<Lending> lendings = new ArrayList<>();
+            while(resultSet.next()){
+                lendings.add(new Lending(resultSet.getInt("code"), r))
+            }
+
 
             /**/
         } catch (SQLException e) {

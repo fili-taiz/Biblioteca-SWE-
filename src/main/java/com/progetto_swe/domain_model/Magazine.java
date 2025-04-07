@@ -1,6 +1,7 @@
 package com.progetto_swe.domain_model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Magazine extends Item {
 
@@ -18,6 +19,23 @@ public class Magazine extends Item {
         this.publishingHouse = publishingHouse;
     }
 
+
+    @Override
+    public ArrayList<String[]> toStringValues() {
+        ArrayList<String[]> data = new ArrayList<>();
+        data.add(new String[]{"Codice: ", Integer.toString(this.code)});
+        data.add(new String[]{"Titolo: ", this.title});
+        data.add(new String[]{"Casa editrice: ", this.publishingHouse});
+        data.add(new String[]{"Data pubblicazione: ", this.publicationDate.toString()});
+        data.add(new String[]{"Categoria: ", this.category.toString()});
+        data.add(new String[]{"Link: ", this.link});
+        return data;
+    }
+
+    @Override
+    public String[] getValues(){
+        return new String[]{this.title, this.publishingHouse, this.category.name(), this.publicationDate.toString()};
+    }
 
     @Override
     public boolean sameField(Item itemsCopy) {

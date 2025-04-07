@@ -1,13 +1,9 @@
 package com.progetto_swe.business_logic;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
-import com.progetto_swe.domain_model.Category;
-import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.Item;
-import com.progetto_swe.domain_model.Lending;
-import com.progetto_swe.domain_model.Library;
-import com.progetto_swe.domain_model.Reservation;
+import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.ReservationDAO;
 
@@ -18,10 +14,16 @@ public class HirerController {
         this.hirer = hirer;
     }
 
-    public ArrayList<Item> searchItem(String keyWords, String category ){
+    public ArrayList<Item> searchItem(String keyWords, Category category ){
         HirerDAO hirerDAO = new HirerDAO();
         hirerDAO.refreshCatalogue();
-        return hirer.searchItem(keyWords, Category.valueOf(category));
+        return hirer.searchItem(keyWords, category);
+    }
+
+    public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
+        HirerDAO hirerDAO = new HirerDAO();
+        hirerDAO.refreshCatalogue();
+        return hirer.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
 
@@ -34,15 +36,13 @@ public class HirerController {
         return this.hirer.reservePhysicalCopy(item, storagePlace);
     }
 
-    public ArrayList<Lending> getLendings(Hirer hirer){
-        return hirer.getLendings();
+    public ArrayList<Lending> getLendings(){
+        HirerDAO hirerDAO = new HirerDAO();
+        return hirerDAO.getLendings(this.hirer.getUserCode());
     }
 
-    public ArrayList<Reservation> getReservations(Hirer hirer){
-        return hirer.getReservations();
+    public ArrayList<Reservation> getReservation(){
+        HirerDAO hirerDAO = new HirerDAO();
+        return hirerDAO.getReservations(this.hirer.getUserCode());
     }
-
-
-
-
 }

@@ -2,7 +2,7 @@ package com.progetto_swe.domain_model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-public class Item {
+public abstract class Item {
     int code;
     String title;
     LocalDate publicationDate;
@@ -69,6 +69,9 @@ public class Item {
         return false;
     }
 
+    public abstract String[] getValues();
+
+    public abstract ArrayList<String[]> toStringValues();
 
     @Override
     public boolean equals(Object o) {
@@ -91,8 +94,16 @@ public class Item {
     }
 
     public boolean isBorrowable(Library library) {
-        if(physicalCopies.get(library) != null)
-            return physicalCopies.get(library).isBorrowable();
+        if(physicalCopies.get(library) == null)
+            return false;
+
+        return physicalCopies.get(library).isBorrowable();
+    }
+
+    public boolean isBorrowable() {
+        for(PhysicalCopies p : physicalCopies.values()){
+            if(p.isBorrowable()) return true;
+        }
         return false;
     }
 
