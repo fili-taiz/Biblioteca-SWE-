@@ -10,8 +10,8 @@ public abstract class Item {
     Category category;
     String link;
     HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
-    ArrayList<Lending> lendings = new ArrayList<>();
-    ArrayList<Reservation> reservations = new ArrayList<>();
+    //ArrayList<Lending> lendings = new ArrayList<>();
+    //ArrayList<Reservation> reservations = new ArrayList<>();
 
     public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link) {
         this.code = code;

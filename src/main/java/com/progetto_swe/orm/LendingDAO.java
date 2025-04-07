@@ -28,12 +28,11 @@ public class LendingDAO {
                     = "SELECT P.number_of_copies - "
                     + " - (SELECT COUNT(*) FROM Lendings L WHERE L.code = " + code + " AND L.storage_place = '" + storagePlace + "')"
                     + " - (SELECT COUNT(*) FROM Reservation R WHERE R.code = " + code + " AND R.storage_place = '" + storagePlace + "')"
-                    + "FROM Physical_copies P"
-                    + "WHERE P.code = '" + code + "' AND i.storage_place = '" + storagePlace + "'; ";
+                    + "FROM Physical_copies P" + "WHERE P.code = '" + code + "' AND i.storage_place = '" + storagePlace + "'; ";
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 return resultSet.getInt("number_of_copies");
-            } else{
+            } else {
                 throw new DataAccessException("Error executing query!", null);
             }
         } catch (SQLException e) {
@@ -43,12 +42,9 @@ public class LendingDAO {
 
     private boolean containsHirer(Statement statement, String userCode) {
         try {
-            String query
-                    = "SELECT *"
-                    + "FROM Hirer H "
-                    + "WHERE H.user_code = " + userCode + "; ";
+            String query = "SELECT *" + "FROM Hirer H " + "WHERE H.user_code = " + userCode + "; ";
             ResultSet resultSet = statement.executeQuery(query);
-            if(!resultSet.next()) {
+            if (!resultSet.next()) {
                 throw new DataAccessException("Error executing query!", null);
             }
             return true;
@@ -62,10 +58,9 @@ public class LendingDAO {
         try {
             Statement statement = connection.createStatement();
 
-            String query = "INSERT INTO Lendings (user_code, code, storage_place, lenfing_date)"
-                    + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
+            String query = "INSERT INTO Lendings (user_code, code, storage_place, lenfing_date)" + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
-            if(!resultSet.next()){
+            if (!resultSet.next()) {
                 throw new CRUD_exception("Error executing query!", null);
             }
             return true;
@@ -77,21 +72,21 @@ public class LendingDAO {
     public ArrayList<Lending> getLendings(String hirerCode) {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "SELECT * FROM Lendings WHERE userCode = '" + hirerCode + "';";
+            String query
+                    = "SELECT * "
+                    + "FROM Lendings L "
+                    + "WHERE L.user_code = '" + hirerCode + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
             ArrayList<Lending> lendings = new ArrayList<>();
-            while(resultSet.next()){
-                lendings.add(new Lending(resultSet.getInt("code"), r))
+            while (resultSet.next()) {
+                lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(),resultSet.getInt("code"), resultSet.get))
             }
 
-
-            /**/
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
-        }
-        return null;
+        } return null;
     }
 
     public boolean updateLending(Lending lending) {
@@ -111,15 +106,13 @@ public class LendingDAO {
     }
 
 
-
     public boolean removeLending(String userCode, int itemCode, String storagePlace) {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "DELETE FROM Lending L "
-                    + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
+            String query = "DELETE FROM Lending L " + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            if(!resultSet.next()){
+            if (!resultSet.next()) {
                 throw new CRUD_exception("Error executing query!", null);
             }
             return true;

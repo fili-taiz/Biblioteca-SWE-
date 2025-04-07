@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 public class Admin extends User{
     private final Library workingPlace;
-    private Catalogue catalogue;
-    private ListOfHirers listOfHirers;
+    //private Catalogue catalogue;
+    //private ListOfHirers listOfHirers;
 
     public Admin(String userCode, String name, String surname, String email, String telephoneNumber, Library workingPlace, UserCredentials userProfile) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);

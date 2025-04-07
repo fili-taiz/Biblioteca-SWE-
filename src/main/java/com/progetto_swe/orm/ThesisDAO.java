@@ -55,12 +55,12 @@ public class ThesisDAO {
             //Creazione Item e Book
             String query
                     = "DELETE FROM Item "
-                    + "WHERE code = '" + code + "';";
+                    + "WHERE code = " + code + ";";
             statement.executeUpdate(query);
 
             query
                     = "DELETE FROM Thesis "
-                    + "where code = '" + code + "';";
+                    + "where code = " + code + ";";
 
             if(statement.executeUpdate(query) <= 0){
                 throw new CRUD_exception("Error executing query!", null);
@@ -97,7 +97,7 @@ public class ThesisDAO {
             }
             String query
                     = "UPDATE Item "
-                    + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "';";
+                    + "SET title = '" + title + "', publication_date = " + publicationDate + ", language = '" + language + "', category = '" + category + "', link = '" + link + "';";
             statement.executeUpdate(query);
 
             query
