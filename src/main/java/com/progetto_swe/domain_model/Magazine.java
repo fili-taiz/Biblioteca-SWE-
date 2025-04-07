@@ -49,7 +49,7 @@ public class Magazine extends Item {
         }
     }
 
-
+/*
     @Override
     public boolean updateItem(Item newItem) {
         if (newItem instanceof Magazine magazine) {
@@ -58,7 +58,7 @@ public class Magazine extends Item {
             return true;
         }
         return false;
-    }
+    }*/
 
     @Override
     public boolean contains(String keyword) {
@@ -78,7 +78,7 @@ public class Magazine extends Item {
         return this.publishingHouse.equals(m.publishingHouse);
     }
 
-    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei
+    //messo perché equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei
     //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato
     //dalle hashmap e hashset per metterli come chiave di una tupla, se sono uguali metterli nello stesso pair se no metterlo in una posizione diversa;
     @Override
@@ -87,7 +87,5 @@ public class Magazine extends Item {
     }
 
     public String getPublishingHouse() { return this.publishingHouse; }
-
-    public void setPublishingHouse(String newPublishingHouse) { this.publishingHouse = newPublishingHouse; }
 
 }

@@ -42,7 +42,7 @@ public class Thesis extends Item {
         data.add(new String[]{"Link: ", this.link});
         return data;
     }
-
+/*
     @Override
     public boolean updateItem(Item new_item) {
         if (new_item instanceof Thesis thesis) {
@@ -53,7 +53,7 @@ public class Thesis extends Item {
             return true;
         }
         return false;
-    }
+    }*/
 
     @Override
     public boolean sameField(Item itemsCopy) {

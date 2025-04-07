@@ -32,7 +32,7 @@ public class CommandLineInterface {
                     String password = scanner.nextLine();
                     Hirer hirer = loginExternalHirerController.login(userCode, password);
                     HirerController hirerController = new HirerController(hirer);
-                    HirerCLI hirerCLI = new HirerCLI();
+                    HirerCLI hirerCLI = new HirerCLI(hirerController);
                     role = hirerCLI.start();
                     break;
                 }

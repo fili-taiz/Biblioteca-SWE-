@@ -41,23 +41,8 @@ public class Book extends Item {
         return this.authors;
     }
 
-    public void setIsbn(String newIsbn) {
-        this.isbn = newIsbn;
-    }
 
-    public void setPublishingHouse(String newPublishingHouse) {
-        this.publishingHouse = newPublishingHouse;
-    }
-
-    public void setNumberOfPages(int newNumberOfPages) {
-        this.numberOfPages = newNumberOfPages;
-    }
-
-    public void setAuthors(String newAuthors) {
-        this.authors = newAuthors;
-    }
-
-
+    /*
     @Override
     public boolean updateItem(Item newItem) {
         if (newItem instanceof Book book) {
@@ -69,7 +54,7 @@ public class Book extends Item {
             return true;
         }
         return false;
-    }
+    }*/
 
     @Override
     public boolean sameField(Item itemsCopy) {
@@ -137,7 +122,7 @@ public class Book extends Item {
         return this.isbn.equals(b.getIsbn()) && this.publishingHouse.equals(b.getPublishingHouse()) && this.numberOfPages == b.getNumberOfPages() && this.authors.equals(b.getAuthors());
     }
 
-    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei
+    //messo perché equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei
     //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato
     //dalle hashmap e hashset per metterli come chiave di una tupla, se sono uguali metterli nello stesso pair se no metterlo in una posizione diversa;
     @Override

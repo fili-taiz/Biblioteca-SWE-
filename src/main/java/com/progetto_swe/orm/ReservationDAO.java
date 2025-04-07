@@ -5,9 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
-import com.progetto_swe.domain_model.Library;
-import com.progetto_swe.domain_model.Reservation;
+import com.progetto_swe.domain_model.*;
+
 import com.progetto_swe.orm.database_exception.CRUD_exception;
 import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
@@ -19,72 +20,42 @@ public class ReservationDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public Reservation getReservation(String itemCode, Library LIBRARY, String hirerCode){
-        try {
-            String query = "query";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            resultSet.next();
-
-            /**/
-
-
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-        return null;
-    }
-
-    public Reservation updateReservation(Reservation reservation){
-        try {
-            String query = "query";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            resultSet.next();
-
-            /**/
-
-
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-        return null;
-    }
-
-    private int containsCopies(Statement statement, int code, String storagePlace) {
+    public ListOfReservation getReservations() {
         this.connection = ConnectionManager.getConnection();
         try {
             String query
-                    = "SELECT P.number_of_copies - "
-                    + " - (SELECT COUNT(*) FROM Lendings L WHERE L.code = " + code + " AND L.storage_place = '" + storagePlace + "')"
-                    + " - (SELECT COUNT(*) FROM Reservation R WHERE R.code = " + code + " AND R.storage_place = '" + storagePlace + "')"
-                    + "FROM Phisical_copies P"
-                    + "WHERE P.code = '" + code + "' AND P.storage_place = '" + storagePlace + "'; ";
+                    = "SELECT * "
+                    + "FROM Reservations;";
+            Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            if (resultSet.next()) {
-                resultSet.getInt("number_of_copies");
-            }else{
-                throw new DataAccessException("Error executing query!", null);
-            }
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-        return -1;
-    }
+            resultSet.next();
+            ArrayList<Reservation> reservations = new ArrayList<>();
+            while (resultSet.next()) {
 
-    private boolean containsHirer(Statement statement, String userCode) {
-        try {
-            String query
-                    = "SELECT *"
-                    + "FROM Hirer H "
-                    + "WHERE H.user_code = " + userCode + "; ";
-            ResultSet resultSet = statement.executeQuery(query);
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
+                BookDAO bookDAO = new BookDAO();
+                ThesisDAO thesisDAO = new ThesisDAO();
+                MagazineDAO magazineDAO = new MagazineDAO();
+                Book book = bookDAO.getBook(resultSet.getInt("code"));
+                Thesis thesis = thesisDAO.getThesis(resultSet.getInt("code"));
+                Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
+
+                HirerDAO hirerDAO = new HirerDAO();
+                Hirer hirer = hirerDAO.getHirer(resultSet.getString("user_code"));
+                Item item;
+                if(book != null) {
+                    item = book;
+                } else if (thesis != null) {
+                    item = thesis;
+                } else if (magazine != null) {
+                    item = magazine;
+                } else {
+                    return null;
+                }
+                reservations.add(new Reservation(resultSet.getDate("reservation_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
             }
-            return true;
+
+            ListOfReservation listOfReservations = new ListOfReservation(reservations);
+            return listOfReservations;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
@@ -94,15 +65,7 @@ public class ReservationDAO {
         this.connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-            if(!containsHirer(statement, userCode)){
-                return false;
-            }
-
-            if(containsCopies(statement, itemCode, storagePlace) <= 1){
-                return false;
-            }
-
-            String query = "INSERT INTO Reservation (user_code, code, storage_place, lending_date)"
+            String query = "INSERT INTO Reservation (user_code, code, storage_place, reservation_date)"
                     + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()){

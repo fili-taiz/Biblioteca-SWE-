@@ -1,8 +1,7 @@
 package com.progetto_swe.domain_model;
-import java.sql.Statement;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Catalogue{
     ArrayList<Item> items;
@@ -57,5 +56,4 @@ public class Catalogue{
         return null;
     }
 
-    public ArrayList<Item> getItems() { return items; }
 }

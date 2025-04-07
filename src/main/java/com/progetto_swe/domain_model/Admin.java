@@ -5,42 +5,34 @@ import java.util.ArrayList;
 
 public class Admin extends User{
     private final Library workingPlace;
-    //private Catalogue catalogue;
-    //private ListOfHirers listOfHirers;
 
     public Admin(String userCode, String name, String surname, String email, String telephoneNumber, Library workingPlace, UserCredentials userProfile) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.workingPlace = workingPlace;
     }
 
-
-    public ArrayList<Item> searchItem(String keyWords, Category category){
-        return this.catalogue.searchItem(keyWords, category);
+    public ArrayList<Item> searchItem(Catalogue catalogue, String keyWords, Category category){
+        ArrayList<Item> result = catalogue.searchItem(keyWords, category);
+        for (Item item : result){
+            if(item.getLibraryPhysicalCopies(this.workingPlace) == null){
+                result.remove(item);
+            }
+        }
+        return result;
     }
 
-    public ListOfHirers getListOfHirers() {
-        return listOfHirers;
+    public ArrayList<Item> avanceSearchItem(Catalogue catalogue, String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
+        ArrayList<Item> result = catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+        for (Item item : result){
+            if(item.getLibraryPhysicalCopies(this.workingPlace) == null){
+                result.remove(item);
+            }
+        }
+        return result;
     }
-
-    public ArrayList<Hirer> searchHirer(String keyWords){
-        return this.listOfHirers.searchHirer(keyWords);
-    }
-
 
     public Library getWorkingPlace() {
         return workingPlace;
-    }
-
-    public void setCatalogue(Catalogue catalogue) {
-        this.catalogue = catalogue;
-    }
-
-    public Catalogue getCatalogue() {
-        return catalogue;
-    }
-
-    public void setHirers(ListOfHirers newListOfHirers) {
-        this.listOfHirers = newListOfHirers;
     }
 
 }

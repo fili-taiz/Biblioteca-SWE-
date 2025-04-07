@@ -7,8 +7,8 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import com.progetto_swe.domain_model.Lending;
-import com.progetto_swe.domain_model.Library;
+import com.progetto_swe.domain_model.*;
+
 import com.progetto_swe.orm.database_exception.CRUD_exception;
 import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
@@ -69,24 +69,44 @@ public class LendingDAO {
         }
     }
 
-    public ArrayList<Lending> getLendings(String hirerCode) {
+    public ListOfLending getLendings() {
         this.connection = ConnectionManager.getConnection();
         try {
             String query
                     = "SELECT * "
-                    + "FROM Lendings L "
-                    + "WHERE L.user_code = '" + hirerCode + "';";
+                    + "FROM Lendings;";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
             ArrayList<Lending> lendings = new ArrayList<>();
             while (resultSet.next()) {
-                lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(),resultSet.getInt("code"), resultSet.get))
+                BookDAO bookDAO = new BookDAO();
+                ThesisDAO thesisDAO = new ThesisDAO();
+                MagazineDAO magazineDAO = new MagazineDAO();
+                Book book = bookDAO.getBook(resultSet.getInt("code"));
+                Thesis thesis = thesisDAO.getThesis(resultSet.getInt("code"));
+                Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
+
+                HirerDAO hirerDAO = new HirerDAO();
+                Hirer hirer = hirerDAO.getHirer(resultSet.getString("user_code"));
+                Item item;
+                if(book != null) {
+                    item = book;
+                } else if (thesis != null) {
+                    item = thesis;
+                } else if (magazine != null) {
+                    item = magazine;
+                } else {
+                    return null;
+                }
+                lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
             }
+            ListOfLending listOfLendings = new ListOfLending(lendings);
+            return listOfLendings;
 
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
-        } return null;
+        }
     }
 
     public boolean updateLending(Lending lending) {

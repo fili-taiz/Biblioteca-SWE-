@@ -62,19 +62,4 @@ public class AdminDAO {
             throw new DatabaseConnectionException("Connection error!", e);
         }
     }
-
-    public Catalogue refreshCatalogue(){
-        BookDAO bookDAO = new BookDAO();
-        ArrayList<Item> newCatalogue = new ArrayList<>(bookDAO.getAllBook());
-        MagazineDAO magazineDAO = new MagazineDAO();
-        newCatalogue.addAll(magazineDAO.getAllMagazine());
-        ThesisDAO thesisDAO = new ThesisDAO();
-        newCatalogue.addAll(thesisDAO.getAllThesis());
-        return new Catalogue(newCatalogue);
-    }
-
-    public ListOfHirers refreshHirers(){
-        HirerDAO hirerDAO = new HirerDAO();
-        return new ListOfHirers(hirerDAO.getAllHirers());
-    }
 }

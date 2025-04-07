@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.CatalogueDAO;
 import com.progetto_swe.orm.HirerDAO;
+import com.progetto_swe.orm.LendingDAO;
 import com.progetto_swe.orm.ReservationDAO;
 
 public class HirerController {
@@ -15,15 +17,15 @@ public class HirerController {
     }
 
     public ArrayList<Item> searchItem(String keyWords, Category category ){
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.refreshCatalogue();
-        return hirer.searchItem(keyWords, category);
+        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        Catalogue catalogue = catalogueDAO.getCatalogue();
+        return hirer.searchItem(catalogue, keyWords, category);
     }
 
     public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.refreshCatalogue();
-        return hirer.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        Catalogue catalogue = catalogueDAO.getCatalogue();
+        return catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
 
@@ -32,17 +34,26 @@ public class HirerController {
             return false;
         }
         ReservationDAO reservationDAO = new ReservationDAO();
-        reservationDAO.addReservation(this.hirer.getUserCode(), item.getCode(), storagePlace.name());
-        return this.hirer.reservePhysicalCopy(item, storagePlace);
+        return reservationDAO.addReservation(this.hirer.getUserCode(), item.getCode(), storagePlace.name());
     }
 
     public ArrayList<Lending> getLendings(){
-        HirerDAO hirerDAO = new HirerDAO();
-        return hirerDAO.getLendings(this.hirer.getUserCode());
+        LendingDAO lendingDAO = new LendingDAO();
+        return lendingDAO.getLendings().getLendingsByHirer(this.hirer);
     }
 
     public ArrayList<Reservation> getReservation(){
-        HirerDAO hirerDAO = new HirerDAO();
-        return hirerDAO.getReservations(this.hirer.getUserCode());
+        ReservationDAO reservationDAO = new ReservationDAO();
+        return reservationDAO.getReservations().getReservationsByHirer(this.hirer);
+    }
+
+    public ListOfReservation getListOfReservation() {
+        ReservationDAO reservationDAO = new ReservationDAO();
+        return reservationDAO.getReservations();
+    }
+
+    public ListOfLending getListOfLending() {
+        LendingDAO lendingDAO = new LendingDAO();
+        return lendingDAO.getLendings();
     }
 }

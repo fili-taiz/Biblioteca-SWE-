@@ -10,8 +10,6 @@ public abstract class Item {
     Category category;
     String link;
     HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
-    //ArrayList<Lending> lendings = new ArrayList<>();
-    //ArrayList<Reservation> reservations = new ArrayList<>();
 
     public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link) {
         this.code = code;
@@ -50,25 +48,6 @@ public abstract class Item {
         }
         return true;
     }
-
-    public boolean haveReservation(Reservation reservation){
-        for(Reservation r : reservations){
-            if(r.equals(reservation)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean haveLending(Lending lending){
-        for(Lending l : lendings){
-            if(l.equals(lending)){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public abstract String[] getValues();
 
     public abstract ArrayList<String[]> toStringValues();
@@ -111,43 +90,23 @@ public abstract class Item {
         return physicalCopies.size();
     }
 
-    public int getNumberOfLendingsInLibrary(Library library){
-        int n = 0;
-        for(Lending l: this.lendings){
-            if(l.getStoragePlace().equals(library)){
-                n += 1;
-            }
-        }
-        return n;
-    }
-
-
-    public int getNumberOfReservationsInLibrary(Library library){
-        int n = 0;
-        for(Reservation r: this.reservations){
-            if(r.getStoragePlace().equals(library)){
-                n += 1;
-            }
-        }
-        return n;
-    }
-
-    public int getNumberOfAvailableCopiesInLibrary(Library library){
+    public int getNumberOfAvailableCopiesInLibrary(ListOfLending lendings, ListOfReservation reservations, Library library){
         if(physicalCopies.get(library) == null){
             return -1;
         }
-        return physicalCopies.get(library).getNumberOfPhysicalCopies() - getNumberOfLendingsInLibrary(library) - getNumberOfReservationsInLibrary(library);
+        return physicalCopies.get(library).getNumberOfPhysicalCopies() - lendings.getNumberOfLendingsInLibrary(library, this) - reservations.getNumberOfReservationsInLibrary(library, this);
     }
 
-    public boolean updateItem(Item new_item){
-        this.code = new_item.code;
-        this.title = new_item.title;
-        this.publicationDate = new_item.publicationDate;
-        this.language = new_item.language;
-        this.category = new_item.category;
-        this.link = new_item.link;
+    /*
+    public boolean updateItem(Item newItem){
+        this.code = newItem.code;
+        this.title = newItem.title;
+        this.publicationDate = newItem.publicationDate;
+        this.language = newItem.language;
+        this.category = newItem.category;
+        this.link = newItem.link;
         return true;
-    }
+    }*/
 
     public int getCode(){ return this.code;}
     public String getTitle(){ return this.title;}
@@ -155,14 +114,20 @@ public abstract class Item {
     public Language getLanguage(){ return this.language;}
     public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
-    public ArrayList<Reservation> getReservations() { return this.reservations; }
-    public ArrayList<Lending> getLendings() { return this.lendings; }
-    public HashMap<Library, PhysicalCopies> getPhysicalCopies() { return this.physicalCopies; }
+
+    public PhysicalCopies getLibraryPhysicalCopies(Library library) {
+        if(physicalCopies.get(library) == null){
+            return null;
+        }
+        return physicalCopies.get(library);
+    }
+
+    public HashMap<Library, PhysicalCopies> getPhysicalCopies() {
+        return physicalCopies;
+    }
 
     public void setCode(int newCode){ this.code = newCode; }
     public void setCategory(Category newCategory){ this.category = newCategory;}
-    public void setReservations(ArrayList<Reservation> newReservations) {this.reservations = newReservations; }
-    public void setLendings(ArrayList<Lending> newLendings){this.lendings = newLendings; }
     public void setPhysicalCopies(HashMap<Library, PhysicalCopies> physicalCopies) { this.physicalCopies = physicalCopies; }
 
 }

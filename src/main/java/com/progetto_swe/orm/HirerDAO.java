@@ -5,10 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.progetto_swe.domain_model.Catalogue;
-import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.Item;
-import com.progetto_swe.domain_model.UserCredentials;
+import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
 import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
@@ -23,19 +20,18 @@ public class HirerDAO {
             connection = ConnectionManager.getConnection();
             String query
                     = "SELECT * "
-                    + "FROM Hirer H JOIN User_Credentials UC on H.user_code = UC.user_code LEFT JOIN Banned_hirer B ON H.user_code=B.user_code "
+                    + "FROM Hirer H LEFT JOIN Banned_hirer B ON H.user_code=B.user_code "
                     + "WHERE H.user_code = '" + userCode + "';";
 
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
-                UserCredentials ucs = new UserCredentials(userCode, resultSet.getString("hashed_password"));
                 LocalDate unbannedDate = null;
                 if(resultSet.getDate("unbanned_date") != null){
                     unbannedDate = resultSet.getDate("unbanned_date").toLocalDate();
                 }
                 return new Hirer(userCode, resultSet.getString("name"), resultSet.getString("surname"),
-                        resultSet.getString("email"), resultSet.getString("telephone_number"), ucs, null, null, null, unbannedDate);
+                        resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate);
             } else{
                 throw new DataAccessException("Error executing query!", null);
             }
@@ -97,59 +93,31 @@ public class HirerDAO {
         }
     }
 
-    public Catalogue refreshCatalogue() {
-        ArrayList<Item> newCatalogue = new ArrayList<>();
-        BookDAO bookDAO = new BookDAO();
-        newCatalogue.addAll(bookDAO.getAllBook());
-        MagazineDAO magazineDAO = new MagazineDAO();
-        newCatalogue.addAll(magazineDAO.getAllMagazine());
-        ThesisDAO thesisDAO = new ThesisDAO();
-        newCatalogue.addAll(thesisDAO.getAllThesis());
-        return new Catalogue(newCatalogue);
-    }
-
-
-
-
-    /*
-    public boolean addHirer(String userCode, String password, String name, String surname, String email, String telephoneNumber) {
-        connection = ConnectionManager.getConnection();
-        try {
-            String query = "INSERT INTO Hirer (user_code, password, name, surname, email, telephone_number)"
-                    + "VALUES ('" + userCode + "', '" + password + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "');";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            return resultSet.next();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-        }
-        return false;
-    }
-*/
-
-
-    public ArrayList<Hirer> getAllHirers() {
+    public ListOfHirers getHirers() {
         ArrayList<Hirer> result = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
             String query
                     = "SELECT * "
-                    + "FROM Item I JOIN Book B ON I.code = B.code";
+                    + "FROM Hirer";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()){
                 throw new DataAccessException("Error executing query!", null);
             }
             while (resultSet.next()) {
-                Hirer h = new Hirer(resultSet.getString("user_code"), resultSet.getString("name"),
-                        resultSet.getString("surname"), resultSet.getString("email"), resultSet.getString("telephone_number"), null, null, null, null, null);
-                result.add(h);
+                LocalDate unbannedDate = null;
+                if(resultSet.getDate("unbanned_date") != null){
+                    unbannedDate = resultSet.getDate("unbanned_date").toLocalDate();
+                }
+                result.add(new Hirer(resultSet.getString("user_code"), resultSet.getString("name"), resultSet.getString("surname"),
+                        resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate));
             }
+            ListOfHirers listOfHirers = new ListOfHirers(result);
+            return listOfHirers;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
-        return result;
     }
 
 }

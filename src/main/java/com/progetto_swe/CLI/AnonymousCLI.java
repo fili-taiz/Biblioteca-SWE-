@@ -1,10 +1,7 @@
 package com.progetto_swe.CLI;
 
 import com.progetto_swe.business_logic.AnonymousUserController;
-import com.progetto_swe.domain_model.Category;
-import com.progetto_swe.domain_model.Item;
-import com.progetto_swe.domain_model.Language;
-import com.progetto_swe.domain_model.Library;
+import com.progetto_swe.domain_model.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -140,7 +137,9 @@ public class AnonymousCLI {
         String[] header = {"Sede", "Numero copie", "Stato"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Library library : item.getPhysicalCopies().keySet()) {
-            data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(library)), state(item.getNumberOfAvailableCopiesInLibrary(library), item.isBorrowable(library))});
+            ListOfLending lendings = anonymousUserController.getListOfLending();
+            ListOfReservation reservations = anonymousUserController.getListOfReservation();
+            data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library)), state(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library), item.isBorrowable(library))});
         }
         CommandLineInterface.printTable(header, data, 0);
     }

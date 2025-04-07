@@ -100,6 +100,14 @@ public class HirerCLI {
         return "esci";
     }
 
+    private void stampaPrenotazioni() {
+        /// TODO
+    }
+
+    private void stampaPrestiti() {
+        //TODO
+    }
+
     private ArrayList<Item> ricerca() {
         System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
         for (Category c : Category.values()) {
@@ -147,10 +155,9 @@ public class HirerCLI {
     }
 
     private ArrayList<Lending> ottieniLending() {
-        return hirerController.getLendings()
+        return hirerController.getLendings();
     }
 
-    private void stampaPrenotazioni
 
     private void stampaArticoli(ArrayList<Item> items) {
         CommandLineInterface.clearScreen();
@@ -170,7 +177,9 @@ public class HirerCLI {
         String[] header = {"Sede", "Numero copie", "Stato"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Library library : item.getPhysicalCopies().keySet()) {
-            data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(library)), state(item.getNumberOfAvailableCopiesInLibrary(library), item.isBorrowable(library))});
+            ListOfLending lendings = hirerController.getListOfLending();
+            ListOfReservation reservations = hirerController.getListOfReservation();
+            data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library)), state(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library), item.isBorrowable(library))});
         }
         CommandLineInterface.printTable(header, data, 0);
     }

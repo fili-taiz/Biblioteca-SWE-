@@ -5,12 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
-import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class BookDAO {
@@ -21,13 +19,44 @@ public class BookDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public int addBook(String title, String publicationDate, String language, String category, String link, String isbn,
-                       String publishingHouse, int numberOfPages, String authors) {
+    public Book getBook(int code) {
+        try {
+            connection = ConnectionManager.getConnection();
+            String query
+                    = "SELECT * "
+                    + "FROM Item I JOIN Book B ON I.code = B.code"
+                    + "WHERE I.code = " + code + ";";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()) {
+                return null;
+            }
+            Book book = new Book(code, resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
+                    Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
+                    resultSet.getString("publishing_house"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
+            query
+                    = "SELECT * "
+                    + "FROM Physical_copies P "
+                    + "WHERE P.code = " + code + ";";
+            ResultSet copiesSet = statement.executeQuery(query);
+            if(copiesSet.next()){
+                HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
+                while (copiesSet.next()) {
+                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
+                }
+                book.setPhysicalCopies(physicalCopies);
+            }
+            return book;
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
+        }
+    }
+
+    public int addBook(String title, String publicationDate, String language, String category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
 
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-
             //Creazione Item e Book
             String query
                     = "INSERT INTO Item (title, publication_date, language, category, link)"
@@ -45,6 +74,7 @@ public class BookDAO {
             if(statement.executeUpdate(query) <= 0){
                 throw new CRUD_exception("Error executing query!", null);
             }
+
             return code;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
@@ -56,7 +86,6 @@ public class BookDAO {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
-
             String query
                     = "DELETE FROM Item "
                     + "WHERE code = '" + code + "';";
@@ -70,28 +99,11 @@ public class BookDAO {
 
             if (statement.executeUpdate(query) <= 0){
                 throw new CRUD_exception("Error executing query!", null);
-            }else{
-                return true;
             }
+            return true;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
-    }
-
-    public Book getBook(String itemId) {
-        connection = ConnectionManager.getConnection();
-        try {
-            String query = "query";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            resultSet.next();
-
-            /**/
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-        return null;
     }
 
     public boolean updateBook(int originalItemCode, String title, String publicationDate, String language, String category, String link, String isbn,
@@ -99,6 +111,7 @@ public class BookDAO {
         connection = ConnectionManager.getConnection();
         try {
             Statement statement = connection.createStatement();
+            //TODO guarda se ho controllato che questo libro sia dentro al catalogue;
             String query
                     = "UPDATE Item "
                     + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "'"
@@ -109,93 +122,15 @@ public class BookDAO {
 
             query
                     = "UPDATE Book "
-                    + "SET isbn = '" + isbn + "', publishing_house = '" + publishingHouse + "', number_of_pages = " + numberOfPages
-                    + ", authors = '" + authors + "' "
+                    + "SET isbn = '" + isbn + "', publishing_house = '" + publishingHouse + "', number_of_pages = " + numberOfPages + ", authors = '" + authors + "' "
                     + "WHERE code = '" + originalItemCode + "';";
-            ResultSet resultSet = statement.executeQuery(query);
-            if(resultSet.next()){
-                return true;
-            } else{
+
+            if(statement.executeUpdate(query) <= 0){
                 throw new CRUD_exception("Error executing query!", null);
             }
+            return true;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
     }
-
-
-    public ArrayList<Item> getAllBook() {
-        ArrayList<Item> result = new ArrayList<>();
-        HashMap<Library, PhysicalCopies> physicalCopies;
-        connection = ConnectionManager.getConnection();
-        try {
-            String query
-                    = "SELECT * "
-                    + "FROM Item I JOIN Book B ON I.code = B.code";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
-            }
-            while (resultSet.next()) {
-                Item i = new Book(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
-                        Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
-                        resultSet.getString("publishing_house"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
-                query
-                        = "SELECT * "
-                        + "FROM Physical_copies P "
-                        + "WHERE P.code = " + resultSet.getInt("code");
-                ResultSet copiesSet = statement.executeQuery(query);
-                if(!copiesSet.next()){
-                    throw new DataAccessException("Error executing query!", null);
-                }
-                physicalCopies = new HashMap<>();
-                while (copiesSet.next()) {
-                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
-                }
-                i.setPhysicalCopies(physicalCopies);
-                result.add(i);
-            }
-            return result;
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-    }
-
-    /*
-    public HashMap<Library, Integer> getBookCopies(Statement statement, int code) {
-        HashMap<Library, Integer> copies = new HashMap<>();
-        connection = ConnectionManager.getConnection();
-        try {
-            String query
-                    = "SELECT * "
-                    + "FROM Physical_copies P "
-                    + "WHERE P.code = " + code;
-            ResultSet copiesSet = statement.executeQuery(query);
-            while (copiesSet.next()) {
-                copies.put(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
-            }
-            return copies;
-        } catch (SQLException e) {
-        }
-        return copies;
-    }
-
-    public HashMap<Library, Integer> getBookLendings(Statement statement, int code) {
-        HashMap<Library, Integer> copies = new HashMap<>();
-        connection = ConnectionManager.getConnection();
-        try {
-            String query
-                    = "SELECT * "
-                    + "FROM Physical_copies P "
-                    + "WHERE P.code = " + code;
-            ResultSet copiesSet = statement.executeQuery(query);
-            while (copiesSet.next()) {
-                copies.put(Library.valueOf(copiesSet.getString("storage_place")), copiesSet.getInt("number_of_copies"));
-            }
-            return copies;
-        } catch (SQLException e) {
-        }
-        return copies;
-    }*/
 }
