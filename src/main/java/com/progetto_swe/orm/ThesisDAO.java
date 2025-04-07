@@ -32,7 +32,7 @@ public class ThesisDAO {
                 return null;
             }
             Thesis thesis = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
-                    Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("author"),
+                    Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"), resultSet.getString("author"),
                     resultSet.getString("supervisors"), resultSet.getString("university"));
             query
                     = "SELECT * "

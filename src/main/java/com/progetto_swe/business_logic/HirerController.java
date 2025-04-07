@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.CatalogueDAO;
-import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.LendingDAO;
 import com.progetto_swe.orm.ReservationDAO;
 
@@ -47,12 +46,12 @@ public class HirerController {
         return reservationDAO.getReservations().getReservationsByHirer(this.hirer);
     }
 
-    public ListOfReservation getListOfReservation() {
+    public ListOfReservations getListOfReservation() {
         ReservationDAO reservationDAO = new ReservationDAO();
         return reservationDAO.getReservations();
     }
 
-    public ListOfLending getListOfLending() {
+    public ListOfLendings getListOfLending() {
         LendingDAO lendingDAO = new LendingDAO();
         return lendingDAO.getLendings();
     }

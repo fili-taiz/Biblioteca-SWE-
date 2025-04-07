@@ -177,8 +177,8 @@ public class HirerCLI {
         String[] header = {"Sede", "Numero copie", "Stato"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Library library : item.getPhysicalCopies().keySet()) {
-            ListOfLending lendings = hirerController.getListOfLending();
-            ListOfReservation reservations = hirerController.getListOfReservation();
+            ListOfLendings lendings = hirerController.getListOfLending();
+            ListOfReservations reservations = hirerController.getListOfReservation();
             data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library)), state(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library), item.isBorrowable(library))});
         }
         CommandLineInterface.printTable(header, data, 0);

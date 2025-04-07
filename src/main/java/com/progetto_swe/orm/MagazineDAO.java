@@ -32,7 +32,7 @@ public class MagazineDAO {
                 return null;
             }
             Magazine magazine = new Magazine(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
-                    Category.valueOf(resultSet.getString("category")), resultSet.getString("link"),
+                    Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"),
                     resultSet.getString("publishingHouse"));
             query
                     = "SELECT * "

@@ -7,15 +7,15 @@ public class Magazine extends Item {
 
     String publishingHouse;
 
-    public Magazine(int code, String title, LocalDate publicationDate, Language language, Category category, String link,
+    public Magazine(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages,
                     String publishingHouse) {
-        super(code, title, publicationDate, language, category, link);
+        super(code, title, publicationDate, language, category, link, number_of_pages);
         this.publishingHouse = publishingHouse;
     }
 
-    public Magazine(String title, LocalDate publicationDate, Language language, Category category, String link,
+    public Magazine(String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages,
                     String publishingHouse) {
-        super(-1, title, publicationDate, language, category, link);
+        super(-1, title, publicationDate, language, category, link, number_of_pages);
         this.publishingHouse = publishingHouse;
     }
 

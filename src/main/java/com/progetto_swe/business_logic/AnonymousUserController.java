@@ -21,12 +21,12 @@ public class AnonymousUserController {
         return catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
-    public ListOfReservation getListOfReservation() {
+    public ListOfReservations getListOfReservation() {
         ReservationDAO reservationDAO = new ReservationDAO();
         return reservationDAO.getReservations();
     }
 
-    public ListOfLending getListOfLending() {
+    public ListOfLendings getListOfLending() {
         LendingDAO lendingDAO = new LendingDAO();
         return lendingDAO.getLendings();
     }

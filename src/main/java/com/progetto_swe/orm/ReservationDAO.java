@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import com.progetto_swe.domain_model.*;
 
 import com.progetto_swe.orm.database_exception.CRUD_exception;
-import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class ReservationDAO {
@@ -20,7 +19,7 @@ public class ReservationDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public ListOfReservation getReservations() {
+    public ListOfReservations getReservations() {
         this.connection = ConnectionManager.getConnection();
         try {
             String query
@@ -54,7 +53,7 @@ public class ReservationDAO {
                 reservations.add(new Reservation(resultSet.getDate("reservation_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
             }
 
-            ListOfReservation listOfReservations = new ListOfReservation(reservations);
+            ListOfReservations listOfReservations = new ListOfReservations(reservations);
             return listOfReservations;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);

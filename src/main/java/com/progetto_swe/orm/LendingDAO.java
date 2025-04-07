@@ -69,7 +69,7 @@ public class LendingDAO {
         }
     }
 
-    public ListOfLending getLendings() {
+    public ListOfLendings getLendings() {
         this.connection = ConnectionManager.getConnection();
         try {
             String query
@@ -101,7 +101,7 @@ public class LendingDAO {
                 }
                 lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
             }
-            ListOfLending listOfLendings = new ListOfLending(lendings);
+            ListOfLendings listOfLendings = new ListOfLendings(lendings);
             return listOfLendings;
 
         } catch (SQLException e) {

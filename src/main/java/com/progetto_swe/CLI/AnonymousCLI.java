@@ -137,8 +137,8 @@ public class AnonymousCLI {
         String[] header = {"Sede", "Numero copie", "Stato"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Library library : item.getPhysicalCopies().keySet()) {
-            ListOfLending lendings = anonymousUserController.getListOfLending();
-            ListOfReservation reservations = anonymousUserController.getListOfReservation();
+            ListOfLendings lendings = anonymousUserController.getListOfLending();
+            ListOfReservations reservations = anonymousUserController.getListOfReservation();
             data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library)), state(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library), item.isBorrowable(library))});
         }
         CommandLineInterface.printTable(header, data, 0);

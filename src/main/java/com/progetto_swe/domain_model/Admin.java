@@ -21,7 +21,7 @@ public class Admin extends User{
         return result;
     }
 
-    public ArrayList<Item> avanceSearchItem(Catalogue catalogue, String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
+    public ArrayList<Item> advanceSearchItem(Catalogue catalogue, String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
         ArrayList<Item> result = catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
         for (Item item : result){
             if(item.getLibraryPhysicalCopies(this.workingPlace) == null){

@@ -2,10 +2,10 @@ package com.progetto_swe.domain_model;
 
 import java.util.ArrayList;
 
-public class ListOfLending {
+public class ListOfLendings {
     ArrayList<Lending> lendings = new ArrayList<>();
 
-    public ListOfLending(ArrayList<Lending> lendings) {
+    public ListOfLendings(ArrayList<Lending> lendings) {
         this.lendings = lendings;
     }
 
