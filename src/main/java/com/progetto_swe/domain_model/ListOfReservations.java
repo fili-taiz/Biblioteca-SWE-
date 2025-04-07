@@ -42,6 +42,15 @@ public class ListOfReservations {
         return false;
     }
 
+    public boolean reservationExist(Hirer hirer, Item item, Library storagePlace) {
+        for(Reservation r : reservations){
+            if(r.getHirer().equals(hirer) && r.getItem().equals(item) && r.getStoragePlace().equals(storagePlace)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ArrayList<Reservation> getReservationsByItem(Item item) {
         ArrayList<Reservation> bookReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {

@@ -29,6 +29,15 @@ public class ListOfLendings {
         return n;
     }
 
+    public boolean lendingExist(Hirer hirer, Item item, Library storagePlace) {
+        for(Lending l : lendings){
+            if(l.getHirer().equals(hirer) && l.getItem().equals(item) && l.getStoragePlace().equals(storagePlace)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean haveLending(Lending lending){
         for(Lending l : lendings){
             if(l.equals(lending)){

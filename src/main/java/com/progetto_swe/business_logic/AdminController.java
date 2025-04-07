@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+import com.progetto_swe.MailSender.MailSender;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 
@@ -89,8 +90,6 @@ public class AdminController {
         Catalogue catalogue = catalogueDAO.getCatalogue();
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
 
-        LendingDAO lendingDAO = new LendingDAO();
-        ReservationDAO reservationDAO = new ReservationDAO();
         Item item = catalogue.getItem(code);
         int physicalCopies = item.getLibraryPhysicalCopies(this.admin.getWorkingPlace()).getNumberOfPhysicalCopies();
         if (physicalCopies == 0){
@@ -331,30 +330,30 @@ public class AdminController {
     }
 
 
-    public boolean registerLending(String userCode, int itemCode) {
+    public boolean registerLending(Hirer hirer, Item item) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
         HirerDAO hirerDAO = new HirerDAO();
         ListOfHirers hirers = hirerDAO.getHirers();
         ReservationDAO reservationDAO = new ReservationDAO();
         LendingDAO lendingDAO = new LendingDAO();
-        if(hirers.getHirer(userCode) == null){
+        if(hirers.getHirer(hirer.getUserCode()) == null){
+            return false;
+        }
+        if(hirers.getHirer(hirer.getUserCode()).getUnbannedDate() != null){
+            return false;
+        }
+        if (!catalogue.getItem(item.getCode()).isBorrowable(this.admin.getWorkingPlace())) {
+            return false;
+        }
+        if(catalogue.getItem(item.getCode()).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings(), reservationDAO.getReservations(), this.admin.getWorkingPlace()) <= 1){
+            return false;
+        }
+        if(lendingDAO.getLendings().lendingExist(hirer, item, this.admin.getWorkingPlace())){
             return false;
         }
 
-        if(hirers.getHirer(userCode).getUnbannedDate() != null){
-            return false;
-        }
-
-        if (!catalogue.getItem(itemCode).isBorrowable(this.admin.getWorkingPlace())) {
-            return false;
-        }
-
-        if(catalogue.getItem(itemCode).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings(), reservationDAO.getReservations(), this.admin.getWorkingPlace()) <= 1){
-            return false;
-        }
-
-        return lendingDAO.addLending(userCode, itemCode, this.admin.getWorkingPlace().name());
+        return lendingDAO.addLending(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name());
     }
 
     public boolean confirmReservationWithdraw(Reservation reservation) {
@@ -397,14 +396,12 @@ public class AdminController {
     public boolean registerItemReturn(Lending lending) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         HirerDAO hirerDAO = new HirerDAO();
-        ReservationDAO reservationDAO = new ReservationDAO();
         LendingDAO lendingDAO = new LendingDAO();
 
         Catalogue catalogue = catalogueDAO.getCatalogue();
         ListOfHirers hirers = hirerDAO.getHirers();
         Hirer hirer = hirers.getHirer(lending.getHirer().getUserCode());
         Item item = catalogue.getItem(lending.getItem().getCode());
-
 
 
         if(hirer == null){
@@ -414,16 +411,24 @@ public class AdminController {
             return false;
         }
 
-        if(lendingDAO.getLendings().haveLending(lending)){
+        if(!lendingDAO.getLendings().haveLending(lending)){
             return false;
         }
 
         /*cancella reservation */
-        return lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name());
+        if(lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name())) {
+            WaitingListDAO waitingListDAO = new WaitingListDAO();
+            ArrayList<String> emails = waitingListDAO.getWaitingList(lending.getItem().getCode(), lending.getStoragePlace().toString());
+            MailSender mailSender = new MailSender();
+            for (String email : emails) {
+                mailSender.mandaMail();//notifica libro disponibile per prenotazione e noleggio
+            }
+            return true;
+        }
+        return false;
     }
 
     public ArrayList<Item> searchItem(String keyWords, String category) {
-        AdminDAO adminDAO = new AdminDAO();
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
         return admin.searchItem(catalogue, keyWords, Category.valueOf(category));
