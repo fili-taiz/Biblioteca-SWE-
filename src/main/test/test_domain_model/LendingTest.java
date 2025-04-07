@@ -14,9 +14,9 @@ public class LendingTest {
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00000",
                 null, null);
         Item item = new Magazine(1, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
-        Lending lending = new Lending(LocalDate.now(), hirer, item, Library.LIBRARY_1);
+        Lending lending = new Lending(LocalDate.of(2025,5,6), hirer, item, Library.LIBRARY_1);
 
-        assertEquals(LocalDate.now(), lending.getLendingDate());
+        assertEquals(LocalDate.of(2025,5,6), lending.getLendingDate());
         assertEquals(hirer, lending.getHirer());
         assertEquals(item, lending.getItem());
         assertEquals(Library.LIBRARY_1, lending.getStoragePlace());

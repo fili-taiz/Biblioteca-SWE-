@@ -25,7 +25,7 @@ public class HirerController {
     public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
-        return catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+        return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
 
@@ -47,12 +47,12 @@ public class HirerController {
         return reservationDAO.getReservations().getReservationsByHirer(this.hirer);
     }
 
-    public ListOfReservation getListOfReservation() {
+    public ListOfReservations getListOfReservation() {
         ReservationDAO reservationDAO = new ReservationDAO();
         return reservationDAO.getReservations();
     }
 
-    public ListOfLending getListOfLending() {
+    public ListOfLendings getListOfLending() {
         LendingDAO lendingDAO = new LendingDAO();
         return lendingDAO.getLendings();
     }

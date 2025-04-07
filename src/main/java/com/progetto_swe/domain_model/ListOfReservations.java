@@ -60,4 +60,6 @@ public class ListOfReservations {
         }
         return bookReservations;
     }
+
+    public ArrayList<Reservation> getReservations(){ return this.reservations; }
 }

@@ -18,7 +18,7 @@ public class AnonymousUserController {
     public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
-        return catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+        return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
     public ListOfReservations getListOfReservation() {

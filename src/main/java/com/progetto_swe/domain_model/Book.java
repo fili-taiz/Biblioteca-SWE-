@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class Book extends Item {
     String isbn;
     String publishingHouse;
-    int numberOfPages;
     String authors;
 
     public Book(int code, String title, LocalDate publicationDate, Language language, Category category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
@@ -20,7 +19,6 @@ public class Book extends Item {
         super(-1, title, publicationDate, language, category, link, numberOfPages);
         this.isbn = isbn;
         this.publishingHouse = publishingHouse;
-        this.numberOfPages = numberOfPages;
         this.authors = authors;
     }
 
@@ -30,10 +28,6 @@ public class Book extends Item {
 
     public String getPublishingHouse() {
         return this.publishingHouse;
-    }
-
-    public int getNumberOfPages() {
-        return this.numberOfPages;
     }
 
     public String getAuthors() {
@@ -65,9 +59,6 @@ public class Book extends Item {
                 return false;
             }
             if (!this.publishingHouse.equals(booksCopy.getPublishingHouse())) {
-                return false;
-            }
-            if (this.numberOfPages != booksCopy.getNumberOfPages()) {
                 return false;
             }
             return this.authors.equals(booksCopy.getAuthors());

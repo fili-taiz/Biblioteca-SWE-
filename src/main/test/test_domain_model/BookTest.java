@@ -11,12 +11,12 @@ public class BookTest {
 
     @Test
     public void testConstructors() {
-        Book book_1 = new Book(1, "title_1", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
-        Book book_2 = new Book("title_2", LocalDate.now(), Language.LANGUAGE_2, Category.CATEGORY_2, "link_2", "isbn_2", "publishing_house_2", 200, "authors_2");
+        Book book_1 = new Book(1, "title_1", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
+        Book book_2 = new Book("title_2", LocalDate.of(2023,5,6), Language.LANGUAGE_2, Category.CATEGORY_2, "link_2", "isbn_2", "publishing_house_2", 200, "authors_2");
 
         assertEquals(1, book_1.getCode());
         assertEquals("title_1", book_1.getTitle());
-        assertEquals(LocalDate.now(), book_1.getPublicationDate());
+        assertEquals(LocalDate.of(2023,5,6), book_1.getPublicationDate());
         assertEquals(Language.LANGUAGE_1, book_1.getLanguage());
         assertEquals(Category.CATEGORY_1, book_1.getCategory());
         assertEquals("link_1", book_1.getLink());
@@ -27,7 +27,7 @@ public class BookTest {
 
         assertEquals(-1, book_2.getCode());
         assertEquals("title_2", book_2.getTitle());
-        assertEquals(LocalDate.now(), book_2.getPublicationDate());
+        assertEquals(LocalDate.of(2023,5,6), book_2.getPublicationDate());
         assertEquals(Language.LANGUAGE_2, book_2.getLanguage());
         assertEquals(Category.CATEGORY_2, book_2.getCategory());
         assertEquals("link_2", book_2.getLink());
@@ -66,9 +66,9 @@ public class BookTest {
 
     @Test
     public void testEquals(){
-        Item magazine = new Magazine(1, "title", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
-        Item book_1 = new Book(1, "title", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
-        Item book_2 = new Book(1, "title", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
+        Item magazine = new Magazine(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
+        Item book_1 = new Book(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
+        Item book_2 = new Book(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
 
         assertTrue(book_1.equals(book_2));
         assertFalse(book_2.equals(magazine));

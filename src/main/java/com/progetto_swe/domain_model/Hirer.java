@@ -17,7 +17,7 @@ public class Hirer extends User{
     } //HO GIA' TESTATO catalogue.searchitem...
 
     public ArrayList<Item> advanceSearchItem(Catalogue catalogue, String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
-        return catalogue.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+        return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
     public boolean contains(String keyword){

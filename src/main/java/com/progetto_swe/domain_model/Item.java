@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 public abstract class Item {
     int code;
-    int number_of_pages;
+    int numberOfPages;
     String title;
     LocalDate publicationDate;
     Language language;
@@ -12,14 +12,14 @@ public abstract class Item {
     String link;
     HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
 
-    public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages) {
+    public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int numberOfPages) {
         this.code = code;
         this.title = title;
         this.publicationDate = publicationDate;
         this.language = language;
         this.category = category;
         this.link = link;
-        this.number_of_pages = number_of_pages;
+        this.numberOfPages = numberOfPages;
     }
 
     public boolean contains(String keyword){
@@ -48,7 +48,7 @@ public abstract class Item {
         if (!itemsCopy.getLink().equals(this.link)) {
             return false;
         }
-        return true;
+        return this.numberOfPages == itemsCopy.getNumberOfPages();
     }
     public abstract String[] getValues();
 
@@ -116,6 +116,7 @@ public abstract class Item {
     public Language getLanguage(){ return this.language;}
     public Category getCategory(){ return this.category;}
     public String getLink(){ return this.link;}
+    public int getNumberOfPages() { return this.numberOfPages; }
 
     public PhysicalCopies getLibraryPhysicalCopies(Library library) {
         if(physicalCopies.get(library) == null){
