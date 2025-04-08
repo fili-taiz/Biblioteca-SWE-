@@ -20,15 +20,15 @@ import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 public class AdminDAO {
     private Connection connection;
 
-    public AdminDAO(){
-        this.connection = ConnectionManager.getConnection();
+    public AdminDAO(Connection connection){
+        this.connection = connection;
     }
 
     public Admin getAdmin(String userCode){
         try {
             String query
                     = "SELECT * "
-                    + "FROM Admin A"
+                    + "FROM Admin A "
                     + "WHERE A.user_code = '" + userCode + "'";
 
             Statement statement = connection.createStatement();

@@ -1,5 +1,6 @@
 package com.progetto_swe.business_logic;
 
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -11,19 +12,21 @@ import com.progetto_swe.orm.ReservationDAO;
 
 public class HirerController {
     Hirer hirer;
+    private Connection connection;
 
-    public HirerController(Hirer hirer){
+    public HirerController(Hirer hirer, Connection connection){
         this.hirer = hirer;
+        this.connection = connection;
     }
 
     public ArrayList<Item> searchItem(String keyWords, Category category ){
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        CatalogueDAO catalogueDAO = new CatalogueDAO(connection);
         Catalogue catalogue = catalogueDAO.getCatalogue();
         return hirer.searchItem(catalogue, keyWords, category);
     }
 
     public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        CatalogueDAO catalogueDAO = new CatalogueDAO(connection);
         Catalogue catalogue = catalogueDAO.getCatalogue();
         return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }

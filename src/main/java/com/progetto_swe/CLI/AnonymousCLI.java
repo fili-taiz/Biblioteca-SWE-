@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class AnonymousCLI {
 
-    private AnonymousUserController anonymousUserController = new AnonymousUserController();
+   /* private AnonymousUserController anonymousUserController = new AnonymousUserController();
     private Scanner scanner = new Scanner(System.in);
 
     public String start() {
@@ -152,5 +152,5 @@ public class AnonymousCLI {
             return "Esaurito";
         }
         return "Prenotabile";
-    }
+    }*/
 }

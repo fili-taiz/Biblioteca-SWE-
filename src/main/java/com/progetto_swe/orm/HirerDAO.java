@@ -14,6 +14,10 @@ public class HirerDAO {
 
     private Connection connection;
 
+    public HirerDAO(Connection connection){
+        this.connection = connection;
+    }
+
     //creazione Hirer con solo i dati inerenti Hirer
     public Hirer getHirer(String userCode) {
         try {

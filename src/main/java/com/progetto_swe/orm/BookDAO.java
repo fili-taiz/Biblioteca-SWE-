@@ -16,16 +16,15 @@ public class BookDAO {
 
     private Connection connection;
 
-    public BookDAO() {
-        this.connection = ConnectionManager.getConnection();
+    public BookDAO(Connection connection) {
+        this.connection = connection;
     }
 
     public Book getBook(int code) {
         try {
-            connection = ConnectionManager.getConnection();
             String query
                     = "SELECT * "
-                    + "FROM Item I JOIN Book B ON I.code = B.code"
+                    + "FROM Item I INNER JOIN Book B ON I.code = B.code "
                     + "WHERE I.code = " + code + ";";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -34,7 +33,7 @@ public class BookDAO {
             }
             Book book = new Book(code, resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                     Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
-                    resultSet.getString("publishing_house"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
+                    resultSet.getString("publishing_house"), resultSet.getInt("number_of_pages"), resultSet.getString("authors"));
             query
                     = "SELECT * "
                     + "FROM Physical_copies P "
