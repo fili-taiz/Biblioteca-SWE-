@@ -90,9 +90,17 @@ public class MailSender {
     }
 
 
-    public static void sendWithdrawSuccessMail(String recepient, String userCode, int itemCode, String title) {
+    public static void sendReturnSuccessMail(String recepient, String userCode, int itemCode, String title) {
         String subject = "RESTITUZIONE ARTICOLO CON SUCCESSO";
         String content = "ha restituito con successo l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>.";
+        String html = createhtml(subject, userCode, content);
+        sendMail(recepient, subject, html);
+    }
+
+    public static void sendWithdrawSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, String expireDate) {
+        String subject = "RESTITUZIONE ARTICOLO CON SUCCESSO";
+        String content = "ha ritirato con successo l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>." +
+                "È pregata di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
     }
@@ -158,9 +166,5 @@ public class MailSender {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    //da cancellare
-    public static void mandaMail() {
     }
 }

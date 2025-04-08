@@ -44,7 +44,7 @@ a.add("A");
             throw new RuntimeException(e);
         }
 
-        MailSender.mandaMail();
+
 
         md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
