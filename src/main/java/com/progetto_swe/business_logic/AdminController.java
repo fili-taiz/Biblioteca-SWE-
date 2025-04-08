@@ -394,7 +394,7 @@ public class AdminController {
             return false;
         }
         ConnectionManager.commit();
-        MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());
+        MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(), reservation.getStoragePlace().toString(), LocalDate.now().plusMonths(1).toString());
         return true;
     }
 
@@ -425,7 +425,7 @@ public class AdminController {
             WaitingListDAO waitingListDAO = new WaitingListDAO();
             ArrayList<String> emails = waitingListDAO.getWaitingList(lending.getItem().getCode(), lending.getStoragePlace().toString());
             for (String email : emails) {
-                MailSender.mandaMail();//notifica libro disponibile per prenotazione e noleggio
+                MailSender.sendReturnSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());//notifica libro disponibile per prenotazione e noleggio
             }
             return true;
         }
