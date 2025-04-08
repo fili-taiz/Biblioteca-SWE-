@@ -4,17 +4,11 @@ import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.UserCredentials;
 import com.progetto_swe.orm.HirerDAO;
 
-import java.sql.Connection;
 import java.util.HashMap;
 
 public class LoginExternalHirerController {
-    private Connection connection;
-
-    public LoginExternalHirerController(Connection connection){
-        this.connection = connection;
-    }
     public Hirer login(String userCode, String password){
-        HirerDAO hirerDAO = new HirerDAO(connection);
+        HirerDAO hirerDAO = new HirerDAO();
         HashMap<String, String> saltAndHashedPassword = hirerDAO.getSaltAndHashedPassword(userCode);
 
         //controllo password

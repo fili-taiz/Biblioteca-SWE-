@@ -1,8 +1,6 @@
 package com.progetto_swe.business_logic;
 
 
-import java.sql.Connection;
-import java.util.Comparator;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.Hirer;
@@ -11,11 +9,6 @@ import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
 public class LoginUniversityHirerController {
-    private Connection connection;
-
-    public LoginUniversityHirerController(Connection connection){
-        this.connection = connection;
-    }
 
     public Hirer loginUniversityHirer(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
@@ -30,7 +23,7 @@ public class LoginUniversityHirerController {
         //TODO implementare grafica controllo che non sia nullo
 
         //ottengo informazioni di questo UniversityHirer nel database bibliotecario
-        HirerDAO hirerDAO = new HirerDAO(connection);
+        HirerDAO hirerDAO = new HirerDAO();
         Hirer hirer = hirerDAO.getHirer(userCode);
 
         //riconosciuto dall'università ma è la prima volta che esegue login

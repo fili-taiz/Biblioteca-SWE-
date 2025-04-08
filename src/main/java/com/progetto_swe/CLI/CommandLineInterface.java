@@ -9,7 +9,7 @@ import com.progetto_swe.business_logic.*;
 import com.progetto_swe.domain_model.Hirer;
 
 public class CommandLineInterface {
-    /*static int screenWidth = 90;
+    static int screenWidth = 90;
     String role = "utente anonimo";
 
     public void start() {
@@ -164,6 +164,6 @@ public class CommandLineInterface {
             }
         }
         return maxLength;
-    }*/
+    }
 
 }

@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class HirerCLI {
 
-    /*private HirerController hirerController;
+    private HirerController hirerController;
     private Scanner scanner = new Scanner(System.in);
 
     public HirerCLI(HirerController hirerController) {
@@ -192,5 +192,5 @@ public class HirerCLI {
             return "Esaurito";
         }
         return "Prenotabile";
-    }*/
+    }
 }

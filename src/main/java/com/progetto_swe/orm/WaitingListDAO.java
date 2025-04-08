@@ -16,8 +16,8 @@ import java.util.HashMap;
 public class WaitingListDAO {
     private Connection connection;
 
-    public WaitingListDAO(Connection connection) {
-        this.connection = connection;
+    public WaitingListDAO() {
+        this.connection = ConnectionManager.getConnection();
     }
 
     public ArrayList<String> getWaitingList(int code, String storagePlace) {

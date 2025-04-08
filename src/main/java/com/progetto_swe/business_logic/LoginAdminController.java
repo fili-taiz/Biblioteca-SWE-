@@ -1,7 +1,6 @@
 package com.progetto_swe.business_logic;
 
 
-import java.sql.Connection;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.Admin;
@@ -10,11 +9,6 @@ import com.progetto_swe.orm.AdminDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
 public class LoginAdminController{
-    private AdminDAO adminDAO;
-
-    public LoginAdminController(Connection connection){
-        this.adminDAO = new AdminDAO(connection);
-    }
 
     public Admin login(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
@@ -29,6 +23,7 @@ public class LoginAdminController{
         //TODO implementare grafica controllo che non sia nullo
 
         //ottengo informazioni di questo Admin nel database bibliotecario
+        AdminDAO adminDAO = new AdminDAO();
         Admin admin = adminDAO.getAdmin(userCode);
 
         //riconosciuto dall'università ma è la prima volta che esegue login

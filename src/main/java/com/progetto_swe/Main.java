@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 
 public class Main {
-   /* public static void main(String[] args) {
+    public static void main(String[] args) {
         clearScreen();
         //ConnectionManager.query("Select * From Hirer");
         System.out.println(Math.round((Math.random()*1000000)));
@@ -26,10 +26,11 @@ a.add("C");
 a.add("c");
 a.add("a");
 a.add("A");
-
+        */
+        /*
         Item i1 = new Item(1, "null", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "null", false);
         Item i2 = new Item(1, "null", LocalDate.now(), Language.LANGUAGE_1, Category.CATEGORY_1, "null", false);
-
+        */
         Integer i = 1;
         System.out.println(i-8);
         HirerDAO dao = new HirerDAO();
@@ -51,5 +52,5 @@ a.add("A");
     public static void clearScreen() {  
         System.out.print("\033[H\033[2J");  
         System.out.flush();  
-    }  */
+    }  
 }

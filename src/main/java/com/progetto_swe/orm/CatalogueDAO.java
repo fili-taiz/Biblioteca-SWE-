@@ -16,8 +16,8 @@ import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 public class CatalogueDAO {
     private Connection connection;
 
-    public CatalogueDAO(Connection connection){
-        this.connection = connection;
+    public CatalogueDAO(){
+        this.connection = ConnectionManager.getConnection();
     }
 
     public Catalogue getCatalogue(){

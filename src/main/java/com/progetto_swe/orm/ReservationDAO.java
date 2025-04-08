@@ -35,14 +35,14 @@ public class ReservationDAO {
             }
             while (resultSet.next()) {
 
-                BookDAO bookDAO = new BookDAO(connection);
-                ThesisDAO thesisDAO = new ThesisDAO(connection);
-                MagazineDAO magazineDAO = new MagazineDAO(connection);
+                BookDAO bookDAO = new BookDAO();
+                ThesisDAO thesisDAO = new ThesisDAO();
+                MagazineDAO magazineDAO = new MagazineDAO();
                 Book book = bookDAO.getBook(resultSet.getInt("code"));
                 Thesis thesis = thesisDAO.getThesis(resultSet.getInt("code"));
                 Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
 
-                HirerDAO hirerDAO = new HirerDAO(connection);
+                HirerDAO hirerDAO = new HirerDAO();
                 Hirer hirer = hirerDAO.getHirer(resultSet.getString("user_code"));
                 Item item;
                 if(book != null) {

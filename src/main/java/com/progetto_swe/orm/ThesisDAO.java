@@ -16,8 +16,8 @@ public class ThesisDAO {
 
     private Connection connection;
 
-    public ThesisDAO(Connection connection) {
-        this.connection = connection;
+    public ThesisDAO() {
+        this.connection = ConnectionManager.getConnection();
     }
 
     public Thesis getThesis(int code) {

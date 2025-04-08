@@ -16,8 +16,8 @@ public class MagazineDAO {
 
     private Connection connection;
 
-    public MagazineDAO(Connection connection) {
-        this.connection = connection;
+    public MagazineDAO() {
+        this.connection = ConnectionManager.getConnection();
     }
 
     public Magazine getMagazine(int code) {
