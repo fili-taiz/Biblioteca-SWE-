@@ -1,7 +1,6 @@
 package com.progetto_swe.orm;
 
 
-import com.progetto_swe.domain_model.PhysicalCopies;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
 import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
@@ -14,8 +13,8 @@ import java.sql.Statement;
 public class PhysicalCopiesDAO {
     private Connection connection;
 
-    public PhysicalCopiesDAO(Connection connection){
-        this.connection = connection;
+    public PhysicalCopiesDAO(){
+        this.connection = ConnectionManager.getConnection();
     }
 
     public boolean addPhysicalCopies(int code, String storagePlace, int numberOfCopies, boolean borrowable){
@@ -47,7 +46,8 @@ public class PhysicalCopiesDAO {
         }
     }
 
-    public PhysicalCopies getPhysicalCopies(int code, String storagePlace) {
+    public int getPhysicalCopies(int code, String storagePlace) {
+        connection = ConnectionManager.getConnection();
         try {
             String query
                     = "SELECT * "
@@ -58,10 +58,8 @@ public class PhysicalCopiesDAO {
             if(!resultSet.next()){
                 throw new DataAccessException("Error executing query!", null);
             }
-            int numberOfCopies = resultSet.getInt("number_of_copies");
-            boolean borrowable = resultSet.getBoolean("borrowable");
-
-            return new PhysicalCopies(numberOfCopies, borrowable);
+            resultSet.next();
+            return resultSet.getInt("number_of_copies");
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }

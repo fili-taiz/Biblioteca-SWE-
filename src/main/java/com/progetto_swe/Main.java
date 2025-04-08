@@ -3,6 +3,7 @@ package com.progetto_swe;
 
 import java.time.LocalDate;
 
+import com.progetto_swe.MailSender.MailSender;
 import com.progetto_swe.domain_model.Category;
 import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.Language;
@@ -32,7 +33,7 @@ a.add("A");
         Integer i = 1;
         System.out.println(i-8);
         HirerDAO dao = new HirerDAO();
-        System.out.println(dao.getHirer("1")==null);
+        //System.out.println(dao.getHirer("1")==null);
 
         String input = "as";
         MessageDigest md = null;
@@ -41,6 +42,8 @@ a.add("A");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+        MailSender mailSender = new MailSender();
+        mailSender.mandaMail();
 
         md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
