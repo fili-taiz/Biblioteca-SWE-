@@ -15,12 +15,14 @@ import java.util.Properties;
 import java.util.Scanner;
 
 public class MailSender {
-    private Session session;
-    private String myAccountEmail = "biblioteca.SWE@gmail.com";
-    private String password = "upun dxcl xqfi rwae";
-    private boolean sendMail = false;
+    private static final MailSender mailSender = new MailSender();
+    private static Session session;
+    private static String myAccountEmail = "biblioteca.SWE@gmail.com";
+    private static String password = "upun dxcl xqfi rwae";
+    private static boolean sendMail = false;
 
-    public MailSender() {
+
+    private MailSender() {
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.host", "smtp.gmail.com");
@@ -36,7 +38,7 @@ public class MailSender {
         session.setDebug(true);
     }
 
-    private String getHTMLmodel() {
+    private static String getHTMLmodel() {
         Scanner in = null;
         try {
             in = new Scanner(new FileReader("src/main/resources/Mail/ModelloHTML.html"));
@@ -50,7 +52,7 @@ public class MailSender {
         return content;
     }
 
-    private String createhtml(String subject, String userCode, String content) {
+    private static String createhtml(String subject, String userCode, String content) {
         String html = getHTMLmodel();
         html = html.replace("$[TITOLO]", subject);
         html = html.replace("$[UTENTE]", userCode);
@@ -58,7 +60,7 @@ public class MailSender {
         return html;
     }
 
-    public void sendReservationSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
+    public static void sendReservationSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "PRENOTAZIONE EFFETTUATA CON SUCCESSO";
         String content = "la sua prenotazione dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
                         " presso " + storagePlace + "  è stata effettuata con successo. <br>" +
@@ -69,7 +71,7 @@ public class MailSender {
     }
 
     //mandata da postgre
-    public void sendReservationExpired(String recepient, String userCode, int itemCode, String title, String storagePlace) {
+    public static void sendReservationExpired(String recepient, String userCode, int itemCode, String title, String storagePlace) {
         String subject = "CANCELLAZIONE PRENOTAZIONE";
         String content = "la sua prenotazione dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
                         " presso " + storagePlace + "  è stata cancellata perché non è venuta a ritirare " +
@@ -78,7 +80,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
-    public void sendLendingSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
+    public static void sendLendingSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "NOLEGGIO EFFETTUATO CON SUCCESSO";
         String content = "il suo noleggio dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
                         " presso " + storagePlace + "  è stata effettuato con successo. <br>" +
@@ -87,7 +89,8 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
-    public void sendWithdrawSuccessMail(String recepient, String userCode, int itemCode, String title) {
+
+    public static void sendWithdrawSuccessMail(String recepient, String userCode, int itemCode, String title) {
         String subject = "RESTITUZIONE ARTICOLO CON SUCCESSO";
         String content = "ha restituito con successo l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>.";
         String html = createhtml(subject, userCode, content);
@@ -95,7 +98,7 @@ public class MailSender {
     }
 
     //mandato da postgre
-    public void sendUpdateLendingDateMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
+    public static void sendUpdateLendingDateMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "RINNOVATO NOLEGGIO";
         String content = "il suo noleggio dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
                         " presso " + storagePlace + "  è stato rinnovato perché non ha restituito il libro" +
@@ -106,7 +109,7 @@ public class MailSender {
     }
 
     //mandato da postgre
-    public void sendHirerBannedMail(String recepient, String userCode, int itemCode, String title, LocalDate unbannedDate) {
+    public static void sendHirerBannedMail(String recepient, String userCode, int itemCode, String title, LocalDate unbannedDate) {
         String subject = "UTENTE BANNATO";
         String content = "è stata bannata fino a data " + unbannedDate + " perché non ha restituito 'articolo \"" + title + "\" " +
                 "<br>con codice <strong>" + itemCode + "</strong>" + " dopo aver il noleggio 3 volte.";
@@ -115,14 +118,14 @@ public class MailSender {
     }
 
     //mandato da postgre
-    public void sendHirerUnbannedMail(String recepient, String userCode) {
+    public static void sendHirerUnbannedMail(String recepient, String userCode) {
         String subject = "UTENTE UNBANNATO";
         String content = "è stata unbannata, la pregriamo di restituire l'articolo entro le scadenze.";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
     }
 
-    public void sendAddInWaitingListSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace) {
+    public static void sendAddInWaitingListSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace) {
         String subject = "AGGIUNTO IL LISTA D'ATTESA";
         String content = "è stata aggiunta nella lista d'attesa per l'articolo \"" + title + "\" con codice <strong>" + itemCode +
                 "</strong> <br> presso " + storagePlace + "." +
@@ -132,7 +135,7 @@ public class MailSender {
     }
 
     //mandato da postgre
-    public void sendNotifyWaitingListMail(String recepient, String userCode, int itemCode, String title, String storagePlace) {
+    public static void sendNotifyWaitingListMail(String recepient, String userCode, int itemCode, String title, String storagePlace) {
         String subject = "ARTICOLO DISPONIBILE";
         String content = "l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
                         " presso " + storagePlace + " è disponibile.<br> " +
@@ -142,7 +145,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
-    private void sendMail(String recipient, String subject, String content) {
+    private static void sendMail(String recipient, String subject, String content) {
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(myAccountEmail));
@@ -158,6 +161,6 @@ public class MailSender {
     }
 
     //da cancellare
-    public void mandaMail() {
+    public static void mandaMail() {
     }
 }

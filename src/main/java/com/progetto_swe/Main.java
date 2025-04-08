@@ -43,8 +43,8 @@ a.add("A");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        MailSender mailSender = new MailSender();
-        mailSender.mandaMail();
+
+        MailSender.mandaMail();
 
         md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
