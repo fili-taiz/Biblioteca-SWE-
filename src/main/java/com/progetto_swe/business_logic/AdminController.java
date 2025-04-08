@@ -353,7 +353,11 @@ public class AdminController {
             return false;
         }
 
-        return lendingDAO.addLending(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name());
+        if(lendingDAO.addLending(hirer.getUserCode(), item.getCode(), this.admin.getWorkingPlace().name())){
+            MailSender.sendLendingSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(), this.admin.getWorkingPlace().toString(), LocalDate.now().plusMonths(1));
+            return true;
+        }
+        return false;
     }
 
     public boolean confirmReservationWithdraw(Reservation reservation) {
@@ -390,6 +394,7 @@ public class AdminController {
             return false;
         }
         ConnectionManager.commit();
+        MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());
         return true;
     }
 
@@ -419,9 +424,8 @@ public class AdminController {
         if(lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name())) {
             WaitingListDAO waitingListDAO = new WaitingListDAO();
             ArrayList<String> emails = waitingListDAO.getWaitingList(lending.getItem().getCode(), lending.getStoragePlace().toString());
-            MailSender mailSender = new MailSender();
             for (String email : emails) {
-                mailSender.mandaMail();//notifica libro disponibile per prenotazione e noleggio
+                MailSender.mandaMail();//notifica libro disponibile per prenotazione e noleggio
             }
             return true;
         }

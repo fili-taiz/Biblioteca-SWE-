@@ -23,7 +23,6 @@ public class ConnectionManager {
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
-
     }
 
     public static Connection getConnection(){

@@ -3,11 +3,9 @@ package com.progetto_swe.business_logic;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import com.progetto_swe.MailSender.MailSender;
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.CatalogueDAO;
-import com.progetto_swe.orm.HirerDAO;
-import com.progetto_swe.orm.LendingDAO;
-import com.progetto_swe.orm.ReservationDAO;
+import com.progetto_swe.orm.*;
 
 public class HirerController {
     Hirer hirer;
@@ -28,13 +26,26 @@ public class HirerController {
         return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
+    public boolean addInWaitingList(Item item, Library storagePlace){
+        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        if(catalogueDAO.getCatalogue().contains(item) == -1){
+            return false;
+        }
+        WaitingListDAO waitingListDAO = new WaitingListDAO();
+        return waitingListDAO.addToWaitingList(item.getCode(), storagePlace.toString(), this.hirer.getEmail());
+    }
+
 
     public boolean reserveItem(Item item, Library storagePlace){
         if(this.hirer.getUnbannedDate() != null){
             return false;
         }
         ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.addReservation(this.hirer.getUserCode(), item.getCode(), storagePlace.name());
+        if(reservationDAO.addReservation(this.hirer.getUserCode(), item.getCode(), storagePlace.name())){
+            MailSender.sendReservationSuccessMail(this.hirer.getEmail(), this.hirer.getUserCode(), item.getCode(), item.getTitle(), storagePlace.toString(), LocalDate.now().plusDays(7));
+            return true;
+        }
+        return false;
     }
 
     public ArrayList<Lending> getLendings(){
