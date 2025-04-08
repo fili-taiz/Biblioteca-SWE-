@@ -1,9 +1,6 @@
 package com.progetto_swe.orm;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,10 +24,9 @@ public class CatalogueDAO {
         try {
             //tutti i book
             String query
-                    = "SELECT * "
-                    + "FROM Item I JOIN Book B ON I.code = B.code";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+                    = "SELECT * FROM Item I JOIN Book B ON I.code = B.code";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet resultSet = ps.executeQuery(query);
             if(!resultSet.next()){
                 throw new DataAccessException("Error executing query!", null);
             }
@@ -43,9 +39,9 @@ public class CatalogueDAO {
 
             //tutti i thesis
             query
-                    = "SELECT * "
-                    + "FROM Item I JOIN Thesis T ON I.code = T.code";
-            resultSet = statement.executeQuery(query);
+                    = "SELECT * FROM Item I JOIN Thesis T ON I.code = T.code";
+            ps = connection.prepareStatement(query);
+            resultSet = ps.executeQuery();
             if(!resultSet.next()){
                 throw new DataAccessException("Error executing query!", null);
             }
@@ -59,9 +55,9 @@ public class CatalogueDAO {
 
             //tutti i magazine
             query
-                    = "SELECT * "
-                    + "FROM Item I JOIN Magazine M ON I.code = M.code";
-            resultSet = statement.executeQuery(query);
+                    = "SELECT * FROM Item I JOIN Magazine M ON I.code = M.code";
+            ps = connection.prepareStatement(query);
+            resultSet = ps.executeQuery();
             if(!resultSet.next()){
                 throw new DataAccessException("Error executing query!", null);
             }
@@ -73,11 +69,9 @@ public class CatalogueDAO {
             }
 
             for(Item item : items){
-                query
-                        = "SELECT * "
-                        + "FROM Physical_copies P "
-                        + "WHERE P.code = " + resultSet.getInt("code") + ";";
-                ResultSet copiesSet = statement.executeQuery(query);
+                query = "SELECT * FROM Physical_copies P WHERE P.code = ?;";
+                ps = connection.prepareStatement(query);
+                ResultSet copiesSet = ps.executeQuery();
                 if(copiesSet.next()){
                     physicalCopies = new HashMap<>();
                     while (copiesSet.next()) {

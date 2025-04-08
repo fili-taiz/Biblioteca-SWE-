@@ -1,9 +1,6 @@
 package com.progetto_swe.orm;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.Admin;
@@ -16,7 +13,6 @@ import com.progetto_swe.domain_model.UserCredentials;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
 import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
-
 public class AdminDAO {
     private Connection connection;
 
@@ -26,13 +22,11 @@ public class AdminDAO {
 
     public Admin getAdmin(String userCode){
         try {
-            String query
-                    = "SELECT * "
-                    + "FROM Admin A"
-                    + "WHERE A.user_code = '" + userCode + "'";
+            String query  = "SELECT * FROM Admin A WHERE A.user_code = ?";
 
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
                 return new Admin(userCode, resultSet.getString("name"), resultSet.getString("surname"),
                         resultSet.getString("email"), resultSet.getString("telephone_number"),
@@ -49,11 +43,15 @@ public class AdminDAO {
         connection = ConnectionManager.getConnection();
         try {
             String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place)"
-                    + "VALUES ('" + userCode + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "', '"
-                    + workingPlace + "');";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            if(resultSet.next()){
+                    + "VALUES (?, ?, ?, ?, ?, ?);";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ps.setString(2, name);
+            ps.setString(3, surname);
+            ps.setString(4, email);
+            ps.setString(5, telephoneNumber);
+            ps.setString(6, workingPlace);
+            if(ps.executeUpdate() > 0){
                 return true;
             }else{
                 throw new CRUD_exception("Error executing insert!", null);

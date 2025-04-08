@@ -1,9 +1,6 @@
 package com.progetto_swe.orm;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -23,11 +20,9 @@ public class ReservationDAO {
     public ListOfReservations getReservations() {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query
-                    = "SELECT * "
-                    + "FROM Reservations;";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            String query = "SELECT * FROM Reservations;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet resultSet = ps.executeQuery();
             resultSet.next();
             ArrayList<Reservation> reservations = new ArrayList<>();
             if(!resultSet.next()){
@@ -67,10 +62,14 @@ public class ReservationDAO {
     public boolean addReservation(String userCode, int itemCode, String storagePlace) {
         this.connection = ConnectionManager.getConnection();
         try {
-            Statement statement = connection.createStatement();
             String query = "INSERT INTO Reservation (user_code, code, storage_place, reservation_date)"
-                    + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
-            ResultSet resultSet = statement.executeQuery(query);
+                    + "VALUES (?, ?, ?, ?); ";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ps.setInt(2, itemCode);
+            ps.setString(3, storagePlace);
+            ps.setDate(4, java.sql.Date.valueOf(LocalDate.now()));
+            ResultSet resultSet = ps.executeQuery();
             if(!resultSet.next()){
                 throw new CRUD_exception("Error executing insert!", null);
             }
@@ -83,10 +82,12 @@ public class ReservationDAO {
     public boolean removeReservation(String userCode, int itemCode, String storagePlace){
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "DELETE FROM Reservation R "
-                    + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
-            Statement statement = connection.createStatement();
-            if(statement.executeUpdate(query) != 1){
+            String query = "DELETE FROM Reservation R WHERE user_code = ? AND code = ? AND storage_place = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ps.setInt(2, itemCode);
+            ps.setString(3, storagePlace);
+            if(ps.executeUpdate() != 1){
                 throw new CRUD_exception("Error executing delete!", null);
             }
             return true;
