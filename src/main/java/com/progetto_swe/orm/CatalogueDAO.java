@@ -31,6 +31,9 @@ public class CatalogueDAO {
                     + "FROM Item I JOIN Book B ON I.code = B.code";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
                 Item book = new Book(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                         Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
@@ -43,9 +46,12 @@ public class CatalogueDAO {
                     = "SELECT * "
                     + "FROM Item I JOIN Thesis T ON I.code = T.code";
             resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
                 Item thesis = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
-                        Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("author"),
+                        Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"), resultSet.getString("author"),
                         resultSet.getString("supervisors"), resultSet.getString("university"));
                 items.add(thesis);
             }
@@ -56,9 +62,12 @@ public class CatalogueDAO {
                     = "SELECT * "
                     + "FROM Item I JOIN Magazine M ON I.code = M.code";
             resultSet = statement.executeQuery(query);
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
                 Item magazine = new Magazine(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
-                        Category.valueOf(resultSet.getString("category")), resultSet.getString("link"),
+                        Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"),
                         resultSet.getString("publishingHouse"));
                 items.add(magazine);
             }
@@ -75,6 +84,8 @@ public class CatalogueDAO {
                         physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
                     }
                     item.setPhysicalCopies(physicalCopies);
+                } else{
+                   throw new DataAccessException("Error executing query!", null);
                 }
             }
             return new Catalogue(items);

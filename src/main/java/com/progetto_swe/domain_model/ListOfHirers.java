@@ -30,5 +30,5 @@ public class ListOfHirers {
         return result;
     }
 
-    public ArrayList<Hirer> getHirers() { return hirers; }
+    public ArrayList<Hirer> getHirers() { return this.hirers; }
 }

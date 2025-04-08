@@ -100,7 +100,7 @@ public class AdminController {
         return true;
     }
 
-    public boolean addMagazine(String title, String publicationDate, String language, String category, String link, String publishingHouse,
+    public boolean addMagazine(String title, String publicationDate, String language, String category, String link, int numberOfPages, String publishingHouse,
                                int numberOfCopies, boolean borrowable) {
         //spostare nella cli
         //convalida data
@@ -108,7 +108,7 @@ public class AdminController {
             return false;
         }
 
-        Magazine magazineCopy = new Magazine(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, publishingHouse);
+        Magazine magazineCopy = new Magazine(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, publishingHouse);
         MagazineDAO magazineDAO = new MagazineDAO();
 
         CatalogueDAO catalogueDAO = new CatalogueDAO();
@@ -138,7 +138,7 @@ public class AdminController {
         return false;
     }
 
-    public boolean addThesis(String title, String publicationDate, String language, String category, String link, String author,
+    public boolean addThesis(String title, String publicationDate, String language, String category, String link, int numberOfPages, String author,
                              String supervisors, String university, int numberOfCopies, boolean borrowable) {
 
         //spostare nella cli
@@ -147,7 +147,7 @@ public class AdminController {
             return false;
         }
 
-        Thesis thesisCopy = new Thesis(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, author, supervisors, university);
+        Thesis thesisCopy = new Thesis(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, author, supervisors, university);
         ThesisDAO thesisDAO = new ThesisDAO();
 
         CatalogueDAO catalogueDAO = new CatalogueDAO();

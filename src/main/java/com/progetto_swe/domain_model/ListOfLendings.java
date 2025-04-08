@@ -2,10 +2,10 @@ package com.progetto_swe.domain_model;
 
 import java.util.ArrayList;
 
-public class ListOfLending {
-    ArrayList<Lending> lendings = new ArrayList<>();
+public class ListOfLendings {
+    ArrayList<Lending> lendings;
 
-    public ListOfLending(ArrayList<Lending> lendings) {
+    public ListOfLendings(ArrayList<Lending> lendings) {
         this.lendings = lendings;
     }
 
@@ -56,4 +56,6 @@ public class ListOfLending {
         }
         return bookLendings;
     }
+
+    public ArrayList<Lending> getLendings(){ return this.lendings; }
 }

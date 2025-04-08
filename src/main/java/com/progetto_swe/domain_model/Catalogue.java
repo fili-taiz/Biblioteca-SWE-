@@ -24,7 +24,7 @@ public class Catalogue{
         return result;
     }
 
-    public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
+    public ArrayList<Item> advancedSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
         String[] splittedKeyword = keywords.split(" ");
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : this.items) {
@@ -55,5 +55,7 @@ public class Catalogue{
         }
         return null;
     }
+
+    public ArrayList<Item> getItems(){ return this.items; }
 
 }

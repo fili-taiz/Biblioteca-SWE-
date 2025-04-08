@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class BookDAO {
@@ -29,7 +30,7 @@ public class BookDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()) {
-                return null;
+                throw new DataAccessException("Error executing query!", null);
             }
             Book book = new Book(code, resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                     Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
@@ -45,6 +46,8 @@ public class BookDAO {
                     physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
                 }
                 book.setPhysicalCopies(physicalCopies);
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
             return book;
         } catch (SQLException e) {
@@ -64,7 +67,7 @@ public class BookDAO {
                     + "RETURNING code;";
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             int code = resultSet.getInt("code");
 
@@ -72,7 +75,7 @@ public class BookDAO {
                     = "INSERT INTO Book (code, isbn, publishing_house, number_of_pages, authors)"
                     + "VALUES ('" + code + "', '" + isbn + "', " + publishingHouse + ", " + numberOfPages + ", '" + authors + "');";
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
 
             return code;
@@ -90,7 +93,7 @@ public class BookDAO {
                     = "DELETE FROM Item "
                     + "WHERE code = '" + code + "';";
             if (statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing delete!", null);
             };
 
             query
@@ -98,7 +101,7 @@ public class BookDAO {
                     + "where code = '" + code + "';";
 
             if (statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing delete!", null);
             }
             return true;
         } catch (SQLException e) {
@@ -117,7 +120,7 @@ public class BookDAO {
                     + "SET title = '" + title + "', publication_date = '" + publicationDate + "', language = '" + language + "', category = '" + category + "', link = '" + link + "'"
                     + "WHERE code = '" + originalItemCode + "';";
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing update!", null);
             }
 
             query
@@ -126,7 +129,7 @@ public class BookDAO {
                     + "WHERE code = '" + originalItemCode + "';";
 
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing update!", null);
             }
             return true;
         } catch (SQLException e) {

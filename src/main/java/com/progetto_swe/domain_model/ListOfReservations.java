@@ -2,10 +2,10 @@ package com.progetto_swe.domain_model;
 
 import java.util.ArrayList;
 
-public class ListOfReservation {
+public class ListOfReservations {
     ArrayList<Reservation> reservations = new ArrayList<>();
 
-    public ListOfReservation(ArrayList<Reservation> reservations) {
+    public ListOfReservations(ArrayList<Reservation> reservations) {
         this.reservations = reservations;
     }
 
@@ -60,4 +60,6 @@ public class ListOfReservation {
         }
         return bookReservations;
     }
+
+    public ArrayList<Reservation> getReservations(){ return this.reservations; }
 }
