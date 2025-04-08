@@ -70,7 +70,7 @@ public class HirerDAO {
                     + "VALUES ('" + userCode + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "');";
             Statement statement = connection.createStatement();
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             return true;
         } catch (SQLException e) {
@@ -85,7 +85,7 @@ public class HirerDAO {
                     + "VALUES ('" + userCode + "', '" + hashedPassword + "', '" + salt + "');";
             Statement statement = connection.createStatement();
             if (statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             return true;
         } catch (SQLException e) {

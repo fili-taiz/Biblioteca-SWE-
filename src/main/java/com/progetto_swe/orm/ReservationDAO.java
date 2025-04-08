@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import com.progetto_swe.domain_model.*;
 
 import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class ReservationDAO {
@@ -29,6 +30,9 @@ public class ReservationDAO {
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
             ArrayList<Reservation> reservations = new ArrayList<>();
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             while (resultSet.next()) {
 
                 BookDAO bookDAO = new BookDAO();
@@ -68,7 +72,7 @@ public class ReservationDAO {
                     + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             return true;
         } catch (SQLException e) {
@@ -83,7 +87,7 @@ public class ReservationDAO {
                     + "WHERE user_code = '" + userCode + "' AND code = " + itemCode + "AND storage_place = '" + storagePlace + "';";
             Statement statement = connection.createStatement();
             if(statement.executeUpdate(query) != 1){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing delete!", null);
             }
             return true;
 

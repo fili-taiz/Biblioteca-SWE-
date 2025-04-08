@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class ThesisDAO {
@@ -29,7 +30,7 @@ public class ThesisDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()) {
-                return null;
+                throw new DataAccessException("Error executing query!", null);
             }
             Thesis thesis = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
                     Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"), resultSet.getString("author"),
@@ -45,6 +46,8 @@ public class ThesisDAO {
                     physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
                 }
                 thesis.setPhysicalCopies(physicalCopies);
+            } else{
+                throw new DataAccessException("Error executing query!", null);
             }
             return thesis;
         } catch (SQLException e) {
@@ -64,7 +67,7 @@ public class ThesisDAO {
                     + "RETURNING code;";
             ResultSet resultSet = statement.executeQuery(query);
             if(!resultSet.next()){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             int code = resultSet.getInt("code");
 
@@ -72,7 +75,7 @@ public class ThesisDAO {
                     = "INSERT INTO Thesis (code, author, supervisors, university)"
                     + "VALUES ('" + code + "', '" + author + "', '" + supervisors + "', '" + university + "');";
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }//si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
 
             return code;
@@ -90,7 +93,7 @@ public class ThesisDAO {
                     = "DELETE FROM Item "
                     + "WHERE code = " + code + ";";
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing delete!", null);
             }
 
             query
@@ -98,7 +101,7 @@ public class ThesisDAO {
                     + "where code = " + code + ";";
 
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing delete!", null);
             }
             return true;
         } catch (SQLException e) {
@@ -117,7 +120,7 @@ public class ThesisDAO {
                     + "SET title = '" + title + "', publication_date = " + publicationDate + ", language = '" + language + "', category = '" + category + "', link = '" + link + "'"
                     + "WHERE code = '" + originalItemCode + "';";
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing update!", null);
             }
 
             query
@@ -126,7 +129,7 @@ public class ThesisDAO {
                     + "WHERE code = '" + originalItemCode + "';";;
 
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing update!", null);
             }
             return true;
         } catch (SQLException e) {

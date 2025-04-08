@@ -56,7 +56,7 @@ public class AdminDAO {
             if(resultSet.next()){
                 return true;
             }else{
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);

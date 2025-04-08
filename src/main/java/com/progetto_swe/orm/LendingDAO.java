@@ -61,7 +61,7 @@ public class LendingDAO {
             String query = "INSERT INTO Lendings (user_code, code, storage_place, lenfing_date)" + "VALUES ('" + userCode + "', '" + itemCode + "', " + storagePlace + ", '" + LocalDate.now() + "'); ";
             ResultSet resultSet = statement.executeQuery(query);
             if (!resultSet.next()) {
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             return true;
         } catch (SQLException e) {
@@ -78,6 +78,9 @@ public class LendingDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
+            if(!resultSet.next()){
+                throw new DataAccessException("Error executing query!", null);
+            }
             ArrayList<Lending> lendings = new ArrayList<>();
             while (resultSet.next()) {
                 BookDAO bookDAO = new BookDAO();
@@ -109,7 +112,7 @@ public class LendingDAO {
         }
     }
 
-    public boolean updateLending(Lending lending) {
+    /*public boolean updateLending(Lending lending) {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "query";
@@ -118,12 +121,12 @@ public class LendingDAO {
 
             resultSet.next();
 
-            /**/
+
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
         return false;
-    }
+    }*/
 
 
     public boolean removeLending(String userCode, int itemCode, String storagePlace) {
@@ -133,7 +136,7 @@ public class LendingDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if (!resultSet.next()) {
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing delete!", null);
             }
             return true;
         } catch (SQLException e) {

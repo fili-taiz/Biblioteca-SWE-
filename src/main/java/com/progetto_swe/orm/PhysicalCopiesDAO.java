@@ -24,7 +24,10 @@ public class PhysicalCopiesDAO {
                     + "VALUES (" + code + ", '" + storagePlace + "', " + numberOfCopies + ", " + borrowable + " );";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            return resultSet.next();
+            if(!resultSet.next()){
+                throw new CRUD_exception("Error executing insert!", null);
+            }
+            return true;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
@@ -71,7 +74,7 @@ public class PhysicalCopiesDAO {
                     + "WHERE code = " + code + " AND storage_place = '" + storagePlace + "' AND borrowable = " + borrowable + "; ";
             Statement statement = connection.createStatement();
             if(statement.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing query!", null);
+                throw new CRUD_exception("Error executing update!", null);
             }
             return true;
         } catch (SQLException e) {
