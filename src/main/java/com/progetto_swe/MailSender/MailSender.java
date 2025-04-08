@@ -68,6 +68,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
+    //mandata da postgre
     public void sendReservationExpired(String recepient, String userCode, int itemCode, String title, String storagePlace) {
         String subject = "CANCELLAZIONE PRENOTAZIONE";
         String content = "la sua prenotazione dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
@@ -93,6 +94,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
+    //mandato da postgre
     public void sendUpdateLendingDateMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "RINNOVATO NOLEGGIO";
         String content = "il suo noleggio dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
@@ -103,6 +105,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
+    //mandato da postgre
     public void sendHirerBannedMail(String recepient, String userCode, int itemCode, String title, LocalDate unbannedDate) {
         String subject = "UTENTE BANNATO";
         String content = "è stata bannata fino a data " + unbannedDate + " perché non ha restituito 'articolo \"" + title + "\" " +
@@ -111,6 +114,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
+    //mandato da postgre
     public void sendHirerUnbannedMail(String recepient, String userCode) {
         String subject = "UTENTE UNBANNATO";
         String content = "è stata unbannata, la pregriamo di restituire l'articolo entro le scadenze.";
@@ -127,6 +131,7 @@ public class MailSender {
         sendMail(recepient, subject, html);
     }
 
+    //mandato da postgre
     public void sendNotifyWaitingListMail(String recepient, String userCode, int itemCode, String title, String storagePlace) {
         String subject = "ARTICOLO DISPONIBILE";
         String content = "l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
@@ -152,7 +157,7 @@ public class MailSender {
         }
     }
 
-
+    //da cancellare
     public void mandaMail() {
     }
 }

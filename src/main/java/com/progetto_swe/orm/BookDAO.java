@@ -35,20 +35,8 @@ public class BookDAO {
             Book book = new Book(code, resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                     Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
                     resultSet.getString("publishing_house"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
-            query
-                    = "SELECT * "
-                    + "FROM Physical_copies P "
-                    + "WHERE P.code = " + code + ";";
-            ResultSet copiesSet = statement.executeQuery(query);
-            if(copiesSet.next()){
-                HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
-                while (copiesSet.next()) {
-                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
-                }
-                book.setPhysicalCopies(physicalCopies);
-            } else{
-                throw new DataAccessException("Error executing query!", null);
-            }
+            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+            book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(code));
             return book;
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
