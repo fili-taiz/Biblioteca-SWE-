@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 public class Thesis extends Item {
 
-    String author;
-    String supervisors;
-    String university;
+    private String author;
+    private String supervisors;
+    private String university;
 
     public Thesis(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages, String author, String supervisors, String university) {
         super(code, title, publicationDate, language, category, link, number_of_pages);

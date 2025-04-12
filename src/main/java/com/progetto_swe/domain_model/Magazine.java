@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Magazine extends Item {
 
-    String publishingHouse;
+    private String publishingHouse;
 
     public Magazine(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages,
                     String publishingHouse) {

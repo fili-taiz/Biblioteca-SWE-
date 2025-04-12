@@ -2,7 +2,7 @@ package com.progetto_swe.domain_model;
 import java.util.ArrayList;
 
 public class ListOfHirers {
-    ArrayList<Hirer> hirers;
+    private ArrayList<Hirer> hirers;
 
     public ListOfHirers(ArrayList<Hirer> hirers){
         this.hirers = hirers;

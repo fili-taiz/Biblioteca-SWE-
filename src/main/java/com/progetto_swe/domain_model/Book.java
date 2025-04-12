@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Book extends Item {
-    String isbn;
-    String publishingHouse;
-    String authors;
+    private String isbn;
+    private String publishingHouse;
+    private String authors;
 
     public Book(int code, String title, LocalDate publicationDate, Language language, Category category, String link, String isbn, String publishingHouse, int numberOfPages, String authors) {
         super(code, title, publicationDate, language, category, link, numberOfPages);

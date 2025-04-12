@@ -3,7 +3,7 @@ package com.progetto_swe.domain_model;
 import java.util.ArrayList;
 
 public class ListOfReservations {
-    ArrayList<Reservation> reservations = new ArrayList<>();
+    private ArrayList<Reservation> reservations = new ArrayList<>();
 
     public ListOfReservations(ArrayList<Reservation> reservations) {
         this.reservations = reservations;

@@ -3,7 +3,7 @@ package com.progetto_swe.domain_model;
 import java.util.ArrayList;
 
 public class ListOfLendings {
-    ArrayList<Lending> lendings;
+    private ArrayList<Lending> lendings;
 
     public ListOfLendings(ArrayList<Lending> lendings) {
         this.lendings = lendings;

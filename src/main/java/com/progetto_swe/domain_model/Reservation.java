@@ -2,10 +2,10 @@ package com.progetto_swe.domain_model;
 import java.time.LocalDate;
 
 public class Reservation {
-    final LocalDate reservationDate;
-    Hirer hirer;
-    Item item;
-    Library storagePlace;
+    private LocalDate reservationDate;
+    private Hirer hirer;
+    private Item item;
+    private Library storagePlace;
 
     public Reservation(LocalDate reservationDate, Hirer hirer, Item item, Library storagePlace){
         this.reservationDate = reservationDate;

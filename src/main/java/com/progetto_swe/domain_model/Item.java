@@ -3,14 +3,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 public abstract class Item {
-    int code;
-    int numberOfPages;
-    String title;
-    LocalDate publicationDate;
-    Language language;
-    Category category;
-    String link;
-    HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
+    protected int code;
+    protected int numberOfPages;
+    protected String title;
+    protected LocalDate publicationDate;
+    protected Language language;
+    protected Category category;
+    protected String link;
+    protected HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
 
     public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int numberOfPages) {
         this.code = code;

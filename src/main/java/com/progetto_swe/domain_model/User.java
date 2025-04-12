@@ -1,12 +1,12 @@
 package com.progetto_swe.domain_model;
 
 public abstract class User {
-    String userCode;
-    String name;
-    String surname;
-    String email;
-    String telephoneNumber;
-    UserCredentials userCredentials;
+    protected String userCode;
+    protected String name;
+    protected String surname;
+    protected String email;
+    protected String telephoneNumber;
+    protected UserCredentials userCredentials;
 
     public User(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userCredentials){
         this.userCode = userCode;
