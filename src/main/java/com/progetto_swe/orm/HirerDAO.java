@@ -21,10 +21,11 @@ public class HirerDAO {
             String query
                     = "SELECT * "
                     + "FROM Hirer H LEFT JOIN Banned_hirer B ON H.user_code=B.user_code "
-                    + "WHERE H.user_code = '" + userCode + "';";
+                    + "WHERE H.user_code = ?;";
 
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
                 LocalDate unbannedDate = null;
                 if(resultSet.getDate("unbanned_date") != null){
@@ -43,13 +44,11 @@ public class HirerDAO {
     public HashMap<String, String> getSaltAndHashedPassword(String userCode) {
         try {
             connection = ConnectionManager.getConnection();
-            String query
-                    = "SELECT HC.salt, HC.hashed_password "
-                    + "FROM Hirer_credentials HC"
-                    + "WHERE HC.usercode = '" + userCode + "';";
+            String query = "SELECT HC.salt, HC.hashed_password FROM Hirer_credentials HC WHERE HC.usercode = ?;";
 
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
                 HashMap<String, String> saltAndHashedPassword = new HashMap<>();
                 saltAndHashedPassword.put("salt", resultSet.getString("salt"));
@@ -66,10 +65,14 @@ public class HirerDAO {
     public boolean addHirer(String userCode, String name, String surname, String email, String telephoneNumber) {
         try {
             connection = ConnectionManager.getConnection();
-            String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number)"
-                    + "VALUES ('" + userCode + "', '" + name + "', '" + surname + "', '" + email + "', '" + telephoneNumber + "');";
-            Statement statement = connection.createStatement();
-            if(statement.executeUpdate(query) <= 0){
+            String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ps.setString(2, name);
+            ps.setString(3, surname);
+            ps.setString(4, email);
+            ps.setString(5, telephoneNumber);
+            if(ps.executeUpdate() <= 0){
                 throw new CRUD_exception("Error executing insert!", null);
             }
             return true;
@@ -81,10 +84,12 @@ public class HirerDAO {
     public boolean addHirerPassword(String userCode, String hashedPassword, String salt) {
         try {
             connection = ConnectionManager.getConnection();
-            String query = "INSERT INTO User_credentials (user_code, hashed_password, salt)"
-                    + "VALUES ('" + userCode + "', '" + hashedPassword + "', '" + salt + "');";
-            Statement statement = connection.createStatement();
-            if (statement.executeUpdate(query) <= 0){
+            String query = "INSERT INTO User_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ps.setString(2, hashedPassword);
+            ps.setString(3, salt);
+            if (ps.executeUpdate() <= 0){
                 throw new CRUD_exception("Error executing insert!", null);
             }
             return true;
@@ -98,10 +103,9 @@ public class HirerDAO {
         connection = ConnectionManager.getConnection();
         try {
             String query
-                    = "SELECT * "
-                    + "FROM Hirer";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+                    = "SELECT * FROM Hirer";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet resultSet = ps.executeQuery();
             if(!resultSet.next()){
                 throw new DataAccessException("Error executing query!", null);
             }

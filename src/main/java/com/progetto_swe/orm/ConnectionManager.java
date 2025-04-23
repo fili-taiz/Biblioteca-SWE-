@@ -9,27 +9,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
 public class ConnectionManager {
     private static final ConnectionManager connectionManager = new ConnectionManager();
     private static Connection connection;
+    private static boolean prepared = false;
 
     private ConnectionManager() {
-        try {
-            String url = "jdbc:postgresql://localhost:5432/Biblioteca";
-            String username = "postgres";
-            String password = "HU12HUI26TAO";
-            connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+        if(prepared){
+            try {
+                String url = "jdbc:postgresql://localhost:5432/Biblioteca";
+                String username = "postgres";
+                String password = "HU12HUI26TAO";
+                connection = DriverManager.getConnection(url, username, password);
+            } catch (SQLException e) {
+                throw new DatabaseConnectionException("Connection error!", e);
+            }
         }
+    }
+
+    public static void setConnection(Connection newConnection){
+        this.connection = newConnection;
     }
 
     public static Connection getConnection(){
         return connection;
     }
 
-    public static void closeAutoCommit(){
+    public static void closeAutoCommit() {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
@@ -37,7 +43,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void openAutoCommit(){
+    public static void openAutoCommit() {
         try {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -45,7 +51,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void commit(){
+    public static void commit() {
         try {
             connection.commit();
             openAutoCommit();
@@ -54,7 +60,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void rollback(){
+    public static void rollback() {
         try {
             connection.rollback();
             openAutoCommit();
