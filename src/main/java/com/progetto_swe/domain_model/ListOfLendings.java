@@ -19,6 +19,16 @@ public class ListOfLendings {
         return hirerLendings;
     }
 
+    public ArrayList<Lending> getLendingsByItem(Item item) {
+        ArrayList<Lending> bookLendings = new ArrayList<>();
+        for (Lending lending : lendings) {
+            if (lending.getItem().equals(item)) {
+                bookLendings.add(lending);
+            }
+        }
+        return bookLendings;
+    }
+
     public int getNumberOfLendingsInLibrary(Library library, Item item){
         int n = 0;
         for(Lending l: lendings){
@@ -45,16 +55,6 @@ public class ListOfLendings {
             }
         }
         return false;
-    }
-
-    public ArrayList<Lending> getLendingsByItem(Item item) {
-        ArrayList<Lending> bookLendings = new ArrayList<>();
-        for (Lending lending : lendings) {
-            if (lending.getItem().equals(item)) {
-                bookLendings.add(lending);
-            }
-        }
-        return bookLendings;
     }
 
     public ArrayList<Lending> getLendings(){ return this.lendings; }

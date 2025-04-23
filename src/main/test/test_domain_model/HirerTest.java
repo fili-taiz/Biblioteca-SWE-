@@ -20,7 +20,7 @@ public class HirerTest {
         assertEquals("surname", hirer.getSurname());
         assertEquals("email", hirer.getEmail());
         assertEquals("00000", hirer.getTelephoneNumber());
-        assertEquals(ucs, hirer.getUserProfile());
+        assertEquals(ucs, hirer.getUserCredentials());
         assertEquals(LocalDate.of(2025, 5, 6), hirer.getUnbannedDate());
     }
 

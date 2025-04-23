@@ -9,8 +9,7 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 
 public class AdminController {
-
-    Admin admin;
+    private Admin admin;
 
     public AdminController(Admin admin) {
         this.admin = admin;
@@ -49,12 +48,6 @@ public class AdminController {
 
     public boolean addBook(String title, String publicationDate, String language, String category, String link, String isbn,
                            String publishingHouse, int numberOfPages, String authors, int numberOfCopies, boolean borrowable) {
-        //spostare nella cli
-        //convalida data
-        if (!checkParametersValidity(publicationDate, language, category)) {
-            return false;
-        }
-
         Book bookCopy = new Book(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, isbn, publishingHouse, numberOfPages, authors);
         BookDAO bookDAO = new BookDAO();
 
@@ -102,12 +95,6 @@ public class AdminController {
 
     public boolean addMagazine(String title, String publicationDate, String language, String category, String link, int numberOfPages, String publishingHouse,
                                int numberOfCopies, boolean borrowable) {
-        //spostare nella cli
-        //convalida data
-        if (!checkParametersValidity(publicationDate, language, category)) {
-            return false;
-        }
-
         Magazine magazineCopy = new Magazine(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, publishingHouse);
         MagazineDAO magazineDAO = new MagazineDAO();
 
@@ -140,13 +127,6 @@ public class AdminController {
 
     public boolean addThesis(String title, String publicationDate, String language, String category, String link, int numberOfPages, String author,
                              String supervisors, String university, int numberOfCopies, boolean borrowable) {
-
-        //spostare nella cli
-        //convalida data
-        if (!checkParametersValidity(publicationDate, language, category)) {
-            return false;
-        }
-
         Thesis thesisCopy = new Thesis(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, author, supervisors, university);
         ThesisDAO thesisDAO = new ThesisDAO();
 
@@ -371,14 +351,16 @@ public class AdminController {
         Hirer hirer = hirers.getHirer(reservation.getHirer().getUserCode());
         Item item = catalogue.getItem(reservation.getItem().getCode());
 
+        if(!reservation.getStoragePlace().equals(this.admin.getWorkingPlace())){
+            return false;
+        }
+
         if(hirer == null){
             return false;
         }
-
         if(item == null){
             return false;
         }
-
         if(reservationDAO.getReservations().haveReservation(reservation)){
             return false;
         }
@@ -398,7 +380,7 @@ public class AdminController {
         return true;
     }
 
-    public boolean registerItemReturn(Lending lending) {
+    public boolean registerReturnOfItem(Lending lending) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         HirerDAO hirerDAO = new HirerDAO();
         LendingDAO lendingDAO = new LendingDAO();
@@ -408,14 +390,15 @@ public class AdminController {
         Hirer hirer = hirers.getHirer(lending.getHirer().getUserCode());
         Item item = catalogue.getItem(lending.getItem().getCode());
 
-
+        if(!lending.getStoragePlace().equals(this.admin.getWorkingPlace())){
+            return false;
+        }
         if(hirer == null){
             return false;
         }
         if(item == null){
             return false;
         }
-
         if(!lendingDAO.getLendings().haveLending(lending)){
             return false;
         }
@@ -432,62 +415,21 @@ public class AdminController {
         return false;
     }
 
-    public ArrayList<Item> searchItem(String keyWords, String category) {
+    public ArrayList<Item> searchItem(String keywords, String category) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
-        return admin.searchItem(catalogue, keyWords, Category.valueOf(category));
+        return admin.searchItem(catalogue, keywords, Category.valueOf(category));
     }
 
-    public ArrayList<Hirer> searchHirer(String keyWords) {
+    public ArrayList<Item> advancedSearchItem(String keywords, String category, String language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
+        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        Catalogue catalogue = catalogueDAO.getCatalogue();
+        return admin.advancedSearchItem(catalogue, keywords, Category.valueOf(category), Language.valueOf(language), borrowable, startDate, endDate);
+    }
+
+    public ArrayList<Hirer> searchHirer(String keywords) {
         HirerDAO hirerDAO = new HirerDAO();
         ListOfHirers hirers = hirerDAO.getHirers();
-        return hirers.searchHirer(keyWords);
+        return hirers.searchHirer(keywords);
     }
-
-    //controllo validità parametri;
-    //da spostare nella cli
-    private boolean checkParametersValidity(String publicationDate, String language, String category) {
-        //convalida data
-        try {
-            LocalDate.parse(publicationDate);
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-
-
-        //convalida lingua
-        try {
-            Language.valueOf(language);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-
-        //convalida categoria
-        try {
-            Category.valueOf(category);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-        return true;
-    }
-
 }
-
-/**
- * //spostare nella cli //creazione stringa contenente tutti gli autori (ordine
- * alfabetico) authors.sort(String::compareTo); String concatenateAuthors = "";
- * for (String author : authors) { concatenateAuthors += author + ", "; }
- * concatenateAuthors = concatenateAuthors.substring(0,
- * concatenateAuthors.length() - 1);
- * <p>
- * <p>
- * <p>
- * <p>
- * <p>
- * <p>
- * //spostare nella cli //creazione stringa contenente tutti gli autori (ordine
- * alfabetico) supervisors.sort(String::compareTo); String
- * concatenateSupervisors = ""; for (String supervisor : supervisors) {
- * concatenateSupervisors += supervisor + ", "; } concatenateSupervisors =
- * concatenateSupervisors.substring(0, concatenateSupervisors.length() - 1);
- */

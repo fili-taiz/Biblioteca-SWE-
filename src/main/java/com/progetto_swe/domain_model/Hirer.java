@@ -39,6 +39,4 @@ public class Hirer extends User{
     public LocalDate getUnbannedDate() {
         return this.unbannedDate;
     }
-
-
 }

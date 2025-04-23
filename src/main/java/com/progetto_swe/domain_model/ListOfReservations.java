@@ -19,8 +19,14 @@ public class ListOfReservations {
         return hirerReservations;
     }
 
-    public void setReservations(ArrayList<Reservation> reservations) {
-        this.reservations = reservations;
+    public ArrayList<Reservation> getReservationsByItem(Item item) {
+        ArrayList<Reservation> bookReservations = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            if (reservation.getItem().equals(item)) {
+                bookReservations.add(reservation);
+            }
+        }
+        return bookReservations;
     }
 
     public int getNumberOfReservationsInLibrary(Library library, Item item){
@@ -51,15 +57,9 @@ public class ListOfReservations {
         return false;
     }
 
-    public ArrayList<Reservation> getReservationsByItem(Item item) {
-        ArrayList<Reservation> bookReservations = new ArrayList<>();
-        for (Reservation reservation : reservations) {
-            if (reservation.getItem().equals(item)) {
-                bookReservations.add(reservation);
-            }
-        }
-        return bookReservations;
-    }
-
     public ArrayList<Reservation> getReservations(){ return this.reservations; }
+
+    public void setReservations(ArrayList<Reservation> reservations) {
+        this.reservations = reservations;
+    }
 }

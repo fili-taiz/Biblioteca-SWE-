@@ -62,26 +62,4 @@ public class ConnectionManager {
             throw new DatabaseConnectionException("Connection error!", e);
         }
     }
-
-    public static void query(String query) {
-        try {
-            Statement statement = getConnection().createStatement();
-
-            ResultSet resultSet = statement.executeQuery(query);
-
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
-            }
-
-            while (resultSet.next()) {
-                System.out.println("Id: " + resultSet.getString("userCode")
-                        + ", Name: " + resultSet.getString("name")
-                        + ", Surname: " + resultSet.getString("surname")
-                        + ";");
-            }
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-    }
-
 }

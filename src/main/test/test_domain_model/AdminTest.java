@@ -23,7 +23,7 @@ public class AdminTest {
         assertEquals("email", admin.getEmail());
         assertEquals("00000", admin.getTelephoneNumber());
         assertEquals(Library.LIBRARY_1, admin.getWorkingPlace());
-        assertEquals(ucs, admin.getUserProfile());
+        assertEquals(ucs, admin.getUserCredentials());
     }
 
     @Test

@@ -22,7 +22,7 @@ public abstract class User {
     public String getSurname() { return this.surname; }
     public String getEmail() { return this.email; }
     public String getTelephoneNumber() { return this.telephoneNumber; }
-    public UserCredentials getUserProfile() { return this.userCredentials; }
+    public UserCredentials getUserCredentials() { return this.userCredentials; }
 
     public void setUserCode(String userCode) { this.userCode = userCode; }
     public void setName(String name) { this.name = name; }

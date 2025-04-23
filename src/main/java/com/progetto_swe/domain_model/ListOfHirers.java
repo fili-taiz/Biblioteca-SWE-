@@ -8,9 +8,9 @@ public class ListOfHirers {
         this.hirers = hirers;
     }
 
-    public Hirer getHirer(String usercode){
+    public Hirer getHirer(String userCode){
         for(Hirer h : this.hirers){
-            if(h.getUserCode().equals(usercode)){
+            if(h.getUserCode().equals(userCode)){
                 return h;
             }
         }

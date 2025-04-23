@@ -8,7 +8,7 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 
 public class HirerController {
-    Hirer hirer;
+    private Hirer hirer;
 
     public HirerController(Hirer hirer){
         this.hirer = hirer;
@@ -26,15 +26,14 @@ public class HirerController {
         return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
     }
 
-    public boolean addInWaitingList(Item item, Library storagePlace){
+    public boolean addInWaitingList(Item item, String storagePlace){
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         if(catalogueDAO.getCatalogue().contains(item) == -1){
             return false;
         }
         WaitingListDAO waitingListDAO = new WaitingListDAO();
-        return waitingListDAO.addToWaitingList(item.getCode(), storagePlace.toString(), this.hirer.getEmail());
+        return waitingListDAO.addToWaitingList(item.getCode(), storagePlace, this.hirer.getEmail());
     }
-
 
     public boolean reserveItem(Item item, Library storagePlace){
         if(this.hirer.getUnbannedDate() != null){
@@ -46,6 +45,22 @@ public class HirerController {
             return true;
         }
         return false;
+    }
+
+    public boolean removeReservation(Reservation reservation){
+        ReservationDAO reservationDAO = new ReservationDAO();
+        ListOfReservations listOfReservations = reservationDAO.getReservations();
+
+        if(!listOfReservations.haveReservation(reservation)){
+            return false;
+        }
+
+        if(reservation.getHirer()!=this.hirer){
+            return false;
+        }
+
+        reservationDAO.removeReservation(this.hirer.getUserCode(), reservation.getItem().getCode(), reservation.getStoragePlace().toString());
+        return true;
     }
 
     public ArrayList<Lending> getLendings(){
