@@ -20,4 +20,5 @@ progetto per gestione bibliotecaria:
 
 ## Database SQL
 [Library](https://github.com/fili-taiz/Biblioteca-SWE-/blob/master2/src/main/resources/SQL%20Database/Library.sql): contenente informazioni riguardanti libri, prenotazioni, prestiti e utenti esterni.
+
 [University](https://github.com/fili-taiz/Biblioteca-SWE-/blob/master2/src/main/resources/SQL%20Database/University.sql): per sistema di autenticazione universitaria.
