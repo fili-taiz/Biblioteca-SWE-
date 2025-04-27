@@ -12,14 +12,14 @@ import java.sql.Statement;
 public class ConnectionManager {
     private static final ConnectionManager connectionManager = new ConnectionManager();
     private static Connection connection;
-    private static boolean prepared = false;
+    private static final boolean prepared = false;
+    private static final String url = "jdbc:postgresql://localhost:5432/Library";
+    private static final String username = "postgres";
+    private static final String password = "HU12HUI26TAO";
 
     private ConnectionManager() {
-        if(prepared){
+        if (prepared) {
             try {
-                String url = "jdbc:postgresql://localhost:5432/Biblioteca";
-                String username = "postgres";
-                String password = "HU12HUI26TAO";
                 connection = DriverManager.getConnection(url, username, password);
             } catch (SQLException e) {
                 throw new DatabaseConnectionException("Connection error!", e);
@@ -27,11 +27,18 @@ public class ConnectionManager {
         }
     }
 
-    public static void setConnection(Connection newConnection){
-        this.connection = newConnection;
+    public static void setConnection(Connection newConnection) {
+        connection = newConnection;
     }
 
-    public static Connection getConnection(){
+    public static Connection getConnection() {
+        try {
+            if (connection.isClosed()) {
+                connection = DriverManager.getConnection(url, username, password);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
+        }
         return connection;
     }
 
