@@ -18,6 +18,9 @@ progetto per gestione bibliotecaria:
 
 [ORM](https://github.com/fili-taiz/Biblioteca-SWE-/blob/master2/doc/Class%20Diagram/Class%20Diagram%20-%20ORM.png)
 
+## Mock Ups
+[Mock Ups](https://github.com/fili-taiz/Biblioteca-SWE-/tree/master2/doc/Mock%20Ups)
+
 ## Database SQL
 [Library](https://github.com/fili-taiz/Biblioteca-SWE-/blob/master2/src/main/resources/SQL%20Database/Library.sql): contenente informazioni riguardanti libri, prenotazioni, prestiti e utenti esterni.
 
