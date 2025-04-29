@@ -18,48 +18,9 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    private int containsCopies(PreparedStatement ps, int code, String storagePlace) {
-        this.connection = ConnectionManager.getConnection();
-        try {
-            String query = "SELECT P.number_of_copies - "
-                    + " - (SELECT COUNT(*) FROM Lendings L WHERE L.code = ? AND L.storage_place = ?)"
-                    + " - (SELECT COUNT(*) FROM Reservation R WHERE R.code = ? AND R.storage_place = ?)"
-                    + "FROM Physical_copies P WHERE P.code = ? AND i.storage_place = ?; ";
-            ps.setInt(1, code);
-            ps.setString(2, storagePlace);
-            ps.setInt(3, code);
-            ps.setString(4, storagePlace);
-            ps.setInt(5, code);
-            ps.setString(6, storagePlace);
-            ResultSet resultSet = ps.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("number_of_copies");
-            } else {
-                throw new DataAccessException("Error executing query!", null);
-            }
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-    }
-
-    private boolean containsHirer(PreparedStatement ps, String userCode) {
-        try {
-            String query = "SELECT * FROM Hirer H WHERE H.user_code = ?;";
-            ps.setString(1, userCode);
-            ResultSet resultSet = ps.executeQuery();
-            if (!resultSet.next()) {
-                throw new DataAccessException("Error executing query!", null);
-            }
-            return true;
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-    }
-
     public boolean addLending(String userCode, int itemCode, String storagePlace) {
         this.connection = ConnectionManager.getConnection();
         try {
-
             String query = "INSERT INTO Lendings (user_code, code, storage_place, lending_date) VALUES (?, ?, ?, ?); ";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
@@ -117,23 +78,6 @@ public class LendingDAO {
             throw new DatabaseConnectionException("Connection error!", e);
         }
     }
-
-    /*public boolean updateLending(Lending lending) {
-        this.connection = ConnectionManager.getConnection();
-        try {
-            String query = "query";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            resultSet.next();
-
-
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-        return false;
-    }*/
-
 
     public boolean removeLending(String userCode, int itemCode, String storagePlace) {
         this.connection = ConnectionManager.getConnection();

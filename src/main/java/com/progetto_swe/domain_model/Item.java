@@ -3,14 +3,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 public abstract class Item {
-    int code;
-    int numberOfPages;
-    String title;
-    LocalDate publicationDate;
-    Language language;
-    Category category;
-    String link;
-    HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
+    protected int code;
+    protected int numberOfPages;
+    protected String title;
+    protected LocalDate publicationDate;
+    protected Language language;
+    protected Category category;
+    protected String link;
+    protected HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
 
     public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int numberOfPages) {
         this.code = code;
@@ -32,23 +32,23 @@ public abstract class Item {
         return language.name().toUpperCase().contains(keyword.toUpperCase());
     }
 
-    public boolean sameField(Item itemsCopy){
-        if(!itemsCopy.getTitle().equals(this.title)){
+    public boolean sameField(Item itemCopy){
+        if(!itemCopy.getTitle().equals(this.title)){
             return false;
         }
-        if(!itemsCopy.getPublicationDate().equals(this.publicationDate)){
+        if(!itemCopy.getPublicationDate().equals(this.publicationDate)){
             return false;
         }
-        if(itemsCopy.getLanguage() != this.language){
+        if(itemCopy.getLanguage() != this.language){
             return false;
         }
-        if(itemsCopy.getCategory() != this.category){
+        if(itemCopy.getCategory() != this.category){
             return false;
         }
-        if (!itemsCopy.getLink().equals(this.link)) {
+        if (!itemCopy.getLink().equals(this.link)) {
             return false;
         }
-        return this.numberOfPages == itemsCopy.getNumberOfPages();
+        return this.numberOfPages == itemCopy.getNumberOfPages();
     }
     public abstract String[] getValues();
 
@@ -64,14 +64,6 @@ public abstract class Item {
         }
         Item item = (Item) o;
         return this.code == item.code && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link);
-    }
-
-    //messo perchè equals da solo dava warning, e cercando su stack overflow ogni talvolta che overrido equal dovrei 
-    //farlo anche con hashCode ma ora non ho voglia di capire come funziona di preciso, ho solo capito che viene invocato 
-    //dalle hashmap e hashset per metterli come chiave di una tupla, se sono uguali metterli nello stesso pair se no metterlo in una posizione diversa;
-    @Override
-    public int hashCode () {
-        return super.hashCode();
     }
 
     public boolean isBorrowable(Library library) {
@@ -98,17 +90,6 @@ public abstract class Item {
         }
         return physicalCopies.get(library).getNumberOfPhysicalCopies() - lendings.getNumberOfLendingsInLibrary(library, this) - reservations.getNumberOfReservationsInLibrary(library, this);
     }
-
-    /*
-    public boolean updateItem(Item newItem){
-        this.code = newItem.code;
-        this.title = newItem.title;
-        this.publicationDate = newItem.publicationDate;
-        this.language = newItem.language;
-        this.category = newItem.category;
-        this.link = newItem.link;
-        return true;
-    }*/
 
     public int getCode(){ return this.code;}
     public String getTitle(){ return this.title;}

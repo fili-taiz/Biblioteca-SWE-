@@ -2,7 +2,6 @@ package com.progetto_swe.CLI;
 
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Scanner;
 
 import com.progetto_swe.business_logic.*;
@@ -30,7 +29,7 @@ public class CommandLineInterface {
                     String userCode = scanner.nextLine();
                     System.out.println("Inserisci la tua password: ");
                     String password = scanner.nextLine();
-                    Hirer hirer = loginExternalHirerController.login(userCode, password);
+                    Hirer hirer = loginExternalHirerController.loginExternalHirer(userCode, password);
                     HirerController hirerController = new HirerController(hirer);
                     HirerCLI hirerCLI = new HirerCLI(hirerController);
                     role = hirerCLI.start();
@@ -57,7 +56,7 @@ public class CommandLineInterface {
                     String userCode = scanner.nextLine();
                     System.out.println("Inserisci la tua password: ");
                     String password = scanner.nextLine();
-                    AdminController adminController = new AdminController(loginAdminController.login(userCode, password));
+                    AdminController adminController = new AdminController(loginAdminController.loginAdmin(userCode, password));
                     AdminCLI adminCLI = new AdminCLI();
                     role = adminCLI.start();
                     break;

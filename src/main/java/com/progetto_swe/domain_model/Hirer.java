@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Hirer extends User{
-    LocalDate unbannedDate;
+    private LocalDate unbannedDate;
 
     public Hirer(String userCode, String name, String surname, String email, String telephoneNumber,
                  UserCredentials userProfile, LocalDate unbannedDate) {
@@ -39,6 +39,4 @@ public class Hirer extends User{
     public LocalDate getUnbannedDate() {
         return this.unbannedDate;
     }
-
-
 }

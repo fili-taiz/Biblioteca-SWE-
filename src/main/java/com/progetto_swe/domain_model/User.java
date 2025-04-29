@@ -1,12 +1,12 @@
 package com.progetto_swe.domain_model;
 
 public abstract class User {
-    String userCode;
-    String name;
-    String surname;
-    String email;
-    String telephoneNumber;
-    UserCredentials userCredentials;
+    protected String userCode;
+    protected String name;
+    protected String surname;
+    protected String email;
+    protected String telephoneNumber;
+    protected UserCredentials userCredentials;
 
     public User(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userCredentials){
         this.userCode = userCode;
@@ -22,7 +22,7 @@ public abstract class User {
     public String getSurname() { return this.surname; }
     public String getEmail() { return this.email; }
     public String getTelephoneNumber() { return this.telephoneNumber; }
-    public UserCredentials getUserProfile() { return this.userCredentials; }
+    public UserCredentials getUserCredentials() { return this.userCredentials; }
 
     public void setUserCode(String userCode) { this.userCode = userCode; }
     public void setName(String name) { this.name = name; }

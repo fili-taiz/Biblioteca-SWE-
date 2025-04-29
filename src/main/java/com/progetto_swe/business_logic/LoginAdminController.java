@@ -10,7 +10,7 @@ import com.progetto_swe.university_authentication_system.UniversityAuthenticatio
 
 public class LoginAdminController{
 
-    public Admin login(String userCode, String password){
+    public Admin loginAdmin(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
 
         //ottengo informazioni di questo Admin se la password combacia con quella nel database universitario

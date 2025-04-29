@@ -2,10 +2,10 @@ package com.progetto_swe.domain_model;
 import java.time.LocalDate;
 
 public class Lending {
-    LocalDate lendingDate;
-    Hirer hirer;
-    Item item;
-    Library storagePlace;
+    private LocalDate lendingDate;
+    private Hirer hirer;
+    private Item item;
+    private Library storagePlace;
 
 
     public Lending(LocalDate lendingDate, Hirer hirer, Item item, Library storagePlace){

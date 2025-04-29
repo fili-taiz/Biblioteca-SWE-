@@ -10,40 +10,41 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ConnectionManager {
+    private static final ConnectionManager connectionManager = new ConnectionManager();
+    private static Connection connection;
+    private static final boolean prepared = false;
+    private static final String url = "jdbc:postgresql://localhost:5432/Library";
+    private static final String username = "postgres";
+    private static final String password = "HU12HUI26TAO";
 
-    private static Connection connection = null;
-    private static boolean isTestConnection = false;
-
-    public static void setTestConnection(Connection newConnection) {
-        connection = newConnection;
-        isTestConnection = true;
-    }
-
-    public static void clearTestConnection() {
-        connection = null;
-        isTestConnection = false;
-    }
-
-    public static Connection getConnection() {
-        if (connection == null) {
-            if (isTestConnection) {
-                throw new DatabaseConnectionException("Test connection not set!", null);
-            }
+    private ConnectionManager() {
+        if (prepared) {
             try {
-                String url = "jdbc:postgresql://localhost:5432/Biblioteca";
-                String username = "postgres";
-                String password = "HU12HUI26TAO";
                 connection = DriverManager.getConnection(url, username, password);
             } catch (SQLException e) {
                 throw new DatabaseConnectionException("Connection error!", e);
             }
+        }
+    }
+
+    public static void setConnection(Connection newConnection) {
+        connection = newConnection;
+    }
+
+    public static Connection getConnection() {
+        try {
+            if (connection.isClosed()) {
+                connection = DriverManager.getConnection(url, username, password);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException("Connection error!", e);
         }
         return connection;
     }
 
     public static void closeAutoCommit() {
         try {
-            getConnection().setAutoCommit(false);
+            connection.setAutoCommit(false);
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
@@ -51,7 +52,7 @@ public class ConnectionManager {
 
     public static void openAutoCommit() {
         try {
-            getConnection().setAutoCommit(true);
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }
@@ -59,7 +60,7 @@ public class ConnectionManager {
 
     public static void commit() {
         try {
-            getConnection().commit();
+            connection.commit();
             openAutoCommit();
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
@@ -68,28 +69,8 @@ public class ConnectionManager {
 
     public static void rollback() {
         try {
-            getConnection().rollback();
+            connection.rollback();
             openAutoCommit();
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-    }
-
-    public static void query(String query) {
-        try {
-            Statement statement = getConnection().createStatement();
-
-            ResultSet resultSet = statement.executeQuery(query);
-
-            if (!resultSet.next()) {
-                throw new DataAccessException("Error executing query!", null);
-            }
-
-            while (resultSet.next()) {
-                System.out.println("Id: " + resultSet.getString("userCode")
-                        + ", Name: " + resultSet.getString("name")
-                        + ", Surname: " + resultSet.getString("surname") + ";");
-            }
         } catch (SQLException e) {
             throw new DatabaseConnectionException("Connection error!", e);
         }

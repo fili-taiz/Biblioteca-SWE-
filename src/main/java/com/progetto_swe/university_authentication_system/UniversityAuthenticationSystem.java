@@ -42,7 +42,7 @@ public class UniversityAuthenticationSystem {
 
     private Connection getConnection() {
         try {
-            url = "jdbc:postgresql://localhost:5432/Biblioteca";
+            url = "jdbc:postgresql://localhost:5432/University";
             username = "postgres";
             password = "HU12HUI26TAO";
             connection = DriverManager.getConnection(url, username, password);
@@ -60,7 +60,7 @@ public class UniversityAuthenticationSystem {
 
             String query
                     = "SELECT U.salt, U.hashed_password "
-                    + "FROM UniveristyPeople U"
+                    + "FROM Univerisity_People U"
                     + "WHERE U.usercode = '" + userCode + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -72,7 +72,7 @@ public class UniversityAuthenticationSystem {
             }
             query
                     = "SELECT * "
-                    + "FROM UniveristyPeople U"
+                    + "FROM Univerisity_People U"
                     + "WHERE U.usercode = '" + userCode + "'; ";
             resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
@@ -99,7 +99,7 @@ public class UniversityAuthenticationSystem {
 
             String query
                     = "SELECT L.salt, L.hashed_password "
-                    + "FROM LibraryAdmin L"
+                    + "FROM Library_Admin L"
                     + "WHERE L.usercode = '" + userCode + "';";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -111,7 +111,7 @@ public class UniversityAuthenticationSystem {
             }
             query
                     = "SELECT * "
-                    + "FROM LibraryAdmin L"
+                    + "FROM Library_Admin L"
                     + "WHERE L.usercode = '" + userCode + "'; ";
             resultSet = statement.executeQuery(query);
             if (resultSet.next()) {

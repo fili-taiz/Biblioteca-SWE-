@@ -51,25 +51,6 @@ public class PhysicalCopiesDAO {
         }
     }
 
-    public PhysicalCopies getPhysicalCopies(int code, String storagePlace) {
-        connection = ConnectionManager.getConnection();
-        try {
-            String query
-                    = "SELECT * FROM Physical_copies WHERE code = ? AND storage_place = ?;";
-            PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
-            ps.setString(2, storagePlace);
-            ResultSet resultSet = ps.executeQuery(query);
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
-            }
-            resultSet.next();
-            return new PhysicalCopies(resultSet.getInt("number_of_copies"), resultSet.getBoolean("borrowable"));
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
-        }
-    }
-
     public boolean updatePhysicalCopies(int code, String storagePlace, int newNumberOfCopies, boolean borrowable) {
         connection = ConnectionManager.getConnection();
         try {

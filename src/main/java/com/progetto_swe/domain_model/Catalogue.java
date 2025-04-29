@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Catalogue{
-    ArrayList<Item> items;
+    private ArrayList<Item> items;
 
 
     public Catalogue(ArrayList<Item> items) {

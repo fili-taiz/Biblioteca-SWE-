@@ -3,7 +3,7 @@ package com.progetto_swe.domain_model;
 import java.util.ArrayList;
 
 public class ListOfLendings {
-    ArrayList<Lending> lendings;
+    private ArrayList<Lending> lendings;
 
     public ListOfLendings(ArrayList<Lending> lendings) {
         this.lendings = lendings;
@@ -17,6 +17,16 @@ public class ListOfLendings {
             }
         }
         return hirerLendings;
+    }
+
+    public ArrayList<Lending> getLendingsByItem(Item item) {
+        ArrayList<Lending> bookLendings = new ArrayList<>();
+        for (Lending lending : lendings) {
+            if (lending.getItem().equals(item)) {
+                bookLendings.add(lending);
+            }
+        }
+        return bookLendings;
     }
 
     public int getNumberOfLendingsInLibrary(Library library, Item item){
@@ -45,16 +55,6 @@ public class ListOfLendings {
             }
         }
         return false;
-    }
-
-    public ArrayList<Lending> getLendingsByItem(Item item) {
-        ArrayList<Lending> bookLendings = new ArrayList<>();
-        for (Lending lending : lendings) {
-            if (lending.getItem().equals(item)) {
-                bookLendings.add(lending);
-            }
-        }
-        return bookLendings;
     }
 
     public ArrayList<Lending> getLendings(){ return this.lendings; }
