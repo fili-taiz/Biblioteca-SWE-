@@ -268,7 +268,7 @@ public class AdminController {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
 
         ConnectionManager.closeAutoCommit();
-        if(!bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn, publishingHouse, numberOfPages,
+        if(!bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn, publishingHouse,
                 authors)){
             ConnectionManager.rollback();
             return false;

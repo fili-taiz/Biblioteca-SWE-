@@ -30,7 +30,7 @@ public class BookDAO {
             }
             Book book = new Book(code, resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                     Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
-                    resultSet.getString("publishing_house"), resultSet.getInt("number_of_page"), resultSet.getString("authors"));
+                    resultSet.getString("publishing_house"), resultSet.getInt("number_of_pages"), resultSet.getString("authors"));
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(code));
             return book;
@@ -44,21 +44,22 @@ public class BookDAO {
         connection = ConnectionManager.getConnection();
         try {
             //Creazione Item e Book
-            String query
-                    = "INSERT INTO Item (title, publication_date, language, category, link, number_of_pages) VALUES (?, ?, ?, ?, ?, ?) RETURNING code;";
-            PreparedStatement ps = connection.prepareStatement(query);
+            String query = "INSERT INTO Item (title, publication_date, language, category, link, number_of_pages) VALUES (?, ?, ?, ?, ?, ?);";
+            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, title);
             ps.setString(2, publicationDate);
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
-            ps.setString(6, isbn);
-            ps.executeUpdate();
-            ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()){
+            ps.setInt(6, numberOfPages);
+            if(ps.executeUpdate() <= 0){
                 throw new CRUD_exception("Error executing insert!", null);
             }
-            int code = resultSet.getInt("code");
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (!generatedKeys.next()) {
+                throw new CRUD_exception("Insert failed, no ID obtained.", null);
+            }
+            int code = generatedKeys.getInt(1);
 
             query
                     = "INSERT INTO Book (code, isbn, publishing_house, authors)"
@@ -82,16 +83,15 @@ public class BookDAO {
 
         connection = ConnectionManager.getConnection();
         try {
-            String query
-                    = "DELETE FROM Item WHERE code = ?;";
+            String query = "DELETE FROM Book WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
             if (ps.executeUpdate() <= 0){
                 throw new CRUD_exception("Error executing delete!", null);
             };
 
-            query
-                    = "DELETE FROM Book WHERE code = ?;";
+            query = "DELETE FROM Item WHERE code = ?;";
+
 
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
@@ -105,7 +105,7 @@ public class BookDAO {
     }
 
     public boolean updateBook(int originalItemCode, String title, String publicationDate, String language, String category, String link, String isbn,
-                              String publishingHouse, int numberOfPages, String authors) {
+                              String publishingHouse, String authors) {
         connection = ConnectionManager.getConnection();
         try {
             //TODO guarda se ho controllato che questo libro sia dentro al catalogue;
@@ -123,14 +123,13 @@ public class BookDAO {
             }
 
             query
-                    = "UPDATE Book SET isbn = ?, publishing_house = ?, number_of_pages = ?, authors = ? WHERE code = ?;";
+                    = "UPDATE Book SET isbn = ?, publishing_house = ?, authors = ? WHERE code = ?;";
 
             ps = connection.prepareStatement(query);
             ps.setString(1, isbn);
             ps.setString(2, publishingHouse);
-            ps.setInt(3, numberOfPages);
-            ps.setString(4, authors);
-            ps.setInt(5, originalItemCode);
+            ps.setString(3, authors);
+            ps.setInt(4, originalItemCode);
             if(ps.executeUpdate() <= 0){
                 throw new CRUD_exception("Error executing update!", null);
             }
