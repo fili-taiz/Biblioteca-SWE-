@@ -21,14 +21,14 @@ public class BookDAOTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        // Carico il driver H2
+        // carico il driver H2
         Class.forName("org.h2.Driver");
         connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", "user", "pass");
         ConnectionManager.setTestConnection(connection);
 
         Statement stmt = connection.createStatement();
 
-        // Creo tabelle base: Item e Book
+        // creo tabelle Item e Book
         stmt.execute("CREATE TABLE IF NOT EXISTS Item (" +
                 "code SERIAL, " +
                 "title VARCHAR(64), " +
@@ -47,7 +47,7 @@ public class BookDAOTest {
                 "PRIMARY KEY (code)," +
                 "FOREIGN KEY (code) REFERENCES Item(code))");
 
-        // Dummy per PhysicalCopiesDAO se necessario
+        // dummy per PhysicalCopiesDAO se necessario
         stmt.execute("CREATE TABLE IF NOT EXISTS Physical_Copies (" +
                 "code INTEGER, " +
                 "storage_place VARCHAR(64)," +
@@ -108,7 +108,7 @@ public class BookDAOTest {
 
         boolean newBook = bookDAO.updateBook(
                 code, "new_title", "2020-05-01", "LANGUAGE_1", "CATEGORY_1", "new_link",
-                "990", "new_publishing_house", 100, "new_authors"
+                "990", "new_publishing_house", "new_authors"
         );
 
         assertTrue(newBook);
@@ -125,20 +125,18 @@ public class BookDAOTest {
     }
 
     @Test
-    public void testRemoveBook() {
+    public void testRemoveExistingBook() {
         int code = bookDAO.addBook(
-                "To Be Deleted", "2010-01-01", "ENGLISH", "SCIENCE", "link", "del-123", "Del House", 123, "Someone"
+                "title", "2010-01-01", "LANGUAGE_1", "CATEGORY_1", "link", "isbn", "publishing_house", 100, "authors"
         );
 
         assertNotNull(bookDAO.getBook(code));
-        boolean deleted = bookDAO.removeBook(code);
-        assertTrue(deleted);
-
-        try {
-            bookDAO.getBook(code);
-            fail("Expected DataAccessException");
-        } catch (Exception e) {
-            // ok
-        }
+        assertTrue(bookDAO.removeBook(code));
     }
+
+    @Test(expected = com.progetto_swe.orm.database_exception.CRUD_exception.class)
+    public void testRemoveNonExistingBook()  {
+        assertFalse(bookDAO.removeBook(123));
+    }
+
 }
