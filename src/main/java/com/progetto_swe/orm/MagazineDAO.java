@@ -26,51 +26,58 @@ public class MagazineDAO {
             ps.setInt(1, code);
             ResultSet resultSet = ps.executeQuery();
             if(!resultSet.next()) {
-                throw new DataAccessException("Error executing query!", null);
+                //System.out.println("There is no book in the database with code = " + code + "!");
+                return null;
             }
             Magazine magazine = new Magazine(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                     Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"),
-                    resultSet.getString("publishingHouse"));
+                    resultSet.getString("publishing_house"));
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(code));
             return magazine;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
-    public int addMagazine(String title, String publicationDate, String language, String category, String link, String publishingHouse) {
+    public int addMagazine(String title, String publicationDate, String language, String category, String link, String publishingHouse, int number_of_pages) {
 
         connection = ConnectionManager.getConnection();
         try {
             //Creazione Item e Magazine
             String query
-                    = "INSERT INTO Item (title, publication_date, language, category, link)"
-                    + "VALUES (?, ?, ?, ?, ?) "
-                    + "RETURNING code;";
-            PreparedStatement ps = connection.prepareStatement(query);
+                    = "INSERT INTO Item (title, publication_date, language, category, link, number_of_pages)"
+                    + " VALUES (?, ?, ?, ?, ?, ?) "
+                    + " RETURNING code;";
+            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, title);
-            ps.setString(2, publicationDate);
+            ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
-            ResultSet resultSet = ps.executeQuery(query);
-            if(!resultSet.next()){
+            ps.setInt(6, number_of_pages);
+
+            ps.executeUpdate();
+
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (!generatedKeys.next()) {
                 throw new CRUD_exception("Error executing insert!", null);
             }
-            int code = resultSet.getInt("code");
+
+            int code = generatedKeys.getInt(1);
 
             query = "INSERT INTO Magazine (code, publishing_house) VALUES (?, ?);";
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
             ps.setString(2, publishingHouse);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }
+
+            ps.executeUpdate();
 
             return code;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return -1;
         }
     }
 
@@ -78,55 +85,53 @@ public class MagazineDAO {
 
         connection = ConnectionManager.getConnection();
         try {
-            String query = "DELETE FROM Item WHERE code = ?;";
+            String query = "DELETE FROM Magazine WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing delete!", null);
+
+            if(ps.executeUpdate() == 0){
+                return false;
             }
 
-            query = "DELETE FROM Magazine WHERE code = ?;";
+            query = "DELETE FROM Item WHERE code = ?;";
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing delete!", null);
-            }
-            return true;
+            return ps.executeUpdate() != 0;
+
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 
-    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category, String link,
-                                  String publishingHouse) {
+    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category, String link, String publishingHouse) {
         connection = ConnectionManager.getConnection();
         try {
-            //TODO guarda se ho controllato che questo magazine sia dentro al catalogue;
             String query
                     = "UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
-            ps.setString(2, publicationDate);
+            ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
-            if(ps.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing update!", null);
+
+            if(ps.executeUpdate() == 0){
+                return false;
             }
 
             query = "UPDATE Magazine SET publishing_house = ? WHERE code = ?;";
             ps = connection.prepareStatement(query);
             ps.setString(1, publishingHouse);
-            ps.setInt(1, originalItemCode);
+            ps.setInt(2, originalItemCode);
 
-            if(ps.executeUpdate(query) <= 0){
-                throw new CRUD_exception("Error executing update!", null);
-            }
-            return true;
+            return ps.executeUpdate() != 0;
+
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 }

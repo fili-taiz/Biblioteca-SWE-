@@ -1,6 +1,7 @@
 package com.progetto_swe.domain_model;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ListOfLendings {
     private ArrayList<Lending> lendings;
@@ -56,6 +57,25 @@ public class ListOfLendings {
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        ListOfLendings listOfLendings = (ListOfLendings) o;
+        return Objects.equals(this.lendings, listOfLendings.getLendings());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lendings);
+    }
+
+
 
     public ArrayList<Lending> getLendings(){ return this.lendings; }
 }

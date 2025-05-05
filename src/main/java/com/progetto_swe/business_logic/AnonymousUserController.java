@@ -23,11 +23,11 @@ public class AnonymousUserController {
 
     public ListOfReservations getListOfReservation() {
         ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.getReservations();
+        return reservationDAO.getReservations_();
     }
 
     public ListOfLendings getListOfLending() {
         LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.getLendings();
+        return lendingDAO.getLendings_();
     }
 }

@@ -10,20 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ConnectionManager {
-    private static final ConnectionManager connectionManager = new ConnectionManager();
     private static Connection connection;
-    private static final boolean prepared = false;
     private static final String url = "jdbc:postgresql://localhost:5432/Library";
     private static final String username = "postgres";
-    private static final String password = "HU12HUI26TAO";
+    private static final String password = "filipposwe";
 
     private ConnectionManager() {
-        if (prepared) {
-            try {
-                connection = DriverManager.getConnection(url, username, password);
-            } catch (SQLException e) {
-                throw new DatabaseConnectionException("Connection error!", e);
-            }
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
         }
     }
 
@@ -33,11 +29,11 @@ public class ConnectionManager {
 
     public static Connection getConnection() {
         try {
-            if (connection.isClosed()) {
+            if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(url, username, password);
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
         }
         return connection;
     }
@@ -46,7 +42,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
         }
     }
 
@@ -54,7 +50,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
         }
     }
 
@@ -63,7 +59,7 @@ public class ConnectionManager {
             connection.commit();
             openAutoCommit();
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
         }
     }
 
@@ -72,7 +68,7 @@ public class ConnectionManager {
             connection.rollback();
             openAutoCommit();
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
         }
     }
 }

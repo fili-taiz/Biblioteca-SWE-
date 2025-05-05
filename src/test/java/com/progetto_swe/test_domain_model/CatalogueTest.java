@@ -1,13 +1,13 @@
 package com.progetto_swe.test_domain_model;
 
 import com.progetto_swe.domain_model.*;
-import org.junit.Test;
+import org.checkerframework.checker.units.qual.C;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CatalogueTest {
 
@@ -103,5 +103,31 @@ public class CatalogueTest {
         result.add(book_2);
         assertEquals(result, catalogue.advancedSearchItem("analisi_matematica", Category.CATEGORY_1, Language.LANGUAGE_1, true, LocalDate.of(2021, 4, 3 ), LocalDate.of(2025, 4, 5)));
         assertNotEquals(items, catalogue.advancedSearchItem("analisi_matematica", Category.CATEGORY_1, Language.LANGUAGE_1, true, LocalDate.of(2021, 4, 3 ), LocalDate.of(2025, 4, 5)));
+    }
+
+    @Test
+    public void testEquals(){
+        Item book_1 = new Book(1, "analisi_matematica_1", LocalDate.of(2025, 3, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 200, "authors");
+        Item book_2 = new Book("analisi_matematica_2", LocalDate.of(2025, 3, 7), Language.LANGUAGE_1, Category.CATEGORY_1, "link_2", "isbn_2", "publishing_house_1", 200, "authors");
+        Item book_3 = new Book("geometria_e_algebra_lineare", LocalDate.of(2025, 3, 8), Language.LANGUAGE_2, Category.CATEGORY_2, "link_3", "isbn_3", "publishing_house_1", 200, "authors");
+        ArrayList<Item> items_1 = new ArrayList<>();
+        items_1.add(book_1);
+        items_1.add(book_2);
+        items_1.add(book_3);
+        ArrayList<Item> items_2 = new ArrayList<>();
+        items_2.add(book_1);
+        items_2.add(book_2);
+        items_2.add(book_3);
+        ArrayList<Item> items_3 = new ArrayList<>();
+        items_3.add(book_1);
+        Catalogue catalogue_1 = new Catalogue(items_1);
+        Catalogue catalogue_2 = new Catalogue(items_2);
+        Catalogue catalogue_3 = new Catalogue(items_3);
+
+        assertTrue(catalogue_1.equals(catalogue_2));
+        assertFalse(catalogue_1.equals(catalogue_3));
+        assertFalse(catalogue_1.equals(null));
+
+
     }
 }

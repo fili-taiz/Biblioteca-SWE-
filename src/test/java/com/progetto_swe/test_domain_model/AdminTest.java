@@ -1,14 +1,12 @@
 package com.progetto_swe.test_domain_model;
 
 import com.progetto_swe.domain_model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AdminTest {
 

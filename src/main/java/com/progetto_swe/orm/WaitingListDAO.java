@@ -21,39 +21,34 @@ public class WaitingListDAO {
         try {
             ArrayList<String> emails = new ArrayList<>();
             connection = ConnectionManager.getConnection();
-            String query = "SELECT W.email FROM Waiting_list W WHERE W.code = ? AND W.storage_place = ?;";
+            String query = "SELECT W.email FROM waiting_list W WHERE W.code = ? AND W.storage_place = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
             ps.setString(2, storagePlace);
-            ResultSet resultSet = ps.executeQuery(query);
-
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
-            }
+            ResultSet resultSet = ps.executeQuery();
 
             while(resultSet.next()) {
                 emails.add(resultSet.getString("email"));
             }
             return emails;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
     public boolean addToWaitingList(int code, String storagePlace, String email) {
         connection = ConnectionManager.getConnection();
         try {
-            String query = "INSERT INTO Waiting_list (code, storage_place, email) VALUES (?, ?, ?);";
+            String query = "INSERT INTO waiting_list (code, storage_place, email) VALUES (?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
             ps.setString(2, storagePlace);
             ps.setString(3, email);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }//si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 }

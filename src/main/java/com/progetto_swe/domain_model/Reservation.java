@@ -1,5 +1,6 @@
 package com.progetto_swe.domain_model;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Reservation {
     private LocalDate reservationDate;
@@ -21,5 +22,22 @@ public class Reservation {
 
     public void setHirer(Hirer newHirer){ this.hirer = newHirer; }
     public void setItem(Item newItem){ this.item = newItem; }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        Reservation reservation = (Reservation) o;
+        return (this.reservationDate.equals(reservation.reservationDate)) && (this.hirer.equals(reservation.hirer)) && (this.item.equals(reservation.item)) && (this.storagePlace.equals(reservation.storagePlace));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reservationDate, hirer, item, storagePlace);
+    }
 
 }

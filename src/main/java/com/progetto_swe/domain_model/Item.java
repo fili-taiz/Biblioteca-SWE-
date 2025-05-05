@@ -2,6 +2,8 @@ package com.progetto_swe.domain_model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
+
 public abstract class Item {
     protected int code;
     protected int numberOfPages;
@@ -65,6 +67,12 @@ public abstract class Item {
         Item item = (Item) o;
         return this.code == item.code && this.title.equals(item.title) && this.publicationDate.equals(item.publicationDate) && this.language.equals(item.language) && this.category.equals(item.category) && this.link.equals(item.link);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, numberOfPages, title, publicationDate, language, category, link, physicalCopies);
+    }
+
 
     public boolean isBorrowable(Library library) {
         if(physicalCopies.get(library) == null)

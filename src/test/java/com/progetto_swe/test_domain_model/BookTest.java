@@ -1,11 +1,10 @@
 package com.progetto_swe.test_domain_model;
 
 import com.progetto_swe.domain_model.*;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BookTest {
 
@@ -72,5 +71,6 @@ public class BookTest {
 
         assertTrue(book_1.equals(book_2));
         assertFalse(book_2.equals(magazine));
+        assertFalse(book_1.equals(null));
     }
 }

@@ -1,12 +1,12 @@
 package com.progetto_swe.test_domain_model;
 
 import com.progetto_swe.domain_model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ListOfLendingsTest {
 
@@ -142,6 +142,33 @@ public class ListOfLendingsTest {
 
         assertEquals(result, listOfLendings.getLendingsByItem(book_1));
         assertNotEquals(lendings, listOfLendings.getLendingsByItem(book_1));
+
+    }
+
+    @Test
+    public void testEquals(){
+        Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00000",
+                null, null);
+        Item item_1 = new Magazine(1, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
+        Item item_2 = new Magazine(2, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
+        Lending lending_1 = new Lending(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
+        Lending lending_2 = new Lending(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
+        Lending lending_3 = new Lending(LocalDate.of(2025,5,6), hirer, item_2, Library.LIBRARY_1);
+
+        ArrayList<Lending> expected_lendings_1 = new ArrayList<>();
+        expected_lendings_1.add(lending_1);
+        expected_lendings_1.add(lending_2);
+        expected_lendings_1.add(lending_3);
+
+        ArrayList<Lending> expected_lendings_2 = expected_lendings_1;
+
+        ArrayList<Lending> unexpected_lendings = new ArrayList<>();
+        unexpected_lendings.add(lending_1);
+
+        assertTrue(expected_lendings_1.equals(expected_lendings_2));
+        assertFalse(expected_lendings_1.equals(unexpected_lendings));
+        assertFalse(expected_lendings_1.equals(null));
+
 
     }
 }

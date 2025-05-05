@@ -4,83 +4,116 @@ import com.progetto_swe.domain_model.Admin;
 import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.orm.AdminDAO;
 import com.progetto_swe.orm.ConnectionManager;
-import org.junit.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 import java.sql.*;
 
-import static org.junit.Assert.*;
+import com.progetto_swe.orm.database_exception.CRUD_exception;
+import com.progetto_swe.orm.database_exception.DataAccessException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.postgresql.util.PSQLException;
+
 
 public class AdminDAOTest {
 
-    private static Connection connection;
-    private AdminDAO adminDAO;
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        // Caricamento del driver H2
-        Class.forName("org.h2.Driver");
-
-        // Connessione a database in memoria
-        connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", "sa", "");
-
-        // Creazione tabella Admin
-        Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS Admin(" +
-                "user_code VARCHAR(32)," +
-                "name VARCHAR(32)," +
-                "surname VARCHAR(32)," +
-                "email VARCHAR(128) UNIQUE," +
-                "telephone_number VARCHAR(32) UNIQUE," +
-                "working_place VARCHAR(128)," +
-                "PRIMARY KEY(user_code)" +
-                ");");
+    @BeforeEach
+    public void setUp() throws SQLException{
+        Connection connection = ConnectionManager.getConnection();
+        PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE admin RESTART IDENTITY CASCADE;");
+        ps.execute();
     }
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        connection.close();
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        connection.createStatement().execute("DELETE FROM Admin");
-
-        Statement insert = connection.createStatement();
-        insert.execute("INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place) " +
-                "VALUES ('02345', 'Mario', 'Rossi', 'mario.rossi@unifi.it', '1234', 'LIBRARY_1')");
-
-        // Inietta la connessione H2 nel ConnectionManager
-        ConnectionManager.setConnection(connection);
-
-        // Ora adminDAO userà la connessione di test
-        adminDAO = new AdminDAO();
-    }
 
     @Test
-    public void testGetAdminFound() {
-        Admin admin = adminDAO.getAdmin("02345");
+    public void testGetAdmin() throws SQLException {
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
 
-        assertNotNull(admin);
-        assertEquals("Mario", admin.getName());
-        assertEquals("Rossi", admin.getSurname());
-        assertEquals("mario.rossi@unifi.it", admin.getEmail());
-        assertEquals("1234", admin.getTelephoneNumber());
-        assertEquals(Library.LIBRARY_1, admin.getWorkingPlace());
+        try {
+            String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, "123");
+            ps.setString(2, "Filippo");
+            ps.setString(3, "Taiti");
+            ps.setString(4, "filippo.taiti@edu.unifi.it");
+            ps.setString(5, "333");
+            ps.setString(6, Library.LIBRARY_1.toString());
+            ps.executeUpdate();
+
+            AdminDAO adminDAO = new AdminDAO();
+            Admin admin = adminDAO.getAdmin("123");
+
+            assertNotNull(admin);
+            assertEquals(admin.getUserCode(), "123");
+            assertEquals(admin.getName(), "Filippo");
+            assertEquals(admin.getSurname(), "Taiti");
+            assertEquals(admin.getEmail(), "filippo.taiti@edu.unifi.it");
+            assertEquals(admin.getTelephoneNumber(), "333");
+            assertEquals(admin.getWorkingPlace(), Library.LIBRARY_1);
+
+            assertThrows(DataAccessException.class, () -> {adminDAO.getAdmin("456");});
+
+            connection.rollback();
+
+        }finally {
+            connection.rollback();
+            connection.setAutoCommit(true);
+            connection.close();
+        }
+
     }
 
-    @Test(expected = com.progetto_swe.orm.database_exception.DataAccessException.class)
-    public void testGetAdminNotFound() {
-        adminDAO.getAdmin("56789");
+   @Test
+    public void testAddAdmin() throws SQLException {
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
+        try {
+            String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place)"
+                    + " VALUES (?, ?, ?, ?, ?, ?);";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, "123");
+            ps.setString(2, "Filippo");
+            ps.setString(3, "Taiti");
+            ps.setString(4, "filippo.taiti@edu.unifi.it");
+            ps.setString(5, "333");
+            ps.setString(6, Library.LIBRARY_1.toString());
+            assertEquals(1, ps.executeUpdate());
+
+            AdminDAO adminDAO = new AdminDAO();
+            Admin admin = adminDAO.getAdmin("123");
+
+            assertNotNull(admin);
+            assertEquals(admin.getUserCode(), "123");
+            assertEquals(admin.getName(), "Filippo");
+            assertEquals(admin.getSurname(), "Taiti");
+            assertEquals(admin.getEmail(), "filippo.taiti@edu.unifi.it");
+            assertEquals(admin.getTelephoneNumber(), "333");
+            assertEquals(admin.getWorkingPlace(), Library.LIBRARY_1);
+
+            ps = connection.prepareStatement(query);
+            ps.setString(1, "123");
+            ps.setString(2, "Marco");
+            ps.setString(3, "Taiti");
+            ps.setString(4, "marco.bianchi@edu.unifi.it");
+            ps.setString(5, "334");
+            ps.setString(6, Library.LIBRARY_1.toString());
+            assertThrows(PSQLException.class, ps::executeUpdate);
+
+            connection.rollback();
+
+        }finally{
+            connection.rollback();
+            connection.setAutoCommit(true);
+            connection.close();
+        }
     }
 
-    @Test
-    public void testAddAdmin() {
-        boolean result = adminDAO.addAdmin("01234", "Filippo", "Taiti", "filippo.taiti@unifi.it", "0987654321", "LIBRARY_2");
-        assertTrue(result);
 
-        Admin admin = adminDAO.getAdmin("01234");
-        assertNotNull(admin);
-        assertEquals("Filippo", admin.getName());
-        assertEquals(Library.LIBRARY_2, admin.getWorkingPlace());
-    }
+
+
 }

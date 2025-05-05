@@ -2,6 +2,7 @@ package com.progetto_swe.domain_model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Catalogue{
     private ArrayList<Item> items;
@@ -55,6 +56,28 @@ public class Catalogue{
         }
         return null;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+
+        Catalogue catalogue = (Catalogue) o;
+
+        return Objects.equals(this.items, catalogue.items);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(items);
+    }
+
+
 
     public ArrayList<Item> getItems(){ return this.items; }
 

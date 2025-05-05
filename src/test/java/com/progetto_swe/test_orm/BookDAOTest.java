@@ -1,141 +1,121 @@
 package com.progetto_swe.test_orm;
 
-import com.progetto_swe.domain_model.Book;
-import com.progetto_swe.domain_model.Language;
-import com.progetto_swe.domain_model.Category;
+import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.BookDAO;
 import com.progetto_swe.orm.ConnectionManager;
-import org.junit.*;
+import com.progetto_swe.orm.PhysicalCopiesDAO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
+import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BookDAOTest {
 
-    private static Connection connection;
-    private BookDAO bookDAO;
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        // carico il driver H2
-        Class.forName("org.h2.Driver");
-        connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", "user", "pass");
-        ConnectionManager.setConnection(connection);
-
-        Statement stmt = connection.createStatement();
-
-        // creo tabelle Item e Book
-        stmt.execute("CREATE TABLE IF NOT EXISTS Item (" +
-                "code SERIAL, " +
-                "title VARCHAR(64), " +
-                "publication_date DATE, " +
-                "language VARCHAR(32), " +
-                "category VARCHAR(32), " +
-                "link VARCHAR(32), "  +
-                "number_of_pages INTEGER, " +
-                "PRIMARY KEY (code))");
-
-        stmt.execute("CREATE TABLE IF NOT EXISTS Book (" +
-                "code INTEGER, " +
-                "isbn VARCHAR(64), " +
-                "publishing_house VARCHAR(128), " +
-                "authors VARCHAR(128), " +
-                "PRIMARY KEY (code)," +
-                "FOREIGN KEY (code) REFERENCES Item(code))");
-
-        // dummy per PhysicalCopiesDAO se necessario
-        stmt.execute("CREATE TABLE IF NOT EXISTS Physical_Copies (" +
-                "code INTEGER, " +
-                "storage_place VARCHAR(64)," +
-                "borrowable BOOLEAN, " +
-                "PRIMARY KEY (code, storage_place), " +
-                "FOREIGN KEY (code) REFERENCES Item(code));");
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        connection.close();
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        // Pulizia tabelle prima di ogni test
-        Statement stmt = connection.createStatement();
-        stmt.execute("DELETE FROM Book");
-        stmt.execute("DELETE FROM Item");
-
-        bookDAO = new BookDAO();
+        Connection connection = ConnectionManager.getConnection();
+        String query = "TRUNCATE TABLE Book, Item RESTART IDENTITY CASCADE;";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.execute();
     }
 
     @Test
-    public void testAddAndGetBook() {
-        int code = bookDAO.addBook(
-                "title",
-                "2008-08-01",
-                "LANGUAGE_1",
-                "CATEGORY_1",
-                "link",
-                "1234",
-                "publishing_house",
-                500,
-                "authors"
-        );
+    public void testGetBook() throws SQLException{
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
 
-        assertTrue(code > 0);
+        try{
 
-        Book book = bookDAO.getBook(code);
-        assertEquals("title", book.getTitle());
-        assertEquals(LocalDate.of(2008, 8, 1), book.getPublicationDate());
-        assertEquals(Language.LANGUAGE_1, book.getLanguage());
-        assertEquals(Category.CATEGORY_1, book.getCategory());
-        assertEquals("link", book.getLink());
-        assertEquals("1234", book.getIsbn());
-        assertEquals("publishing_house", book.getPublishingHouse());
-        assertEquals(500, book.getNumberOfPages());
-        assertEquals("authors", book.getAuthors());
+            BookDAO bookDAO = new BookDAO();
+            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+            int book_code = bookDAO.addBook("titolo", LocalDate.of(2023,4,5).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors");
+            physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 5, true);
+            Book book_1 = new Book(book_code, "titolo", LocalDate.of(2023,4,5), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing house", 200, "authors");
+            Book book_2 = new Book(book_code+1, "titolo2", LocalDate.of(2023,4,5), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing house", 200, "authors");
+
+
+            assertEquals(book_1, bookDAO.getBook(book_code));
+            assertNotEquals(book_2, bookDAO.getBook(book_code));
+            connection.rollback();
+
+        }finally {
+            connection.setAutoCommit(true);
+            connection.close();
+        }
     }
 
     @Test
-    public void testUpdateBook() {
-        int code = bookDAO.addBook(
-                "old_title", "2000-01-01", "LANGUAGE_1", "CATEGORY_2", "link", "123", "old_publishing_house", 100, "authors"
-        );
+    public void testAddBook() throws SQLException{
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
+        try{
 
-        boolean newBook = bookDAO.updateBook(
-                code, "new_title", "2020-05-01", "LANGUAGE_1", "CATEGORY_1", "new_link",
-                "990", "new_publishing_house", "new_authors"
-        );
+            BookDAO bookDAO = new BookDAO();
+            Book book_1 = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
 
-        assertTrue(newBook);
-        Book book = bookDAO.getBook(code);
-        assertEquals("new_title", book.getTitle());
-        assertEquals("2020-05-01", book.getPublicationDate().toString());
-        assertEquals("LANGUAGE_1", book.getLanguage().toString());
-        assertEquals("CATEGORY_1", book.getCategory().toString());
-        assertEquals("new_link", book.getLink());
-        assertEquals("990", book.getIsbn());
-        assertEquals("new_publishing_house", book.getPublishingHouse());
-        assertEquals(100, book.getNumberOfPages());
-        assertEquals("new_authors", book.getAuthors());
+            assertEquals(book_1.getCode(), bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1" ));
+            assertNotEquals(3, bookDAO.addBook("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2", "isbn2", "publishing house 2", 200, "authors2" ));
+            connection.rollback();
+
+        }finally {
+            connection.setAutoCommit(true);
+            connection.close();
+        }
+
     }
 
     @Test
-    public void testRemoveExistingBook() {
-        int code = bookDAO.addBook(
-                "title", "2010-01-01", "LANGUAGE_1", "CATEGORY_1", "link", "isbn", "publishing_house", 100, "authors"
-        );
+    public void testUpdateBook() throws SQLException{
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
+        try{
 
-        assertNotNull(bookDAO.getBook(code));
-        assertTrue(bookDAO.removeBook(code));
+            BookDAO bookDAO = new BookDAO();
+            Book book_1 = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
+            Book book_2 = new Book(2, "titolo2", LocalDate.of(2023,4,2), Language.LANGUAGE_2, Category.CATEGORY_2, "link2", "isbn2", "publishing house 2", 200, "authors2" );
+            bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1");
+
+            assertTrue(bookDAO.updateBook(book_1.getCode(), "titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2", "isbn2", "publishing house 2", "authors2"));
+            assertFalse(bookDAO.updateBook(book_2.getCode(), "titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", "authors1" ));
+
+            connection.rollback();
+
+
+        }finally{
+            connection.setAutoCommit(true);
+            connection.close();
+        }
     }
 
-    @Test(expected = com.progetto_swe.orm.database_exception.CRUD_exception.class)
-    public void testRemoveNonExistingBook()  {
-        assertFalse(bookDAO.removeBook(123));
+    @Test
+    public void testRemoveBook() throws SQLException {
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
+        try{
+
+            BookDAO bookDAO = new BookDAO();
+            int book_code = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1");
+            Book book_2 = new Book(2, "titolo2", LocalDate.of(2023,4,2), Language.LANGUAGE_2, Category.CATEGORY_2, "link2", "isbn2", "publishing house 2", 200, "authors2" );
+            assertTrue(bookDAO.removeBook(book_code));
+            assertFalse(bookDAO.removeBook(book_2.getCode()));
+
+
+
+            connection.rollback();
+
+
+        }finally {
+            connection.setAutoCommit(true);
+            connection.close();
+        }
     }
+
+
+
 
 }

@@ -49,7 +49,7 @@ public class HirerController {
 
     public boolean removeReservation(Reservation reservation){
         ReservationDAO reservationDAO = new ReservationDAO();
-        ListOfReservations listOfReservations = reservationDAO.getReservations();
+        ListOfReservations listOfReservations = reservationDAO.getReservations_();
 
         if(!listOfReservations.haveReservation(reservation)){
             return false;
@@ -65,21 +65,21 @@ public class HirerController {
 
     public ArrayList<Lending> getLendings(){
         LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.getLendings().getLendingsByHirer(this.hirer);
+        return lendingDAO.getLendings_().getLendingsByHirer(this.hirer);
     }
 
     public ArrayList<Reservation> getReservation(){
         ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.getReservations().getReservationsByHirer(this.hirer);
+        return reservationDAO.getReservations_().getReservationsByHirer(this.hirer);
     }
 
     public ListOfReservations getListOfReservation() {
         ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.getReservations();
+        return reservationDAO.getReservations_();
     }
 
     public ListOfLendings getListOfLending() {
         LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.getLendings();
+        return lendingDAO.getLendings_();
     }
 }

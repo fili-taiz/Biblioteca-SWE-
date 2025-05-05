@@ -1,11 +1,11 @@
 package com.progetto_swe.test_domain_model;
 
 import com.progetto_swe.domain_model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerTest {
 
@@ -36,6 +36,21 @@ public class HirerTest {
         assertTrue(hirer.contains("mai"));
         assertTrue(hirer.contains("12345"));
         assertFalse(hirer.contains("universita"));
+    }
+
+    @Test
+    public void testEquals(){
+        Hirer h_1 = new Hirer("usercode1", "name1", "surname1", "email1", "00001",
+                null,LocalDate.of(2025, 5,3));
+        Hirer h_2 = new Hirer("usercode1", "name1", "surname1", "email1", "00001",
+                null,LocalDate.of(2025, 5,3));
+        Hirer h_3 = new Hirer("usercode3", "name3", "surname3", "email3", "00003",
+                null,LocalDate.of(2025, 5,5));
+
+        assertTrue(h_1.equals(h_2));
+        assertFalse(h_2.equals(h_3));
+        assertFalse(h_2.equals(null));
+
     }
 
 }

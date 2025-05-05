@@ -17,7 +17,7 @@ public class ReservationDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public ListOfReservations getReservations() {
+    public ListOfReservations getReservations_() {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "SELECT * FROM Reservations;";
@@ -25,9 +25,6 @@ public class ReservationDAO {
             ResultSet resultSet = ps.executeQuery();
             resultSet.next();
             ArrayList<Reservation> reservations = new ArrayList<>();
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
-            }
             while (resultSet.next()) {
 
                 BookDAO bookDAO = new BookDAO();
@@ -52,10 +49,10 @@ public class ReservationDAO {
                 reservations.add(new Reservation(resultSet.getDate("reservation_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
             }
 
-            ListOfReservations listOfReservations = new ListOfReservations(reservations);
-            return listOfReservations;
+            return new ListOfReservations(reservations);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
@@ -69,13 +66,11 @@ public class ReservationDAO {
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
             ps.setDate(4, java.sql.Date.valueOf(LocalDate.now()));
-            ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()){
-                throw new CRUD_exception("Error executing insert!", null);
-            }
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 
@@ -87,13 +82,12 @@ public class ReservationDAO {
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
-            if(ps.executeUpdate() != 1){
-                throw new CRUD_exception("Error executing delete!", null);
-            }
+            ps.executeUpdate();
             return true;
 
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 }

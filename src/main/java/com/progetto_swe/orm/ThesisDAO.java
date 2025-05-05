@@ -23,9 +23,10 @@ public class ThesisDAO {
             String query = "SELECT * FROM Item I JOIN Thesis T ON I.code = T.code WHERE I.code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
-            ResultSet resultSet = ps.executeQuery(query);
+            ResultSet resultSet = ps.executeQuery();
             if(!resultSet.next()) {
-                throw new DataAccessException("Error executing query!", null);
+                //System.out.println("There is no book in the database with code = " + code + "!");
+                return null;
             }
             Thesis thesis = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
                     Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"), resultSet.getString("author"),
@@ -34,29 +35,32 @@ public class ThesisDAO {
             thesis.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(code));
             return thesis;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
-    public int addThesis(String title, String publicationDate, String language, String category, String link, String author, String supervisors, String university) {
+    public int addThesis(String title, String publicationDate, String language, String category, String link, int number_of_pages, String author, String supervisors, String university) {
 
         connection = ConnectionManager.getConnection();
         try {
             //Creazione Item e Thesis
-            String query = "INSERT INTO Item (title, publication_date, borrowable, language, category, link) VALUES (?, ?, ?, ?, ?) "
-                    + "RETURNING code;";
-            PreparedStatement ps = connection.prepareStatement(query);
+            String query = "INSERT INTO Item (title, publication_date, language, category, link, number_of_pages) VALUES (?, ?, ?, ?, ?, ?) "
+                    + " RETURNING code;";
+            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, title);
-            ps.setString(2, publicationDate);
-            ps.setBoolean(3, false);
-            ps.setString(4, language);
-            ps.setString(5, category);
-            ps.setString(6, link);
-            ResultSet resultSet = ps.executeQuery(query);
-            if(!resultSet.next()){
+            ps.setDate(2, Date.valueOf(publicationDate));
+            ps.setString(3, language);
+            ps.setString(4, category);
+            ps.setString(5, link);
+            ps.setInt(6, number_of_pages);
+
+            ps.executeUpdate();
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (!generatedKeys.next()) {
                 throw new CRUD_exception("Error executing insert!", null);
             }
-            int code = resultSet.getInt("code");
+            int code = generatedKeys.getInt(1);
 
             query = "INSERT INTO Thesis (code, author, supervisors, university) VALUES (?, ?, ?, ?);";
             ps = connection.prepareStatement(query);
@@ -64,13 +68,12 @@ public class ThesisDAO {
             ps.setString(2, author);
             ps.setString(3, supervisors);
             ps.setString(4, university);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }//si chiama executeUpdate ma vale per INSERT, DELETE e UPDATE
+            ps.executeUpdate();
 
             return code;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return -1;
         }
     }
 
@@ -78,23 +81,22 @@ public class ThesisDAO {
 
         connection = ConnectionManager.getConnection();
         try {
-            String query = "DELETE FROM Item WHERE code = ?;";
+            String query = "DELETE FROM Thesis WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing delete!", null);
+
+            if(ps.executeUpdate() == 0){
+                return false;
             }
 
-            query = "DELETE FROM Thesis WHERE code = ?;";
+            query = "DELETE FROM Item WHERE code = ?;";
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing delete!", null);
-            }
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 
@@ -102,18 +104,18 @@ public class ThesisDAO {
                                 String supervisors, String university) {
         connection = ConnectionManager.getConnection();
         try {
-            //TODO guarda se ho controllato che questo thesis sia dentro al catalogue;
             String query
                     = "UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ? ;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
-            ps.setString(2, publicationDate);
+            ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing update!", null);
+
+            if(ps.executeUpdate() == 0){
+                return false;
             }
 
             query = "UPDATE Thesis SET author = ?, supervisors = ?, university = ? WHERE code = ?;";;
@@ -123,12 +125,10 @@ public class ThesisDAO {
             ps.setString(3, university);
             ps.setInt(4, originalItemCode);
 
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing update!", null);
-            }
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 }

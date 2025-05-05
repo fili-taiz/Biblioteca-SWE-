@@ -1,5 +1,6 @@
 package com.progetto_swe.domain_model;
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Lending {
     private LocalDate lendingDate;
@@ -14,6 +15,24 @@ public class Lending {
         this.item = item;
         this.storagePlace = storagePlace;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        Lending lending = (Lending) o;
+        return (this.lendingDate.equals(lending.lendingDate)) && (this.hirer.equals(lending.hirer)) && (this.item.equals(lending.item)) && (this.storagePlace.equals(lending.storagePlace));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lendingDate, hirer, item, storagePlace);
+    }
+
 
     public Hirer getHirer(){ return this.hirer; }
     public Item getItem(){ return this.item; }

@@ -47,7 +47,7 @@ public class AdminController {
     }
 
     public boolean addBook(String title, String publicationDate, String language, String category, String link, String isbn,
-                           String publishingHouse, int numberOfPages, String authors, int numberOfCopies, boolean borrowable) {
+                           String publishingHouse, int numberOfPages, String authors, int numberOfCopies, boolean isBorrowable) {
         Book bookCopy = new Book(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, isbn, publishingHouse, numberOfPages, authors);
         BookDAO bookDAO = new BookDAO();
 
@@ -66,7 +66,7 @@ public class AdminController {
                 }
             }
 
-            if(!addPhysicalCopies(code, numberOfCopies, borrowable)){
+            if(!addPhysicalCopies(code, numberOfCopies, isBorrowable)){
                 ConnectionManager.rollback();
                 return false;
             }
@@ -94,7 +94,7 @@ public class AdminController {
     }
 
     public boolean addMagazine(String title, String publicationDate, String language, String category, String link, int numberOfPages, String publishingHouse,
-                               int numberOfCopies, boolean borrowable) {
+                               int numberOfCopies, boolean isBorrowable) {
         Magazine magazineCopy = new Magazine(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, publishingHouse);
         MagazineDAO magazineDAO = new MagazineDAO();
 
@@ -105,7 +105,7 @@ public class AdminController {
             ConnectionManager.closeAutoCommit();
             int code = catalogue.contains(magazineCopy);
             if(code ==  -1){
-                code = magazineDAO.addMagazine(title, publicationDate, language, category, link, publishingHouse);
+                code = magazineDAO.addMagazine(title, publicationDate, language, category, link, publishingHouse, numberOfPages);
 
                 if(code == -1){
                     ConnectionManager.rollback();
@@ -113,7 +113,7 @@ public class AdminController {
                 }
             }
 
-            if(!addPhysicalCopies(code, numberOfCopies, borrowable)){
+            if(!addPhysicalCopies(code, numberOfCopies, isBorrowable)){
                 ConnectionManager.rollback();
                 return false;
             }
@@ -126,7 +126,7 @@ public class AdminController {
     }
 
     public boolean addThesis(String title, String publicationDate, String language, String category, String link, int numberOfPages, String author,
-                             String supervisors, String university, int numberOfCopies, boolean borrowable) {
+                             String supervisors, String university, int numberOfCopies, boolean isBorrowable) {
         Thesis thesisCopy = new Thesis(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, author, supervisors, university);
         ThesisDAO thesisDAO = new ThesisDAO();
 
@@ -137,7 +137,7 @@ public class AdminController {
             ConnectionManager.closeAutoCommit();
             int code = catalogue.contains(thesisCopy);
             if(code ==  -1){
-                code = thesisDAO.addThesis(title, publicationDate, language, category, link, author, supervisors, university);
+                code = thesisDAO.addThesis(title, publicationDate, language, category, link, numberOfPages, author, supervisors, university);
 
                 if(code == -1){
                     ConnectionManager.rollback();
@@ -145,7 +145,7 @@ public class AdminController {
                 }
             }
 
-            if(!addPhysicalCopies(code, numberOfCopies, borrowable)){
+            if(!addPhysicalCopies(code, numberOfCopies, isBorrowable)){
                 ConnectionManager.rollback();
                 return false;
             }
@@ -162,7 +162,7 @@ public class AdminController {
         Catalogue catalogue = catalogueDAO.getCatalogue();
         LendingDAO lendingDAO = new LendingDAO();
         ReservationDAO reservationDAO = new ReservationDAO();
-        if(catalogue.getItem(code).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings(), reservationDAO.getReservations(), this.admin.getWorkingPlace()) == -1){
+        if(catalogue.getItem(code).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings_(), reservationDAO.getReservations_(), this.admin.getWorkingPlace()) == -1){
             return false;
         }
         removePhysicalCopies(code);
@@ -193,7 +193,7 @@ public class AdminController {
 
         LendingDAO lendingDAO = new LendingDAO();
         ReservationDAO reservationDAO = new ReservationDAO();
-        if(catalogue.getItem(code).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings(), reservationDAO.getReservations(), this.admin.getWorkingPlace()) == -1){
+        if(catalogue.getItem(code).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings_(), reservationDAO.getReservations_(), this.admin.getWorkingPlace()) == -1){
             return false;
         }
         removePhysicalCopies(code);
@@ -217,7 +217,7 @@ public class AdminController {
         Catalogue catalogue = catalogueDAO.getCatalogue();
         LendingDAO lendingDAO = new LendingDAO();
         ReservationDAO reservationDAO = new ReservationDAO();
-        if(catalogue.getItem(code).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings(), reservationDAO.getReservations(), this.admin.getWorkingPlace()) == -1){
+        if(catalogue.getItem(code).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings_(), reservationDAO.getReservations_(), this.admin.getWorkingPlace()) == -1){
             return false;
         }
         removePhysicalCopies(code);
@@ -236,7 +236,7 @@ public class AdminController {
         return true;
     }
 
-    public boolean updateBook(int originalItemCode, String title, String publicationDate, boolean borrowable, String language, String category, String link,
+    public boolean updateBook(int originalItemCode, String title, String publicationDate, boolean isBorrowable, String language, String category, String link,
                               String isbn, String publishingHouse, int numberOfPages, String authors, int numberOfCopies) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
@@ -253,7 +253,7 @@ public class AdminController {
             ConnectionManager.rollback();
             return false;
         }
-        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, borrowable)){
+        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, isBorrowable)){
             ConnectionManager.rollback();
             return false;
         }
@@ -261,7 +261,7 @@ public class AdminController {
         return true;
     }
 
-    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, boolean borrowable, String language, String category, String link,
+    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, boolean isBorrowable, String language, String category, String link,
                               String isbn, String publishingHouse, int numberOfCopies) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
@@ -277,7 +277,7 @@ public class AdminController {
             ConnectionManager.rollback();
             return false;
         }
-        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, borrowable)){
+        if(!physicalCopiesDAO.updatePhysicalCopies(originalItemCode,this.admin.getWorkingPlace().name(), numberOfCopies, isBorrowable)){
             ConnectionManager.rollback();
             return false;
         }
@@ -314,7 +314,7 @@ public class AdminController {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
         HirerDAO hirerDAO = new HirerDAO();
-        ListOfHirers hirers = hirerDAO.getHirers();
+        ListOfHirers hirers = hirerDAO.getHirers_();
         ReservationDAO reservationDAO = new ReservationDAO();
         LendingDAO lendingDAO = new LendingDAO();
         if(hirers.getHirer(hirer.getUserCode()) == null){
@@ -326,10 +326,10 @@ public class AdminController {
         if (!catalogue.getItem(item.getCode()).isBorrowable(this.admin.getWorkingPlace())) {
             return false;
         }
-        if(catalogue.getItem(item.getCode()).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings(), reservationDAO.getReservations(), this.admin.getWorkingPlace()) <= 1){
+        if(catalogue.getItem(item.getCode()).getNumberOfAvailableCopiesInLibrary(lendingDAO.getLendings_(), reservationDAO.getReservations_(), this.admin.getWorkingPlace()) <= 1){
             return false;
         }
-        if(lendingDAO.getLendings().lendingExist(hirer, item, this.admin.getWorkingPlace())){
+        if(lendingDAO.getLendings_().lendingExist(hirer, item, this.admin.getWorkingPlace())){
             return false;
         }
 
@@ -344,7 +344,7 @@ public class AdminController {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
         HirerDAO hirerDAO = new HirerDAO();
-        ListOfHirers hirers = hirerDAO.getHirers();
+        ListOfHirers hirers = hirerDAO.getHirers_();
         ReservationDAO reservationDAO = new ReservationDAO();
         LendingDAO lendingDAO = new LendingDAO();
 
@@ -361,7 +361,7 @@ public class AdminController {
         if(item == null){
             return false;
         }
-        if(reservationDAO.getReservations().haveReservation(reservation)){
+        if(reservationDAO.getReservations_().haveReservation(reservation)){
             return false;
         }
 
@@ -386,7 +386,7 @@ public class AdminController {
         LendingDAO lendingDAO = new LendingDAO();
 
         Catalogue catalogue = catalogueDAO.getCatalogue();
-        ListOfHirers hirers = hirerDAO.getHirers();
+        ListOfHirers hirers = hirerDAO.getHirers_();
         Hirer hirer = hirers.getHirer(lending.getHirer().getUserCode());
         Item item = catalogue.getItem(lending.getItem().getCode());
 
@@ -399,7 +399,7 @@ public class AdminController {
         if(item == null){
             return false;
         }
-        if(!lendingDAO.getLendings().haveLending(lending)){
+        if(!lendingDAO.getLendings_().haveLending(lending)){
             return false;
         }
 
@@ -429,7 +429,7 @@ public class AdminController {
 
     public ArrayList<Hirer> searchHirer(String keywords) {
         HirerDAO hirerDAO = new HirerDAO();
-        ListOfHirers hirers = hirerDAO.getHirers();
+        ListOfHirers hirers = hirerDAO.getHirers_();
         return hirers.searchHirer(keywords);
     }
 }

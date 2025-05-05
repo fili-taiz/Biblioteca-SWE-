@@ -3,12 +3,11 @@ package com.progetto_swe.test_domain_model;
 import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.ListOfHirers;
 import com.progetto_swe.domain_model.UserCredentials;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ListOfHirersTest {
 
@@ -66,5 +65,35 @@ public class ListOfHirersTest {
 
         assertEquals(h, listOfHirers.searchHirer("nomesecondo"));
         assertNotEquals(hirers, listOfHirers.searchHirer("nomesecondo"));
+    }
+
+    @Test
+    public void testEquals(){
+        ArrayList<Hirer> hirers = new ArrayList<>();
+        UserCredentials ucs_1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Hirer hirer_1 = new Hirer("usercode_1", "nomeprimo", "surname_1", "email_1", "11111", ucs_1, null);
+        UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Hirer hirer_2 = new Hirer("usercode_2", "nomesecondo", "surname_2", "email_2", "22222", ucs_2, null);
+        UserCredentials ucs_3 = new UserCredentials("usercode_3", "hashed_password_3");
+        Hirer hirer_3 = new Hirer("usercode_3", "nomesecondo", "surname_3", "email_3", "33333", ucs_3, null);
+
+
+        hirers.add(hirer_1);
+        hirers.add(hirer_2);
+        hirers.add(hirer_3);
+
+        ListOfHirers listOfHirers_1 = new ListOfHirers(hirers);
+
+        ListOfHirers listOfHirers_2 = listOfHirers_1;
+
+        ArrayList<Hirer> h = new ArrayList<>();
+        h.add(hirer_2);
+        h.add(hirer_3);
+
+        ListOfHirers listOfHirers_3 = new ListOfHirers(h);
+
+        assertTrue(listOfHirers_1.equals(listOfHirers_2));
+        assertFalse(listOfHirers_1.equals(listOfHirers_3));
+        assertFalse(listOfHirers_1.equals(null));
     }
 }

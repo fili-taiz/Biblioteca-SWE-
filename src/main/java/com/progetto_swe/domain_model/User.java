@@ -1,5 +1,7 @@
 package com.progetto_swe.domain_model;
 
+import java.util.Objects;
+
 public abstract class User {
     protected String userCode;
     protected String name;
@@ -15,6 +17,18 @@ public abstract class User {
         this.email = email;
         this.telephoneNumber = telephoneNumber;
         this.userCredentials = userCredentials;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        User user = (User) o;
+        return (Objects.equals(this.userCode, user.userCode)) && Objects.equals(this.name, user.name) && Objects.equals(this.surname, user.surname) && Objects.equals(this.email, user.email) && Objects.equals(this.telephoneNumber, user.telephoneNumber);
     }
 
     public String getUserCode() { return this.userCode; }

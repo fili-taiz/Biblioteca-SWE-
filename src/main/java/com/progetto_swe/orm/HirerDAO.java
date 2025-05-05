@@ -20,7 +20,7 @@ public class HirerDAO {
             connection = ConnectionManager.getConnection();
             String query
                     = "SELECT * "
-                    + "FROM Hirer H LEFT JOIN Banned_hirer B ON H.user_code=B.user_code "
+                    + "FROM hirer H LEFT JOIN banned_hirers B ON H.user_code=B.user_code "
                     + "WHERE H.user_code = ?;";
 
             PreparedStatement ps = connection.prepareStatement(query);
@@ -34,17 +34,18 @@ public class HirerDAO {
                 return new Hirer(userCode, resultSet.getString("name"), resultSet.getString("surname"),
                         resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate);
             } else{
-                throw new DataAccessException("Error executing query!", null);
+                throw new DataAccessException("There isn't any hirer in the database with usercode = " + userCode, null);
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
     public HashMap<String, String> getSaltAndHashedPassword(String userCode) {
         try {
             connection = ConnectionManager.getConnection();
-            String query = "SELECT HC.salt, HC.hashed_password FROM Hirer_credentials HC WHERE HC.usercode = ?;";
+            String query = "SELECT UC.salt, UC.hashed_password FROM user_credentials UC WHERE UC.user_code = ?;";
 
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
@@ -55,14 +56,15 @@ public class HirerDAO {
                 saltAndHashedPassword.put("hashedPassword", resultSet.getString("hashed_password"));
                 return saltAndHashedPassword;
             }else{
-                throw new DataAccessException("Error executing query!", null);
+                throw new DataAccessException("There is no hirer in the database with usercode = " +userCode, null);
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
-    public boolean addHirer(String userCode, String name, String surname, String email, String telephoneNumber) {
+    public boolean addHirer(String userCode, String name, String surname, String email, String telephoneNumber){
         try {
             connection = ConnectionManager.getConnection();
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
@@ -72,43 +74,35 @@ public class HirerDAO {
             ps.setString(3, surname);
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
         }
+        return false;
     }
 
     public boolean addHirerPassword(String userCode, String hashedPassword, String salt) {
         try {
             connection = ConnectionManager.getConnection();
-            String query = "INSERT INTO User_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
+            String query = "INSERT INTO user_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ps.setString(2, hashedPassword);
             ps.setString(3, salt);
-            if (ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 
-    public ListOfHirers getHirers() {
+    public ListOfHirers getHirers_() {
         ArrayList<Hirer> result = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
-            String query
-                    = "SELECT * FROM Hirer";
+            String query = "SELECT * FROM hirer H JOIN banned_hirers BH ON H.user_code = BH.user_code;";
             PreparedStatement ps = connection.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()){
-                throw new DataAccessException("Error executing query!", null);
-            }
             while (resultSet.next()) {
                 LocalDate unbannedDate = null;
                 if(resultSet.getDate("unbanned_date") != null){
@@ -117,10 +111,13 @@ public class HirerDAO {
                 result.add(new Hirer(resultSet.getString("user_code"), resultSet.getString("name"), resultSet.getString("surname"),
                         resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate));
             }
-            ListOfHirers listOfHirers = new ListOfHirers(result);
-            return listOfHirers;
+            if(result.isEmpty()){
+                throw new DataAccessException("There aren't hirers in the database!", null);
+            }
+            return new ListOfHirers(result);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 

@@ -1,6 +1,7 @@
 package com.progetto_swe.domain_model;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ListOfReservations {
     private ArrayList<Reservation> reservations = new ArrayList<>();
@@ -58,6 +59,23 @@ public class ListOfReservations {
     }
 
     public ArrayList<Reservation> getReservations(){ return this.reservations; }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        ListOfReservations listOfReservations = (ListOfReservations) o;
+        return Objects.equals(this.reservations, listOfReservations.getReservations());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reservations);
+    }
 
     public void setReservations(ArrayList<Reservation> reservations) {
         this.reservations = reservations;

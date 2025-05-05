@@ -1,13 +1,11 @@
 package com.progetto_swe.test_domain_model;
 
 import com.progetto_swe.domain_model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ListOfReservationsTest {
     @Test
@@ -142,6 +140,33 @@ public class ListOfReservationsTest {
 
         assertEquals(result, listOfReservations.getReservationsByItem(book_1));
         assertNotEquals(reservations, listOfReservations.getReservationsByItem(book_1));
+
+    }
+
+    @Test
+    public void testEquals(){
+        Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00000",
+                null, null);
+        Item item_1 = new Magazine(1, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
+        Item item_2 = new Magazine(2, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
+        Reservation reservation_1 = new Reservation(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
+        Reservation reservation_2 = new Reservation(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
+        Reservation reservation_3 = new Reservation(LocalDate.of(2025,5,6), hirer, item_2, Library.LIBRARY_1);
+
+        ArrayList<Reservation> expected_reservations_1 = new ArrayList<>();
+        expected_reservations_1.add(reservation_1);
+        expected_reservations_1.add(reservation_2);
+        expected_reservations_1.add(reservation_3);
+
+        ArrayList<Reservation> expected_reservations_2 = expected_reservations_1;
+
+        ArrayList<Reservation> unexpected_reservations = new ArrayList<>();
+        unexpected_reservations.add(reservation_1);
+
+        assertTrue(expected_reservations_1.equals(expected_reservations_2));
+        assertFalse(expected_reservations_1.equals(unexpected_reservations));
+        assertFalse(expected_reservations_1.equals(null));
+
 
     }
 }

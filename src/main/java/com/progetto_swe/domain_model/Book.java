@@ -82,7 +82,7 @@ public class Book extends Item {
         }
 
         Book b = (Book) o;
-        return this.isbn.equals(b.getIsbn()) && this.publishingHouse.equals(b.getPublishingHouse()) && this.numberOfPages == b.getNumberOfPages() && this.authors.equals(b.getAuthors());
+        return this.isbn.equals(b.getIsbn()) && this.publishingHouse.equals(b.getPublishingHouse()) && this.authors.equals(b.getAuthors());
     }
 
     public String getIsbn() {

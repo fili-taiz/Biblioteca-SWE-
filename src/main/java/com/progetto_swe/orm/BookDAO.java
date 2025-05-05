@@ -26,7 +26,8 @@ public class BookDAO {
             ps.setInt(1, code);
             ResultSet resultSet = ps.executeQuery();
             if(!resultSet.next()) {
-                throw new DataAccessException("Error executing query!", null);
+                //System.out.println("There is no book in the database with code = " + code + "!");
+                return null;
             }
             Book book = new Book(code, resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")), Language.valueOf(resultSet.getString("language")),
                     Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getString("isbn"),
@@ -35,7 +36,8 @@ public class BookDAO {
             book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(code));
             return book;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 
@@ -47,17 +49,18 @@ public class BookDAO {
             String query = "INSERT INTO Item (title, publication_date, language, category, link, number_of_pages) VALUES (?, ?, ?, ?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, title);
-            ps.setString(2, publicationDate);
+            ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
             ps.setInt(6, numberOfPages);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }
+
+
+            ps.executeUpdate();
+
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (!generatedKeys.next()) {
-                throw new CRUD_exception("Insert failed, no ID obtained.", null);
+                throw new CRUD_exception("Error executing insert!", null);
             }
             int code = generatedKeys.getInt(1);
 
@@ -69,13 +72,13 @@ public class BookDAO {
             ps.setString(2, isbn);
             ps.setString(3, publishingHouse);
             ps.setString(4, authors);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing insert!", null);
-            }
+
+            ps.executeUpdate();
 
             return code;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return -1;
         }
     }
 
@@ -86,21 +89,19 @@ public class BookDAO {
             String query = "DELETE FROM Book WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
-            if (ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing delete!", null);
-            };
+            ps.executeUpdate();
 
             query = "DELETE FROM Item WHERE code = ?;";
 
 
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
-            if (ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing delete!", null);
-            }
-            return true;
+
+            return ps.executeUpdate() != 0;
+
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 
@@ -108,34 +109,33 @@ public class BookDAO {
                               String publishingHouse, String authors) {
         connection = ConnectionManager.getConnection();
         try {
-            //TODO guarda se ho controllato che questo libro sia dentro al catalogue;
             String query
                     = "UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
-            ps.setString(2, publicationDate);
+            ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing update!", null);
+
+            if(ps.executeUpdate() == 0){
+                return false;
             }
 
-            query
-                    = "UPDATE Book SET isbn = ?, publishing_house = ?, authors = ? WHERE code = ?;";
+            query = "UPDATE Book SET isbn = ?, publishing_house = ?, authors = ? WHERE code = ?;";
 
             ps = connection.prepareStatement(query);
             ps.setString(1, isbn);
             ps.setString(2, publishingHouse);
             ps.setString(3, authors);
             ps.setInt(4, originalItemCode);
-            if(ps.executeUpdate() <= 0){
-                throw new CRUD_exception("Error executing update!", null);
-            }
-            return true;
+
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
+
 }

@@ -1,18 +1,12 @@
 package com.progetto_swe.orm;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 import com.progetto_swe.domain_model.Admin;
-import com.progetto_swe.domain_model.Catalogue;
-import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.Item;
 import com.progetto_swe.domain_model.Library;
-import com.progetto_swe.domain_model.ListOfHirers;
-import com.progetto_swe.domain_model.UserCredentials;
 import com.progetto_swe.orm.database_exception.CRUD_exception;
 import com.progetto_swe.orm.database_exception.DataAccessException;
-import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
+
 public class AdminDAO {
     private Connection connection;
 
@@ -21,6 +15,7 @@ public class AdminDAO {
     }
 
     public Admin getAdmin(String userCode){
+        connection = ConnectionManager.getConnection();
         try {
             String query  = "SELECT * FROM Admin A WHERE A.user_code = ?";
 
@@ -32,10 +27,10 @@ public class AdminDAO {
                         resultSet.getString("email"), resultSet.getString("telephone_number"),
                         Library.valueOf(resultSet.getString("working_place")), null);
             } else{
-                throw new DataAccessException("Error executing query!", null);
+                throw new DataAccessException("There is no admin in the database with usercode " + userCode + "!", null);
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            throw new CRUD_exception("Error executing query!", e);
         }
     }
 
@@ -51,13 +46,11 @@ public class AdminDAO {
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
             ps.setString(6, workingPlace);
-            if(ps.executeUpdate() > 0){
-                return true;
-            }else{
-                throw new CRUD_exception("Error executing insert!", null);
-            }
+            ps.executeUpdate();
+            return true;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException("Connection error!", e);
+            System.out.println("SQLException: " + e.getMessage());
+            return false;
         }
     }
 }
