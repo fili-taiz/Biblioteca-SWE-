@@ -30,7 +30,7 @@ public class LendingDAOTest {
             Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
             BookDAO bookDAO = new BookDAO();
             MagazineDAO magazineDAO = new MagazineDAO();
-            bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+            bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
             magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50);
 
             HirerDAO hirerDAO = new HirerDAO();
@@ -43,37 +43,80 @@ public class LendingDAOTest {
 
 
             LendingDAO lendingDAO = new LendingDAO();
-            assertTrue(lendingDAO.addLending("uc1", 1, Library.LIBRARY_1.toString()));
-            assertTrue(lendingDAO.addLending("uc1", 2, Library.LIBRARY_2.toString()));
+            lendingDAO.addLending("uc1", 1, Library.LIBRARY_1.toString());
+            lendingDAO.addLending("uc1", 2, Library.LIBRARY_2.toString());
 
 
             ArrayList<Lending> expected_lendings = new ArrayList<>();
 
-            Lending l1 = new Lending(LocalDate.of(2025,4,3), hirer, book, Library.LIBRARY_1);
-            Lending l2 = new Lending(LocalDate.of(2025,4,4), hirer, magazine, Library.LIBRARY_2);
+            Lending l1 = new Lending(LocalDate.now(), hirer, book, Library.LIBRARY_1);
+            Lending l2 = new Lending(LocalDate.now(), hirer, magazine, Library.LIBRARY_2);
 
             expected_lendings.add(l1);
             expected_lendings.add(l2);
 
             ListOfLendings expected_list_of_lendings = new ListOfLendings(expected_lendings);
 
-            ArrayList<Lending> unexpected_lendings = new ArrayList<>();
-            unexpected_lendings.add(l1);
-
-            ListOfLendings unexpected_list_of_lendings = new ListOfLendings(unexpected_lendings);
-
             assertEquals(expected_list_of_lendings.getLendings().size(), lendingDAO.getLendings_().getLendings().size());
-
-
             assertTrue(lendingDAO.getLendings_().getLendings().containsAll(expected_lendings));
 
-            assertNotEquals(unexpected_list_of_lendings.getLendings().size(), lendingDAO.getLendings_().getLendings().size());
-            assertFalse(lendingDAO.getLendings_().getLendings().containsAll(unexpected_lendings));
+            Lending l3 = new Lending(LocalDate.now(), hirer, magazine, Library.LIBRARY_3);
+
+            assertFalse(lendingDAO.getLendings_().getLendings().contains(l3));
+
+        }finally{
+            connection.setAutoCommit(true);
+            connection.close();
+        }
+    }
+
+    @Test
+    public void testAddLending() throws SQLException{
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
+        try{
+            Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
+            Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
+            Lending l1 = new Lending(LocalDate.now(), hirer, book, Library.LIBRARY_1);
+            LendingDAO lendingDAO = new LendingDAO();
+            BookDAO bookDAO = new BookDAO();
+            bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+            HirerDAO hirerDAO = new HirerDAO();
+            hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+            physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
+
+            assertTrue(lendingDAO.addLending("uc1", 1, Library.LIBRARY_1.toString()));
+            assertFalse(lendingDAO.addLending("uc1", 1, Library.LIBRARY_2.toString()));
 
 
 
+        }finally{
+            connection.setAutoCommit(true);
+            connection.close();
+        }
+    }
 
+    @Test
+    public void testRemoveLending() throws SQLException{
+        Connection connection = ConnectionManager.getConnection();
+        connection.setAutoCommit(false);
+        try{
+            Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
+            Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
+            Lending l1 = new Lending(LocalDate.now(), hirer, book, Library.LIBRARY_1);
+            LendingDAO lendingDAO = new LendingDAO();
+            BookDAO bookDAO = new BookDAO();
+            bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+            HirerDAO hirerDAO = new HirerDAO();
+            hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+            physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
 
+            lendingDAO.addLending("uc1", 1, Library.LIBRARY_1.toString());
+            assertTrue(lendingDAO.removeLending("uc1", 1, Library.LIBRARY_1.toString()));
+            assertFalse(lendingDAO.removeLending("uc1", 1, Library.LIBRARY_2.toString()));
+            assertFalse(lendingDAO.removeLending("uc2", 1, Library.LIBRARY_2.toString()));
 
         }finally{
             connection.setAutoCommit(true);

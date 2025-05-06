@@ -20,18 +20,15 @@ public class ReservationDAO {
     public ListOfReservations getReservations_() {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "SELECT * FROM Reservations;";
+            String query = "SELECT * FROM reservation;";
             PreparedStatement ps = connection.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
-            resultSet.next();
             ArrayList<Reservation> reservations = new ArrayList<>();
             while (resultSet.next()) {
 
                 BookDAO bookDAO = new BookDAO();
-                ThesisDAO thesisDAO = new ThesisDAO();
                 MagazineDAO magazineDAO = new MagazineDAO();
                 Book book = bookDAO.getBook(resultSet.getInt("code"));
-                Thesis thesis = thesisDAO.getThesis(resultSet.getInt("code"));
                 Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
 
                 HirerDAO hirerDAO = new HirerDAO();
@@ -39,9 +36,7 @@ public class ReservationDAO {
                 Item item;
                 if(book != null) {
                     item = book;
-                } else if (thesis != null) {
-                    item = thesis;
-                } else if (magazine != null) {
+                }else if (magazine != null) {
                     item = magazine;
                 } else {
                     return null;
@@ -66,8 +61,7 @@ public class ReservationDAO {
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
             ps.setDate(4, java.sql.Date.valueOf(LocalDate.now()));
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             return false;
@@ -82,8 +76,7 @@ public class ReservationDAO {
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() != 0;
 
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());

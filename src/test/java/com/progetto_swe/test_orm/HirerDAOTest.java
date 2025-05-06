@@ -138,7 +138,7 @@ public class HirerDAOTest {
     }
 
     @Test
-    public void testGetHirers() throws SQLException{
+    public void testGetHirers_() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
         connection.setAutoCommit(false);
         try {
@@ -163,14 +163,9 @@ public class HirerDAOTest {
             assertEquals(listOfHirers_e.getHirers().size(), hirerDAO.getHirers_().getHirers().size());
             assertTrue(hirerDAO.getHirers_().getHirers().containsAll(listOfHirers_e.getHirers()));
 
-            ArrayList<Hirer> notExpected = new ArrayList<>();
-            notExpected.add(h1);
-            ListOfHirers listOfHirers_nE = new ListOfHirers(notExpected);
-            assertNotEquals(listOfHirers_nE.getHirers().size(), hirerDAO.getHirers_().getHirers().size());
-            assertFalse(hirerDAO.getHirers_().getHirers().containsAll(listOfHirers_nE.getHirers()));
+            Hirer h3 = new Hirer("uc3", "name3", "surname3", "email3", "telephonenumber3", null, LocalDate.of(2024, 4, 5));
 
-
-
+            assertFalse(hirerDAO.getHirers_().getHirers().contains(h3));
 
         }finally{
             connection.setAutoCommit(true);

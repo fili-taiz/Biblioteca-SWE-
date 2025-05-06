@@ -100,7 +100,7 @@ public class HirerDAO {
         ArrayList<Hirer> result = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
-            String query = "SELECT * FROM hirer H JOIN banned_hirers BH ON H.user_code = BH.user_code;";
+            String query = "SELECT * FROM hirer H LEFT JOIN banned_hirers BH ON H.user_code = BH.user_code;";
             PreparedStatement ps = connection.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
