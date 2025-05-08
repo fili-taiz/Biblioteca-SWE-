@@ -26,7 +26,6 @@ public class CatalogueDAOTest {
     @Test
     public void testGetCatalogueFull() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
             Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
@@ -73,7 +72,6 @@ public class CatalogueDAOTest {
             assertTrue(catalogueDAO.getCatalogue().getItems().containsAll(expectedCatalogue.getItems()));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -81,13 +79,11 @@ public class CatalogueDAOTest {
     @Test
     public void getCatalogueEmpty() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             CatalogueDAO catalogueDAO = new CatalogueDAO();
             assertNull(catalogueDAO.getCatalogue());
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

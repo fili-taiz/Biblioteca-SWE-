@@ -30,7 +30,6 @@ public class AdminDAOTest {
     @Test
     public void testGetAdmin() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
 
         try {
             String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place) " +
@@ -58,11 +57,8 @@ public class AdminDAOTest {
 
             assertThrows(DataAccessException.class, () -> {adminDAO.getAdmin("456");});
 
-            connection.rollback();
 
         }finally {
-            connection.rollback();
-            connection.setAutoCommit(true);
             connection.close();
         }
 
@@ -71,7 +67,6 @@ public class AdminDAOTest {
    @Test
     public void testAddAdmin() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try {
             String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place)"
                     + " VALUES (?, ?, ?, ?, ?, ?);";
@@ -104,11 +99,8 @@ public class AdminDAOTest {
             ps.setString(6, Library.LIBRARY_1.toString());
             assertThrows(PSQLException.class, ps::executeUpdate);
 
-            connection.rollback();
 
         }finally{
-            connection.rollback();
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

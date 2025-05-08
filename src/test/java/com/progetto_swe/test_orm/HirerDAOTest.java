@@ -37,7 +37,6 @@ public class HirerDAOTest {
     @Test
     public void testGetHirer() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try {
             Hirer h1 = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
             Hirer h2 = new Hirer("uc2", "name2", "surname2", "email2", "telephonenumber2", null, LocalDate.of(2024, 4, 3));
@@ -46,7 +45,6 @@ public class HirerDAOTest {
             HirerDAO hirerDAO = new HirerDAO();
 
             hirerDAO.addHirer("uc2", "name2", "surname2", "email2", "telephonenumber2");
-            connection.commit();
 
             hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
 
@@ -56,7 +54,6 @@ public class HirerDAOTest {
             ps.setString(1, "uc2");
             ps.setDate(2, Date.valueOf(LocalDate.of(2024, 4, 3)));
             ps.executeUpdate();
-            connection.commit();
             assertEquals(h2, hirerDAO.getHirer("uc2"));
             assertThrows(DataAccessException.class, () -> {
                 hirerDAO.getHirer("uc3");
@@ -67,7 +64,6 @@ public class HirerDAOTest {
             ps_2.setString(1, "uc2");
             ps_2.executeUpdate();
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -75,7 +71,6 @@ public class HirerDAOTest {
     @Test
     public void testGetSaltAndHashedPassword() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try {
             HirerDAO hirerDAO = new HirerDAO();
             hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
@@ -96,7 +91,6 @@ public class HirerDAOTest {
             });
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -104,16 +98,13 @@ public class HirerDAOTest {
     @Test
     public void testAddHirer() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             HirerDAO hirerDAO = new HirerDAO();
             assertTrue(hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
-            connection.commit();
             assertFalse(hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
 
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -121,17 +112,13 @@ public class HirerDAOTest {
     @Test
     public void testAddHirerPassword() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
-
         try{
             HirerDAO hirerDAO = new HirerDAO();
             hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
-            connection.commit();
             assertTrue(hirerDAO.addHirerPassword("uc1", "hp1", "salt"));
             assertFalse(hirerDAO.addHirerPassword("uc2", "hp2", "salt"));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
 
@@ -140,7 +127,6 @@ public class HirerDAOTest {
     @Test
     public void testGetHirers_() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try {
             Hirer h1 = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
             Hirer h2 = new Hirer("uc2", "name2", "surname2", "email2", "telephonenumber2", null, LocalDate.of(2024, 4, 3));
@@ -152,7 +138,6 @@ public class HirerDAOTest {
             ps.setString(1, "uc2");
             ps.setDate(2, Date.valueOf(LocalDate.of(2024,4,3)));
             ps.executeUpdate();
-            connection.commit();
             ArrayList<Hirer> expected = new ArrayList<>();
             expected.add(h1);
             expected.add(h2);
@@ -168,7 +153,6 @@ public class HirerDAOTest {
             assertFalse(hirerDAO.getHirers_().getHirers().contains(h3));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

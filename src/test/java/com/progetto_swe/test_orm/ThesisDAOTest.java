@@ -28,7 +28,6 @@ public class ThesisDAOTest {
     @Test
     public void testGetThesis() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
 
         try {
             ThesisDAO thesisDAO = new ThesisDAO();
@@ -41,10 +40,8 @@ public class ThesisDAOTest {
 
             assertEquals(thesis_1, thesisDAO.getThesis(thesis_code));
             assertNotEquals(thesis_2, thesisDAO.getThesis(thesis_code));
-            connection.rollback();
 
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -52,7 +49,6 @@ public class ThesisDAOTest {
     @Test
     public void testAddThesis() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
 
             ThesisDAO thesisDAO = new ThesisDAO();
@@ -60,10 +56,8 @@ public class ThesisDAOTest {
 
             assertEquals(thesis_1.getCode(), thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  50, "author1", "supervisors", "university"));
             assertNotEquals(3, thesisDAO.addThesis("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2",  55, "author2", "supervisors", "university"));
-            connection.rollback();
 
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
 
@@ -72,7 +66,6 @@ public class ThesisDAOTest {
     @Test
     public void testUpdateThesis() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
 
             ThesisDAO thesisDAO = new ThesisDAO();
@@ -83,11 +76,9 @@ public class ThesisDAOTest {
             assertTrue(thesisDAO.updateThesis(thesis_1.getCode(), "titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2", "author2", "supervisors", "university"));
             assertFalse(thesisDAO.updateThesis(thesis_2.getCode(), "titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "author2", "supervisors", "university"));
 
-            connection.rollback();
 
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -95,7 +86,6 @@ public class ThesisDAOTest {
     @Test
     public void testRemoveThesis() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             ThesisDAO thesisDAO = new ThesisDAO();
             int thesis_code = thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  50, "author1", "supervisors", "university");
@@ -104,12 +94,7 @@ public class ThesisDAOTest {
             assertFalse(thesisDAO.removeThesis(thesis_2.getCode()));
 
 
-
-            connection.rollback();
-
-
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

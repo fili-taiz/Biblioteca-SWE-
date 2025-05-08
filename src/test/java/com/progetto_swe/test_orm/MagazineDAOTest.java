@@ -27,8 +27,6 @@ public class MagazineDAOTest {
     @Test
     public void testGetMagazine() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
-
         try{
             MagazineDAO magazineDAO = new MagazineDAO();
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
@@ -40,10 +38,8 @@ public class MagazineDAOTest {
 
             assertEquals(magazine_1, magazineDAO.getMagazine(magazine_code));
             assertNotEquals(magazine_2, magazineDAO.getMagazine(magazine_code));
-            connection.rollback();
 
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -51,7 +47,6 @@ public class MagazineDAOTest {
     @Test
     public void testAddMagazine() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
 
             MagazineDAO magazineDAO = new MagazineDAO();
@@ -60,12 +55,7 @@ public class MagazineDAOTest {
             assertEquals(magazine_1.getCode(), magazineDAO.addMagazine("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "publishing house 1", 50));
             assertNotEquals(3, magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2",  "publishing house 2", 55));
 
-
-
-            connection.rollback();
-
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
 
@@ -74,7 +64,6 @@ public class MagazineDAOTest {
     @Test
     public void testUpdateMagazine() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             MagazineDAO magazineDAO = new MagazineDAO();
             Magazine magazine_1 = new Magazine(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", 50, "publishing house 1");
@@ -84,11 +73,8 @@ public class MagazineDAOTest {
             assertTrue(magazineDAO.updateMagazine(magazine_1.getCode(), "titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2", "publishing house 2"));
             assertFalse(magazineDAO.updateMagazine(magazine_2.getCode(), "titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "publishing house 1"));
 
-            connection.rollback();
-
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -96,7 +82,6 @@ public class MagazineDAOTest {
     @Test
     public void testRemoveMagazine() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             MagazineDAO magazineDAO = new MagazineDAO();
             int magazine_code = magazineDAO.addMagazine("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "publishing house 1", 50);
@@ -104,13 +89,7 @@ public class MagazineDAOTest {
             assertTrue(magazineDAO.removeMagazine(magazine_code));
             assertFalse(magazineDAO.removeMagazine(magazine_2.getCode()));
 
-
-
-            connection.rollback();
-
-
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

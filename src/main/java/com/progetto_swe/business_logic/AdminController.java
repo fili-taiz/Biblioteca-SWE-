@@ -25,18 +25,13 @@ public class AdminController {
         String salt = String.valueOf(Math.round(Math.random()*100000));
         String hashedPassword = Hasher.hash(password, salt);
 
-        //controllo non sia gia' presente
-        if(hirerDAO.getHirer(userCode) != null) {
-            return false;
-        }
-
         //avvio transazione per prevenire problemi causati dal successo della sola prima operazione
         ConnectionManager.closeAutoCommit();
         if(!hirerDAO.addHirer(userCode, name, surname, eMail, telephoneNumber)){
             ConnectionManager.rollback();
             return false;
         }
-        if(!hirerDAO.addHirerPassword(userCode, salt, hashedPassword)){
+        if(!hirerDAO.addHirerPassword(userCode, hashedPassword, salt)){
             ConnectionManager.rollback();
             return false;
         }
@@ -73,12 +68,12 @@ public class AdminController {
             ConnectionManager.commit();
             return true;
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return false;
     }
 
-    private boolean addPhysicalCopies(int code, int numberOfCopies, boolean borrowable) {
+    public boolean addPhysicalCopies(int code, int numberOfCopies, boolean borrowable) {
         CatalogueDAO catalogueDAO = new CatalogueDAO();
         Catalogue catalogue = catalogueDAO.getCatalogue();
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
@@ -120,7 +115,7 @@ public class AdminController {
             ConnectionManager.commit();
             return true;
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return false;
     }
@@ -152,7 +147,7 @@ public class AdminController {
             ConnectionManager.commit();
             return true;
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return false;
     }

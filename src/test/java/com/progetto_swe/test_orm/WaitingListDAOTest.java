@@ -26,7 +26,6 @@ public class WaitingListDAOTest {
     @Test
     public void testGetWaitingList() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             ArrayList<String> emails_expected = new ArrayList<>();
             emails_expected.add("email1");
@@ -38,7 +37,6 @@ public class WaitingListDAOTest {
             assertEquals(Collections.EMPTY_LIST, waitingListDAO.getWaitingList(2, Library.LIBRARY_1.toString()));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -46,7 +44,6 @@ public class WaitingListDAOTest {
     @Test
     public void testAddToWaitingList() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             WaitingListDAO waitingListDAO = new WaitingListDAO();
             assertTrue(waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
@@ -54,7 +51,6 @@ public class WaitingListDAOTest {
 
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

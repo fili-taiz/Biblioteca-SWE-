@@ -25,7 +25,6 @@ public class ReservationDAOTest {
     @Test
     public void testGetReservations_() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
             Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
@@ -66,7 +65,6 @@ public class ReservationDAOTest {
             assertFalse(reservationDAO.getReservations_().getReservations().contains(r3));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -74,11 +72,7 @@ public class ReservationDAOTest {
     @Test
     public void testAddReservation() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
-            Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
-            Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
-            Reservation r1 = new Reservation(LocalDate.now(), hirer, book, Library.LIBRARY_1);
             ReservationDAO reservationDAO = new ReservationDAO();
             BookDAO bookDAO = new BookDAO();
             bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
@@ -91,7 +85,6 @@ public class ReservationDAOTest {
             assertFalse(reservationDAO.addReservation("uc1", 1, Library.LIBRARY_2.toString()));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -99,11 +92,7 @@ public class ReservationDAOTest {
     @Test
     public void testRemoveReservation() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
-            Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
-            Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
-            Reservation r1 = new Reservation(LocalDate.now(), hirer, book, Library.LIBRARY_1);
             ReservationDAO reservationDAO = new ReservationDAO();
             BookDAO bookDAO = new BookDAO();
             bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
@@ -118,7 +107,6 @@ public class ReservationDAOTest {
             assertFalse(reservationDAO.removeReservation("uc2", 1, Library.LIBRARY_2.toString()));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

@@ -28,7 +28,6 @@ public class PhysicalCopiesDAOTest {
     @Test
     public void testAddPhysicalCopies() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             BookDAO bookDAO = new BookDAO();
@@ -38,7 +37,6 @@ public class PhysicalCopiesDAOTest {
             assertFalse(physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -46,7 +44,6 @@ public class PhysicalCopiesDAOTest {
     @Test
     public void testRemovePhysicalCopies() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             BookDAO bookDAO = new BookDAO();
@@ -57,7 +54,6 @@ public class PhysicalCopiesDAOTest {
             assertFalse(physicalCopiesDAO.removePhysicalCopies(1, Library.LIBRARY_2.toString()));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -65,7 +61,6 @@ public class PhysicalCopiesDAOTest {
     @Test
     public void testUpdatePhysicalCopies() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             BookDAO bookDAO = new BookDAO();
@@ -76,7 +71,6 @@ public class PhysicalCopiesDAOTest {
             assertFalse(physicalCopiesDAO.updatePhysicalCopies(2, Library.LIBRARY_2.toString(), 14, true));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -84,7 +78,6 @@ public class PhysicalCopiesDAOTest {
     @Test
     public void testGetPhysicalCopies() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try {
             Book b1 = new Book(1, "titolo1", LocalDate.of(2023, 4, 1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1");
             PhysicalCopies pc1 = new PhysicalCopies(10, true);
@@ -102,7 +95,6 @@ public class PhysicalCopiesDAOTest {
             assertEquals(pcExpected, physicalCopiesDAO.getPhysicalCopies(1));
             assertEquals(Collections.emptyMap(),physicalCopiesDAO.getPhysicalCopies(2));
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
 

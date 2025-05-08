@@ -27,7 +27,6 @@ public class BookDAOTest {
     @Test
     public void testGetBook() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
 
         try{
 
@@ -44,7 +43,6 @@ public class BookDAOTest {
             connection.rollback();
 
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -52,7 +50,6 @@ public class BookDAOTest {
     @Test
     public void testAddBook() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
 
             BookDAO bookDAO = new BookDAO();
@@ -63,7 +60,6 @@ public class BookDAOTest {
             connection.rollback();
 
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
 
@@ -72,7 +68,6 @@ public class BookDAOTest {
     @Test
     public void testUpdateBook() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
 
             BookDAO bookDAO = new BookDAO();
@@ -87,7 +82,6 @@ public class BookDAOTest {
 
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -95,7 +89,6 @@ public class BookDAOTest {
     @Test
     public void testRemoveBook() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
 
             BookDAO bookDAO = new BookDAO();
@@ -104,13 +97,7 @@ public class BookDAOTest {
             assertTrue(bookDAO.removeBook(book_code));
             assertFalse(bookDAO.removeBook(book_2.getCode()));
 
-
-
-            connection.rollback();
-
-
         }finally {
-            connection.setAutoCommit(true);
             connection.close();
         }
     }

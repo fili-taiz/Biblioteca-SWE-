@@ -34,7 +34,8 @@ public class HirerDAO {
                 return new Hirer(userCode, resultSet.getString("name"), resultSet.getString("surname"),
                         resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate);
             } else{
-                throw new DataAccessException("There isn't any hirer in the database with usercode = " + userCode, null);
+                System.out.println("There isn't any hirer in the database with usercode = " + userCode);
+                return null;
             }
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());

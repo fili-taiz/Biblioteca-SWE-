@@ -24,7 +24,6 @@ public class LendingDAOTest {
     @Test
     public void testGetLendings() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
             Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
@@ -65,7 +64,6 @@ public class LendingDAOTest {
             assertFalse(lendingDAO.getLendings_().getLendings().contains(l3));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
@@ -73,7 +71,6 @@ public class LendingDAOTest {
     @Test
     public void testAddLending() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
             Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
@@ -89,10 +86,8 @@ public class LendingDAOTest {
             assertTrue(lendingDAO.addLending("uc1", 1, Library.LIBRARY_1.toString()));
             assertFalse(lendingDAO.addLending("uc1", 1, Library.LIBRARY_2.toString()));
 
-
-
         }finally{
-            connection.setAutoCommit(true);
+
             connection.close();
         }
     }
@@ -100,7 +95,6 @@ public class LendingDAOTest {
     @Test
     public void testRemoveLending() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        connection.setAutoCommit(false);
         try{
             Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
             Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
@@ -119,7 +113,6 @@ public class LendingDAOTest {
             assertFalse(lendingDAO.removeLending("uc2", 1, Library.LIBRARY_2.toString()));
 
         }finally{
-            connection.setAutoCommit(true);
             connection.close();
         }
     }
