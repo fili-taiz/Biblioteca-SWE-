@@ -90,5 +90,19 @@ public class AdminTest {
         assertNotEquals(items, admin.advancedSearchItem(catalogue, "analisi_matematica", Category.CATEGORY_1, Language.LANGUAGE_1, true, LocalDate.of(2021, 4, 3 ), LocalDate.of(2025, 4, 5)));
     }
 
+    @Test
+    public void testEquals(){
+        UserCredentials ucs1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Admin admin1 = new Admin("usercode_1", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs1);
+        UserCredentials ucs2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Admin admin2 = new Admin("usercode_2", "name2", "surname2", "email2", "00002", Library.LIBRARY_1, ucs2);
+        UserCredentials ucs3 = new UserCredentials("usercode1", "hashed_password_1");
+        Admin admin3 = new Admin("usercode_1", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs3);
+
+        assertEquals(admin1, admin3);
+        assertNotEquals(admin1, admin2);
+        assertNotEquals(admin1, null);
+    }
+
 }
 

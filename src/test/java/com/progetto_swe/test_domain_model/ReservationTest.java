@@ -32,8 +32,8 @@ public class ReservationTest {
         Reservation reservation_2 = new Reservation(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
         Reservation reservation_3 = new Reservation(LocalDate.of(2025,5,6), hirer, item_2, Library.LIBRARY_1);
 
-        assertTrue(reservation_1.equals(reservation_2));
-        assertFalse(reservation_1.equals(reservation_3));
-        assertFalse(reservation_1.equals(null));
+        assertEquals(reservation_1, reservation_2);
+        assertNotEquals(reservation_1, reservation_3);
+        assertNotEquals(null, reservation_1);
     }
 }

@@ -122,8 +122,6 @@ public class ListOfLendingsTest {
         Hirer hirer_1 = new Hirer("usercode_1", "name_1", "surname_1", "email_1", "12345",
                 ucs_1, null);
         UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
-        Hirer hirer_2 = new Hirer("usercode_2", "name_2", "surname_2", "email_2", "12355",
-                ucs_2, null);
         Book book_1 = new Book(1, "title_1", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
         Book book_2 = new Book(2, "title_2", LocalDate.of(2024, 3, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_2", "isbn_2", "publishing_house_2", 200, "authors_2");
         Lending lending_1 = new Lending(LocalDate.of(2025,4,2), hirer_1, book_1, Library.LIBRARY_1);
@@ -165,9 +163,9 @@ public class ListOfLendingsTest {
         ArrayList<Lending> unexpected_lendings = new ArrayList<>();
         unexpected_lendings.add(lending_1);
 
-        assertTrue(expected_lendings_1.equals(expected_lendings_2));
-        assertFalse(expected_lendings_1.equals(unexpected_lendings));
-        assertFalse(expected_lendings_1.equals(null));
+        assertEquals(expected_lendings_1, expected_lendings_2);
+        assertNotEquals(expected_lendings_1, unexpected_lendings);
+        assertNotEquals(null, expected_lendings_1);
 
 
     }

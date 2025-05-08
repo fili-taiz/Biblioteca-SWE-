@@ -31,6 +31,11 @@ public abstract class User {
         return (Objects.equals(this.userCode, user.userCode)) && Objects.equals(this.name, user.name) && Objects.equals(this.surname, user.surname) && Objects.equals(this.email, user.email) && Objects.equals(this.telephoneNumber, user.telephoneNumber);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(userCode, name, surname, email, telephoneNumber);
+    }
+
     public String getUserCode() { return this.userCode; }
     public String getName() { return this.name; }
     public String getSurname() { return this.surname; }

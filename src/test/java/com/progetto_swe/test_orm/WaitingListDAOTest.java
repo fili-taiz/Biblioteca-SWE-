@@ -26,33 +26,32 @@ public class WaitingListDAOTest {
     @Test
     public void testGetWaitingList() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        try{
-            ArrayList<String> emails_expected = new ArrayList<>();
-            emails_expected.add("email1");
-            emails_expected.add("email2");
-            WaitingListDAO waitingListDAO = new WaitingListDAO();
-            waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1");
-            waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email2");
-            assertEquals(emails_expected, waitingListDAO.getWaitingList(1, Library.LIBRARY_1.toString()));
-            assertEquals(Collections.EMPTY_LIST, waitingListDAO.getWaitingList(2, Library.LIBRARY_1.toString()));
 
-        }finally{
-            connection.close();
-        }
+        ArrayList<String> emails_expected = new ArrayList<>();
+        emails_expected.add("email1");
+        emails_expected.add("email2");
+        WaitingListDAO waitingListDAO = new WaitingListDAO();
+        waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1");
+        waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email2");
+
+        assertEquals(emails_expected, waitingListDAO.getWaitingList(1, Library.LIBRARY_1.toString()));
+        assertEquals(Collections.EMPTY_LIST, waitingListDAO.getWaitingList(2, Library.LIBRARY_1.toString()));
+
+        connection.close();
+
     }
 
     @Test
     public void testAddToWaitingList() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        try{
-            WaitingListDAO waitingListDAO = new WaitingListDAO();
-            assertTrue(waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
-            assertFalse(waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
 
+        WaitingListDAO waitingListDAO = new WaitingListDAO();
 
-        }finally{
-            connection.close();
-        }
+        assertTrue(waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
+        assertFalse(waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
+
+        connection.close();
+
     }
 
 }

@@ -26,65 +26,62 @@ public class CatalogueDAOTest {
     @Test
     public void testGetCatalogueFull() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        try{
-            Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
-            Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
-            Thesis thesis = new Thesis(3, "titolo3", LocalDate.of(2023,3,2), Language.LANGUAGE_1, Category.CATEGORY_1, "link3", 55, "author", "supervisors", "university");
-            BookDAO bookDAO = new BookDAO();
-            MagazineDAO magazineDAO = new MagazineDAO();
-            ThesisDAO thesisDAO = new ThesisDAO();
-            bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
-            magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50);
-            thesisDAO.addThesis("titolo3", LocalDate.of(2023,3,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link3", 55, "author", "supervisors", "university");
-            PhysicalCopies pc1 = new PhysicalCopies(10, true);
-            PhysicalCopies pc2 = new PhysicalCopies(12, true);
-            PhysicalCopies pc3 = new PhysicalCopies(1, false);
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
-            physicalCopiesDAO.addPhysicalCopies(2, Library.LIBRARY_2.toString(), 12, true);
-            physicalCopiesDAO.addPhysicalCopies(3, Library.LIBRARY_3.toString(), 1, false);
 
-            ArrayList<Item> expectedItems = new ArrayList<>();
+        Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
+        Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
+        Thesis thesis = new Thesis(3, "titolo3", LocalDate.of(2023,3,2), Language.LANGUAGE_1, Category.CATEGORY_1, "link3", 55, "author", "supervisors", "university");
+        BookDAO bookDAO = new BookDAO();
+        MagazineDAO magazineDAO = new MagazineDAO();
+        ThesisDAO thesisDAO = new ThesisDAO();
+        bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+        magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50);
+        thesisDAO.addThesis("titolo3", LocalDate.of(2023,3,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link3", 55, "author", "supervisors", "university");
+        PhysicalCopies pc1 = new PhysicalCopies(10, true);
+        PhysicalCopies pc2 = new PhysicalCopies(12, true);
+        PhysicalCopies pc3 = new PhysicalCopies(1, false);
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
+        physicalCopiesDAO.addPhysicalCopies(2, Library.LIBRARY_2.toString(), 12, true);
+        physicalCopiesDAO.addPhysicalCopies(3, Library.LIBRARY_3.toString(), 1, false);
 
-            HashMap <Library, PhysicalCopies> expectedmapbook = new HashMap<>();
-            expectedmapbook.put(Library.LIBRARY_1, pc1);
+        ArrayList<Item> expectedItems = new ArrayList<>();
 
-            HashMap <Library, PhysicalCopies> expectedmapmagazine = new HashMap<>();
-            expectedmapmagazine.put(Library.LIBRARY_2, pc2);
+        HashMap <Library, PhysicalCopies> expectedmapbook = new HashMap<>();
+        expectedmapbook.put(Library.LIBRARY_1, pc1);
 
-            HashMap <Library, PhysicalCopies> expectedmapthesis = new HashMap<>();
-            expectedmapthesis.put(Library.LIBRARY_3, pc3);
+        HashMap <Library, PhysicalCopies> expectedmapmagazine = new HashMap<>();
+        expectedmapmagazine.put(Library.LIBRARY_2, pc2);
 
-            book.setPhysicalCopies(expectedmapbook);
-            magazine.setPhysicalCopies(expectedmapmagazine);
-            thesis.setPhysicalCopies(expectedmapthesis);
+        HashMap <Library, PhysicalCopies> expectedmapthesis = new HashMap<>();
+        expectedmapthesis.put(Library.LIBRARY_3, pc3);
 
-            expectedItems.add(book);
-            expectedItems.add(magazine);
-            expectedItems.add(thesis);
+        book.setPhysicalCopies(expectedmapbook);
+        magazine.setPhysicalCopies(expectedmapmagazine);
+        thesis.setPhysicalCopies(expectedmapthesis);
 
-            Catalogue expectedCatalogue = new Catalogue(expectedItems);
+        expectedItems.add(book);
+        expectedItems.add(magazine);
+        expectedItems.add(thesis);
 
-            CatalogueDAO catalogueDAO = new CatalogueDAO();
+        Catalogue expectedCatalogue = new Catalogue(expectedItems);
 
-            assertEquals(expectedCatalogue.getItems().size(), catalogueDAO.getCatalogue().getItems().size());
+        CatalogueDAO catalogueDAO = new CatalogueDAO();
 
-            assertTrue(catalogueDAO.getCatalogue().getItems().containsAll(expectedCatalogue.getItems()));
+        assertEquals(expectedCatalogue.getItems().size(), catalogueDAO.getCatalogue().getItems().size());
 
-        }finally{
-            connection.close();
-        }
+        assertTrue(catalogueDAO.getCatalogue().getItems().containsAll(expectedCatalogue.getItems()));
+
+        connection.close();
+
     }
 
     @Test
     public void getCatalogueEmpty() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
-        try{
-            CatalogueDAO catalogueDAO = new CatalogueDAO();
-            assertNull(catalogueDAO.getCatalogue());
 
-        }finally{
-            connection.close();
-        }
+        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        assertNull(catalogueDAO.getCatalogue());
+        connection.close();
+
     }
 }

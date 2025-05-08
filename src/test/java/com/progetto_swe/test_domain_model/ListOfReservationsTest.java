@@ -163,9 +163,9 @@ public class ListOfReservationsTest {
         ArrayList<Reservation> unexpected_reservations = new ArrayList<>();
         unexpected_reservations.add(reservation_1);
 
-        assertTrue(expected_reservations_1.equals(expected_reservations_2));
-        assertFalse(expected_reservations_1.equals(unexpected_reservations));
-        assertFalse(expected_reservations_1.equals(null));
+        assertEquals(expected_reservations_1, expected_reservations_2);
+        assertNotEquals(expected_reservations_1, unexpected_reservations);
+        assertNotEquals(null, expected_reservations_1);
 
 
     }

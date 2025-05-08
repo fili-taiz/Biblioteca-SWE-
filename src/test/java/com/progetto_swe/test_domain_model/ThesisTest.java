@@ -69,8 +69,8 @@ public class ThesisTest {
         Item thesis_1 = new Thesis(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "author", "supervisors", "university");
         Item thesis_2 = new Thesis(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "author", "supervisors", "university");
 
-        assertTrue(thesis_1.equals(thesis_2));
-        assertFalse(thesis_2.equals(book));
-        assertFalse(thesis_1.equals(null));
+        assertEquals(thesis_1, thesis_2);
+        assertNotEquals(thesis_2, book);
+        assertNotEquals(null, thesis_1);
     }
 }

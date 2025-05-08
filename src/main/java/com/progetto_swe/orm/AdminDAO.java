@@ -27,7 +27,8 @@ public class AdminDAO {
                         resultSet.getString("email"), resultSet.getString("telephone_number"),
                         Library.valueOf(resultSet.getString("working_place")), null);
             } else{
-                throw new DataAccessException("There is no admin in the database with usercode " + userCode + "!", null);
+                System.out.println("There is no admin in the database with usercode " + userCode + "!");
+                return null;
             }
         } catch (SQLException e) {
             throw new CRUD_exception("Error executing query!", e);

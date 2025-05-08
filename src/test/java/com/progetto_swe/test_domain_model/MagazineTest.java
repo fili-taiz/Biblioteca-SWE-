@@ -64,8 +64,8 @@ public class MagazineTest {
         Item magazine_1 = new Magazine(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
         Item magazine_2 = new Magazine(1, "title", LocalDate.of(2023, 5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
 
-        assertTrue(magazine_1.equals(magazine_2));
-        assertFalse(magazine_2.equals(thesis));
-        assertFalse(magazine_1.equals(null));
+        assertEquals(magazine_1, magazine_2);
+        assertNotEquals(magazine_2, thesis);
+        assertNotEquals(null, magazine_1);
     }
 }

@@ -47,9 +47,9 @@ public class HirerTest {
         Hirer h_3 = new Hirer("usercode3", "name3", "surname3", "email3", "00003",
                 null,LocalDate.of(2025, 5,5));
 
-        assertTrue(h_1.equals(h_2));
-        assertFalse(h_2.equals(h_3));
-        assertFalse(h_2.equals(null));
+        assertEquals(h_1, h_2);
+        assertNotEquals(h_2, h_3);
+        assertNotEquals(null, h_2);
 
     }
 

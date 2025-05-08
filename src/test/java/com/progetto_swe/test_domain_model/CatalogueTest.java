@@ -124,9 +124,9 @@ public class CatalogueTest {
         Catalogue catalogue_2 = new Catalogue(items_2);
         Catalogue catalogue_3 = new Catalogue(items_3);
 
-        assertTrue(catalogue_1.equals(catalogue_2));
-        assertFalse(catalogue_1.equals(catalogue_3));
-        assertFalse(catalogue_1.equals(null));
+        assertEquals(catalogue_1, catalogue_2);
+        assertNotEquals(catalogue_1, catalogue_3);
+        assertNotEquals(null, catalogue_1);
 
 
     }

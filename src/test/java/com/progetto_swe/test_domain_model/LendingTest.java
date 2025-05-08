@@ -32,8 +32,8 @@ public class LendingTest {
         Lending lending_2 = new Lending(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
         Lending lending_3 = new Lending(LocalDate.of(2025,5,6), hirer, item_2, Library.LIBRARY_1);
 
-        assertTrue(lending_1.equals(lending_2));
-        assertFalse(lending_1.equals(lending_3));
-        assertFalse(lending_1.equals(null));
+        assertEquals(lending_1, lending_2);
+        assertNotEquals(lending_1, lending_3);
+        assertNotEquals(null, lending_1);
     }
 }

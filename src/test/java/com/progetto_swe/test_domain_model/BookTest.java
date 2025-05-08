@@ -69,8 +69,8 @@ public class BookTest {
         Item book_1 = new Book(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
         Item book_2 = new Book(1, "title", LocalDate.of(2023,5,6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
 
-        assertTrue(book_1.equals(book_2));
-        assertFalse(book_2.equals(magazine));
-        assertFalse(book_1.equals(null));
+        assertEquals(book_1, book_2);
+        assertNotEquals(book_2, magazine);
+        assertNotEquals(null, book_1);
     }
 }

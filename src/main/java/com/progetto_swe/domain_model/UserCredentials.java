@@ -11,6 +11,23 @@ public class UserCredentials {
         this.hashedPassword = hashedPassword;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if(o == null){
+            return false;
+        }
+        if(o.getClass() != this.getClass()){
+            return false;
+        }
+        UserCredentials ucs = (UserCredentials) o;
+        return Objects.equals(this.userCode, ucs.userCode) && Objects.equals(this.hashedPassword, ucs.hashedPassword);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userCode, hashedPassword);
+    }
+
     public String getUserCode(){ return this.userCode; }
     public String getHashedPassword(){ return this.hashedPassword; }
 

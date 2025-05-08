@@ -1,10 +1,6 @@
 package com.progetto_swe.university_authentication_system;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 
 
@@ -18,8 +14,8 @@ public class UniversityAuthenticationSystem {
     private String username;
     private String password;
     private Connection connection;
+    private final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);
 
-    private final byte[] HEX_ARRAY = "0123456789abdcef".getBytes(StandardCharsets.US_ASCII);
     public String bytesToHex(byte[] bytes) {
         byte[] hexChars = new byte[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
@@ -30,12 +26,13 @@ public class UniversityAuthenticationSystem {
         return new String(hexChars, StandardCharsets.UTF_8);
     }
     private boolean check(String password, String salt, String hashedPassword) {
-        MessageDigest md = null;
+        MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-256");
             String hashed = bytesToHex(md.digest((password+salt).getBytes(StandardCharsets.UTF_8)));
             return hashed.equals(hashedPassword);
         } catch (NoSuchAlgorithmException e) {
+            System.out.println(e.getMessage());
         }
         return false;
     }
@@ -44,11 +41,10 @@ public class UniversityAuthenticationSystem {
         try {
             url = "jdbc:postgresql://localhost:5432/University";
             username = "postgres";
-            password = "HU12HUI26TAO";
+            password = "filipposwe";
             connection = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
+            System.out.println("SQLException: " + e.getMessage());
         }
         return connection;
     }
@@ -60,21 +56,24 @@ public class UniversityAuthenticationSystem {
 
             String query
                     = "SELECT U.salt, U.hashed_password "
-                    + "FROM Univerisity_People U"
-                    + "WHERE U.usercode = '" + userCode + "';";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+                    + "FROM University_People U"
+                    + " WHERE U.user_code = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
             if (!resultSet.next()) {
                 return null;
             }
             if(!check(password, resultSet.getString("salt"), resultSet.getString("hashed_password"))){
                 return null;
             }
-            query
+            String query_2
                     = "SELECT * "
-                    + "FROM Univerisity_People U"
-                    + "WHERE U.usercode = '" + userCode + "'; ";
-            resultSet = statement.executeQuery(query);
+                    + "FROM University_People U"
+                    + " WHERE U.user_code = ?; ";
+            PreparedStatement ps2 = connection.prepareStatement(query_2);
+            ps2.setString(1, userCode);
+            resultSet = ps.executeQuery(query);
             if (resultSet.next()) {
                 hirerInfo.put("userCode", userCode);
                 hirerInfo.put("name", resultSet.getString("name"));
@@ -86,7 +85,7 @@ public class UniversityAuthenticationSystem {
                 return hirerInfo;
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            System.out.println("SQLException: " + e.getMessage());
         }
         return null;
     }
@@ -100,20 +99,23 @@ public class UniversityAuthenticationSystem {
             String query
                     = "SELECT L.salt, L.hashed_password "
                     + "FROM Library_Admin L"
-                    + "WHERE L.usercode = '" + userCode + "';";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+                    + " WHERE L.user_code = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
             if (!resultSet.next()) {
                 return null;
             }
             if(!check(password, resultSet.getString("salt"), resultSet.getString("hashed_password"))){
                 return null;
             }
-            query
+            String query_2
                     = "SELECT * "
                     + "FROM Library_Admin L"
-                    + "WHERE L.usercode = '" + userCode + "'; ";
-            resultSet = statement.executeQuery(query);
+                    + " WHERE L.user_code = ?; ";
+            PreparedStatement ps2 = connection.prepareStatement(query_2);
+            ps2.setString(1, userCode);
+            resultSet = ps2.executeQuery();
             if (resultSet.next()) {
                 adminInfo.put("userCode", userCode);
                 adminInfo.put("name", resultSet.getString("name"));
@@ -126,7 +128,7 @@ public class UniversityAuthenticationSystem {
                 return adminInfo;
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            System.out.println("SQLException: " + e.getMessage());
         }
         return null;
     }

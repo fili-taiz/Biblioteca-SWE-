@@ -21,9 +21,9 @@ public class PhysicalCopiesTest {
         PhysicalCopies pc_3 = new PhysicalCopies(104, true);
         PhysicalCopies pc_4 = new PhysicalCopies(100, false);
 
-        assertTrue(pc_1.equals(pc_2));
-        assertFalse(pc_1.equals(pc_3));
-        assertFalse(pc_1.equals(pc_4));
-        assertFalse(pc_1.equals(null));
+        assertEquals(pc_1, pc_2);
+        assertNotEquals(pc_1, pc_3);
+        assertNotEquals(pc_1, pc_4);
+        assertNotEquals(null, pc_1);
     }
 }

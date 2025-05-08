@@ -92,8 +92,8 @@ public class ListOfHirersTest {
 
         ListOfHirers listOfHirers_3 = new ListOfHirers(h);
 
-        assertTrue(listOfHirers_1.equals(listOfHirers_2));
-        assertFalse(listOfHirers_1.equals(listOfHirers_3));
-        assertFalse(listOfHirers_1.equals(null));
+        assertEquals(listOfHirers_1, listOfHirers_2);
+        assertNotEquals(listOfHirers_1, listOfHirers_3);
+        assertNotEquals(null, listOfHirers_1);
     }
 }

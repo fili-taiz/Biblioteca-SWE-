@@ -14,7 +14,7 @@ public class LoginAdminController{
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
 
         //ottengo informazioni di questo Admin se la password combacia con quella nel database universitario
-        HashMap<String, String> adminInfo = authenticationSystem.getUniversityPeople(userCode, password);
+        HashMap<String, String> adminInfo = authenticationSystem.getLibraryAdmin(userCode, password);
 
         //non riconosciuto dall'università
         if (adminInfo == null) {
