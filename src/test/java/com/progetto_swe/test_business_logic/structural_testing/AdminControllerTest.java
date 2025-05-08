@@ -1,4 +1,4 @@
-package com.progetto_swe.test_business_logic.unit_testing;
+package com.progetto_swe.test_business_logic.structural_testing;
 
 import com.progetto_swe.business_logic.AdminController;
 import com.progetto_swe.business_logic.Hasher;
@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
