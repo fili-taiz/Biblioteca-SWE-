@@ -16,8 +16,9 @@ public class LoginUniversityHirerController {
         //ottengo informazioni di questo UniversityHirer se la password combacia con quella nel database universitario
         HashMap<String, String> hirerInfo = authenticationSystem.getUniversityPeople(userCode, password);
 
+
         //non riconosciuto dall'università
-        if (hirerInfo.isEmpty()) {
+        if (hirerInfo == null) {
             return null;
         }
         //TODO implementare grafica controllo che non sia nullo

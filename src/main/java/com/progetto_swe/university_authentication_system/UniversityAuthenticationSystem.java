@@ -73,7 +73,7 @@ public class UniversityAuthenticationSystem {
                     + " WHERE U.user_code = ?; ";
             PreparedStatement ps2 = connection.prepareStatement(query_2);
             ps2.setString(1, userCode);
-            resultSet = ps.executeQuery(query);
+            resultSet = ps2.executeQuery();
             if (resultSet.next()) {
                 hirerInfo.put("userCode", userCode);
                 hirerInfo.put("name", resultSet.getString("name"));

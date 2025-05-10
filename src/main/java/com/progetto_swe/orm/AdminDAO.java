@@ -47,8 +47,7 @@ public class AdminDAO {
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
             ps.setString(6, workingPlace);
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             return false;

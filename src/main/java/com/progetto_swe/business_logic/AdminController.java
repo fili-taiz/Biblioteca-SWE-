@@ -69,6 +69,7 @@ public class AdminController {
             return true;
         } catch (Exception e) {
             e.getMessage();
+            e.printStackTrace();
         }
         return false;
     }
@@ -116,6 +117,7 @@ public class AdminController {
             return true;
         } catch (Exception e) {
             e.getMessage();
+            e.printStackTrace();
         }
         return false;
     }
@@ -148,6 +150,7 @@ public class AdminController {
             return true;
         } catch (Exception e) {
             e.getMessage();
+            e.printStackTrace();
         }
         return false;
     }
@@ -312,9 +315,6 @@ public class AdminController {
         ListOfHirers hirers = hirerDAO.getHirers_();
         ReservationDAO reservationDAO = new ReservationDAO();
         LendingDAO lendingDAO = new LendingDAO();
-        if(hirers.getHirer(hirer.getUserCode()) == null){
-            return false;
-        }
         if(hirers.getHirer(hirer.getUserCode()).getUnbannedDate() != null){
             return false;
         }
@@ -356,7 +356,7 @@ public class AdminController {
         if(item == null){
             return false;
         }
-        if(reservationDAO.getReservations_().haveReservation(reservation)){
+        if(!reservationDAO.getReservations_().haveReservation(reservation)){
             return false;
         }
 
@@ -398,7 +398,7 @@ public class AdminController {
             return false;
         }
 
-        /*cancella reservation */
+        /*cancella lending */
         if(lendingDAO.removeLending(lending.getHirer().getUserCode(), lending.getItem().getCode(), lending.getStoragePlace().name())) {
             WaitingListDAO waitingListDAO = new WaitingListDAO();
             ArrayList<String> emails = waitingListDAO.getWaitingList(lending.getItem().getCode(), lending.getStoragePlace().toString());

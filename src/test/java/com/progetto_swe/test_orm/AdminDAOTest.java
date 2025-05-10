@@ -54,7 +54,7 @@ public class AdminDAOTest {
         assertEquals(admin.getTelephoneNumber(), "333");
         assertEquals(admin.getWorkingPlace(), Library.LIBRARY_1);
 
-        assertThrows(DataAccessException.class, () -> {adminDAO.getAdmin("456");});
+        assertNull(adminDAO.getAdmin("456"));
         connection.close();
 
 
