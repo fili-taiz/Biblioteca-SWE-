@@ -65,12 +65,12 @@ public class HirerController {
 
     public ArrayList<Lending> getLendings(){
         LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.getLendings_().getLendingsByHirer(this.hirer);
+        return lendingDAO.getLendingsByUserCode(this.hirer.getUserCode());
     }
 
     public ArrayList<Reservation> getReservation(){
         ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.getReservations_().getReservationsByHirer(this.hirer);
+        return reservationDAO.getReservationsByUserCode(this.hirer.getUserCode());
     }
 
     public ListOfReservations getListOfReservation() {
