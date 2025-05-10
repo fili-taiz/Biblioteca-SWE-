@@ -39,6 +39,7 @@ code INTEGER,
 storage_place VARCHAR(64),
 number_of_copies INTEGER,
 borrowable BOOLEAN,
+number_of_available_copies INTEGER,
 PRIMARY KEY(code, storage_place),
 FOREIGN KEY (code) REFERENCES Item (code)
 );
@@ -76,6 +77,7 @@ user_code VARCHAR(32),
 code INTEGER,
 storage_place VARCHAR(64),
 lending_date DATE,
+maturity_date DATE,
 PRIMARY KEY(user_code, code, storage_place),
 FOREIGN KEY (user_code) REFERENCES Hirer(user_code),
 FOREIGN KEY (code, storage_place) REFERENCES Physical_Copies(code, storage_place)
