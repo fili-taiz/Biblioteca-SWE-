@@ -44,11 +44,11 @@ public class CatalogueTest {
 
     @Test
     public void testSearchItem(){
-        PhysicalCopies pcs_1 = new PhysicalCopies(0, true);
-        PhysicalCopies pcs_2 = new PhysicalCopies(4, true);
-        PhysicalCopies pcs_3 = new PhysicalCopies(5, true);
-        PhysicalCopies pcs_4 = new PhysicalCopies(3, true);
-        PhysicalCopies pcs_5 = new PhysicalCopies(4, true);
+        PhysicalCopies pcs_1 = new PhysicalCopies(0, 0, true);
+        PhysicalCopies pcs_2 = new PhysicalCopies(4, 4, true);
+        PhysicalCopies pcs_3 = new PhysicalCopies(5, 5, true);
+        PhysicalCopies pcs_4 = new PhysicalCopies(3, 3, true);
+        PhysicalCopies pcs_5 = new PhysicalCopies(4, 4, true);
         HashMap<Library, PhysicalCopies> pcs = new HashMap<>();
         pcs.put(Library.LIBRARY_1, pcs_1);
         pcs.put(Library.LIBRARY_2, pcs_2);
@@ -75,11 +75,11 @@ public class CatalogueTest {
 
     @Test
     public void testAdvancedSearchItem(){
-        PhysicalCopies pcs_1 = new PhysicalCopies(0, true);
-        PhysicalCopies pcs_2 = new PhysicalCopies(4, true);
-        PhysicalCopies pcs_3 = new PhysicalCopies(5, true);
-        PhysicalCopies pcs_4 = new PhysicalCopies(3, true);
-        PhysicalCopies pcs_5 = new PhysicalCopies(4, true);
+        PhysicalCopies pcs_1 = new PhysicalCopies(0, 0, true);
+        PhysicalCopies pcs_2 = new PhysicalCopies(4, 4, true);
+        PhysicalCopies pcs_3 = new PhysicalCopies(5, 5, true);
+        PhysicalCopies pcs_4 = new PhysicalCopies(3, 3, true);
+        PhysicalCopies pcs_5 = new PhysicalCopies(4, 4, true);
         HashMap<Library, PhysicalCopies> pcs = new HashMap<>();
         pcs.put(Library.LIBRARY_1, pcs_1);
         pcs.put(Library.LIBRARY_2, pcs_2);

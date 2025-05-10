@@ -83,4 +83,37 @@ public class ReservationDAO {
             return false;
         }
     }
+
+    public ArrayList<Reservation> getReservationsByUserCode(String userCode) {
+        this.connection = ConnectionManager.getConnection();
+        try {
+            String query = "SELECT * FROM Reservation R WHERE R.user_code = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
+            ArrayList<Reservation> reservations = new ArrayList<>();
+            while (resultSet.next()) {
+                BookDAO bookDAO = new BookDAO();
+                MagazineDAO magazineDAO = new MagazineDAO();
+                Book book = bookDAO.getBook(resultSet.getInt("code"));
+                Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
+
+                HirerDAO hirerDAO = new HirerDAO();
+                Hirer hirer = hirerDAO.getHirer(userCode);
+                Item item;
+                if (book != null) {
+                    item = book;
+                } else if (magazine != null) {
+                    item = magazine;
+                } else {
+                    return null;
+                }
+                reservations.add(new Reservation(resultSet.getDate("lending_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
+            }
+            return reservations;
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
+        }
+    }
 }

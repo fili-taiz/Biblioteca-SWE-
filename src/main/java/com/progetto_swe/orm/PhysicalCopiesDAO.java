@@ -21,12 +21,13 @@ public class PhysicalCopiesDAO {
     public boolean addPhysicalCopies(int code, String storagePlace, int numberOfCopies, boolean borrowable){
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable) VALUES (?, ?, ?, ?);";
+            String query = "INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable, nuber_of_available_copies) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
             ps.setString(2, storagePlace);
             ps.setInt(3, numberOfCopies);
             ps.setBoolean(4, borrowable);
+            ps.setInt(5, numberOfCopies);
             return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
@@ -51,12 +52,12 @@ public class PhysicalCopiesDAO {
     public boolean updatePhysicalCopies(int code, String storagePlace, int newNumberOfCopies, boolean borrowable) {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "UPDATE physical_copies SET number_of_copies = ? WHERE code = ? AND storage_place = ? AND borrowable = ?; ";
+            String query = "UPDATE physical_copies SET number_of_copies = ?, borrowable = ? WHERE code = ? AND storage_place = ?; ";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, newNumberOfCopies);
-            ps.setInt(2, code);
-            ps.setString(3, storagePlace);
-            ps.setBoolean(4, borrowable);
+            ps.setBoolean(2, borrowable);
+            ps.setInt(3, code);
+            ps.setString(4, storagePlace);
             return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
@@ -73,7 +74,7 @@ public class PhysicalCopiesDAO {
             ResultSet copiesSet = ps.executeQuery();
             HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
             while (copiesSet.next()) {
-                physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
+                physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getInt("number_of_available_copies"), copiesSet.getBoolean("borrowable")));
             }
             return physicalCopies;
         } catch (SQLException e) {

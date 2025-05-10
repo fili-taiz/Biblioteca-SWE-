@@ -20,7 +20,6 @@ public class LoginAdminController{
         if (adminInfo == null) {
             return null;
         }
-        //TODO implementare grafica controllo che non sia nullo
 
         //ottengo informazioni di questo Admin nel database bibliotecario
         AdminDAO adminDAO = new AdminDAO();

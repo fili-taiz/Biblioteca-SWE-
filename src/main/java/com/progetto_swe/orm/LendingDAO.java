@@ -27,6 +27,7 @@ public class LendingDAO {
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
             ps.setDate(4, java.sql.Date.valueOf(LocalDate.now()));
+            ps.setDate(4, java.sql.Date.valueOf(LocalDate.now().plusMonths(1)));
             return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
@@ -57,7 +58,7 @@ public class LendingDAO {
                 } else {
                     return null;
                 }
-                lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
+                lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
             }
             return new ListOfLendings(lendings);
 
@@ -79,6 +80,39 @@ public class LendingDAO {
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             return false;
+        }
+    }
+
+    public ArrayList<Lending> getLendingsByUserCode(String userCode) {
+        this.connection = ConnectionManager.getConnection();
+        try {
+            String query = "SELECT * FROM lending L WHERE L.user_code = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, userCode);
+            ResultSet resultSet = ps.executeQuery();
+            ArrayList<Lending> lendings = new ArrayList<>();
+            while (resultSet.next()) {
+                BookDAO bookDAO = new BookDAO();
+                MagazineDAO magazineDAO = new MagazineDAO();
+                Book book = bookDAO.getBook(resultSet.getInt("code"));
+                Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
+
+                HirerDAO hirerDAO = new HirerDAO();
+                Hirer hirer = hirerDAO.getHirer(userCode);
+                Item item;
+                if(book != null) {
+                    item = book;
+                } else if (magazine != null) {
+                    item = magazine;
+                } else {
+                    return null;
+                }
+                lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
+            }
+            return lendings;
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 }

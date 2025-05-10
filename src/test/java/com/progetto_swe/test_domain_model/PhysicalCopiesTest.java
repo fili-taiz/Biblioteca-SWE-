@@ -8,7 +8,7 @@ public class PhysicalCopiesTest {
 
     @Test
     public void testConstructor(){
-        PhysicalCopies pc = new PhysicalCopies(100, true);
+        PhysicalCopies pc = new PhysicalCopies(100, 100, true);
 
         assertEquals(100, pc.getNumberOfPhysicalCopies());
         assertTrue(pc.isBorrowable());
@@ -16,10 +16,10 @@ public class PhysicalCopiesTest {
 
     @Test
     public void testEquals(){
-        PhysicalCopies pc_1 = new PhysicalCopies(100, true);
-        PhysicalCopies pc_2 = new PhysicalCopies(100, true);
-        PhysicalCopies pc_3 = new PhysicalCopies(104, true);
-        PhysicalCopies pc_4 = new PhysicalCopies(100, false);
+        PhysicalCopies pc_1 = new PhysicalCopies(100, 100, true);
+        PhysicalCopies pc_2 = new PhysicalCopies(100, 100, true);
+        PhysicalCopies pc_3 = new PhysicalCopies(104, 104, true);
+        PhysicalCopies pc_4 = new PhysicalCopies(100, 104, false);
 
         assertEquals(pc_1, pc_2);
         assertNotEquals(pc_1, pc_3);

@@ -69,7 +69,7 @@ public class CatalogueDAO {
                 ResultSet copiesSet = ps.executeQuery();
                 physicalCopies = new HashMap<>();
                 while (copiesSet.next()) {
-                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getBoolean("borrowable")));
+                    physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getInt("number_of_available_copies"), copiesSet.getBoolean("borrowable")));
                 }
                 item.setPhysicalCopies(physicalCopies);
             }

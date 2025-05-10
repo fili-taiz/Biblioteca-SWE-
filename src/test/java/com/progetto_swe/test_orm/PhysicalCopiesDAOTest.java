@@ -76,8 +76,8 @@ public class PhysicalCopiesDAOTest {
         Connection connection = ConnectionManager.getConnection();
 
         Book b1 = new Book(1, "titolo1", LocalDate.of(2023, 4, 1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1");
-        PhysicalCopies pc1 = new PhysicalCopies(10, true);
-        PhysicalCopies pc2 = new PhysicalCopies(12, true);
+        PhysicalCopies pc1 = new PhysicalCopies(10, 10, true);
+        PhysicalCopies pc2 = new PhysicalCopies(12, 12, true);
         HashMap<Library, PhysicalCopies> pcExpected = new HashMap<>();
         pcExpected.put(Library.LIBRARY_1, pc1);
         pcExpected.put(Library.LIBRARY_2, pc2);
