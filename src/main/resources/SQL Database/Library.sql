@@ -97,3 +97,11 @@ unbanned_date DATE,
 PRIMARY KEY(user_code),
 FOREIGN KEY (user_code) REFERENCES Hirer(user_code)
 );
+
+CREATE TABLE IF NOT EXISTS waiting_list(
+code integer,
+storage_place VARCHAR(64),
+email VARCHAR(128),
+PRIMARY KEY (code),
+FOREIGN KEY(code, storage_place) REFERENCES physical_copies (code, storage_place)
+);
