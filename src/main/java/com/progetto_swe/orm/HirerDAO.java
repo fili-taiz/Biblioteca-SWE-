@@ -65,7 +65,7 @@ public class HirerDAO {
         }
     }
 
-    public boolean addHirer(String userCode, String name, String surname, String email, String telephoneNumber){
+    public void addHirer(String userCode, String name, String surname, String email, String telephoneNumber){
         try {
             connection = ConnectionManager.getConnection();
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
@@ -75,14 +75,14 @@ public class HirerDAO {
             ps.setString(3, surname);
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
+            //ipotetica eccezione
         }
-        return false;
     }
 
-    public boolean addHirerPassword(String userCode, String hashedPassword, String salt) {
+    public void addHirerPassword(String userCode, String hashedPassword, String salt) {
         try {
             connection = ConnectionManager.getConnection();
             String query = "INSERT INTO user_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
@@ -90,14 +90,14 @@ public class HirerDAO {
             ps.setString(1, userCode);
             ps.setString(2, hashedPassword);
             ps.setString(3, salt);
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false; TODO ipotetica eccezione
         }
     }
 
-    public ListOfHirers getHirers_() {
+    public ArrayList<Hirer> getHirers_() {
         ArrayList<Hirer> result = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
@@ -115,10 +115,10 @@ public class HirerDAO {
             if(result.isEmpty()){
                 throw new DataAccessException("There aren't hirers in the database!", null);
             }
-            return new ListOfHirers(result);
+            return result;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return null;
+            return null; //TODO ipotetica eccezione
         }
     }
 

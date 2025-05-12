@@ -4,7 +4,7 @@ package com.progetto_swe.business_logic;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.UserCredentials;
+import com.progetto_swe.domain_model.Token;
 import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
@@ -29,15 +29,14 @@ public class LoginUniversityHirerController {
 
         //riconosciuto dall'università ma è la prima volta che esegue login
         if (hirer == null){ 
-            if (!hirerDAO.addHirer(userCode, hirerInfo.get("name"), hirerInfo.get("surname"), hirerInfo.get("email"), hirerInfo.get("telephoneNumber"))) {
-                //Aggiunta nel db fallito
-                return null; 
-            }
+            hirerDAO.addHirer(userCode, hirerInfo.get("name"), hirerInfo.get("surname"), hirerInfo.get("email"), hirerInfo.get("telephoneNumber"));
+            //TODO Aggiunta nel db fallito lanciata eccezioen
+
             hirer = hirerDAO.getHirer(userCode);
         }
 
         //aggiunta credenziali
-        hirer.setUserCredentials(new UserCredentials(userCode, hirerInfo.get("hashedPassword")));
+        hirer.setToken(new Token(hirer));
 
         //riconosciuto dal sistema universitario e presente nel database della biblioteca
         return hirer;

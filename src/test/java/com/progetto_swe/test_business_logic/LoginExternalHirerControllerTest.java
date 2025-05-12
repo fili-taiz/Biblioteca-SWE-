@@ -2,7 +2,7 @@ package com.progetto_swe.test_business_logic;
 
 import com.progetto_swe.business_logic.LoginExternalHirerController;
 import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.UserCredentials;
+import com.progetto_swe.domain_model.Token;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.HirerDAO;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +35,7 @@ public class LoginExternalHirerControllerTest {
         hirerDAO.addHirerPassword("7657382", "2e1e47f4c48f13c8d8e43957d5578af8ec128764134875dd400f6a2ae34d858b", "605674");
         LoginExternalHirerController loginExternalHirerController = new LoginExternalHirerController();
 
-        UserCredentials ucs = new UserCredentials("7657382", "2e1e47f4c48f13c8d8e43957d5578af8ec128764134875dd400f6a2ae34d858b");
+        Token ucs = new Token("7657382", "2e1e47f4c48f13c8d8e43957d5578af8ec128764134875dd400f6a2ae34d858b");
 
         Hirer hirer = new Hirer("7657382", "Mario", "Rossi", "mario.rossi@mail.com", "03400", ucs, null);
 
@@ -53,7 +53,7 @@ public class LoginExternalHirerControllerTest {
         hirerDAO.addHirerPassword("7657382", "2e1e47f4c48f13c8d8e43957d5578af8ec128764134875dd400f6a2ae34d858b", "605674");
         LoginExternalHirerController loginExternalHirerController = new LoginExternalHirerController();
 
-        UserCredentials ucs = new UserCredentials("7657382", "2e1e47f4c48f13c8d8e43957d5578af8ec128764134875dd400f6a2ae34d858b");
+        Token ucs = new Token("7657382", "2e1e47f4c48f13c8d8e43957d5578af8ec128764134875dd400f6a2ae34d858b");
 
         Hirer hirer = new Hirer("7657382", "Mario", "Rossi", "mario.rossi@mail.com", "03400", ucs, null);
 

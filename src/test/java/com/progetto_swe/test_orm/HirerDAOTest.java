@@ -1,7 +1,6 @@
 package com.progetto_swe.test_orm;
 
 import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.ListOfHirers;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.database_exception.DataAccessException;

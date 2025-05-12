@@ -14,72 +14,52 @@ public class HirerController {
         this.hirer = hirer;
     }
 
-    public ArrayList<Item> searchItem(String keyWords, Category category ){
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
-        Catalogue catalogue = catalogueDAO.getCatalogue();
-        return hirer.searchItem(catalogue, keyWords, category);
-    }
-
-    public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate){
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
-        Catalogue catalogue = catalogueDAO.getCatalogue();
-        return catalogue.advancedSearchItem(keywords, category, language, borrowable, startDate, endDate);
-    }
-
-    public boolean addInWaitingList(Item item, String storagePlace){
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
-        if(catalogueDAO.getCatalogue().contains(item) == -1){
-            return false;
+    public void addInWaitingList(Item item, Library storagePlace){
+        if(item.getLibraryPhysicalCopies(storagePlace).isBorrowable()){
+            return; //TODO eccezione
         }
         WaitingListDAO waitingListDAO = new WaitingListDAO();
-        return waitingListDAO.addToWaitingList(item.getCode(), storagePlace, this.hirer.getEmail());
+        waitingListDAO.addToWaitingList(item.getCode(), storagePlace.toString(), this.hirer.getEmail());
     }
 
-    public boolean reserveItem(Item item, Library storagePlace){
-        if(this.hirer.getUnbannedDate() != null){
-            return false;
+    public ArrayList<Hirer> searchHirer(String keywords) {
+        HirerDAO hirerDAO = new HirerDAO();
+        ArrayList<Hirer> hirers = hirerDAO.getHirers_();
+        ArrayList<Hirer> result = new ArrayList<>();
+        for(Hirer h : hirers){
+            if(!h.contains(keywords)){
+                result.add(h);
+            }
         }
-        ReservationDAO reservationDAO = new ReservationDAO();
-        if(reservationDAO.addReservation(this.hirer.getUserCode(), item.getCode(), storagePlace.name())){
-            MailSender.sendReservationSuccessMail(this.hirer.getEmail(), this.hirer.getUserCode(), item.getCode(), item.getTitle(), storagePlace.toString(), LocalDate.now().plusDays(7));
-            return true;
+        return result;
+    }
+
+    //la password non è inserita dall'utente è il codice di verifica dell'email ottenuto in fase di registrazione
+    public void registerExternalHirer(String password, String name, String surname, String eMail, String telephoneNumber, Token token) {
+        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+            //TODO lancia eccezione
         }
-        return false;
-    }
+        HirerDAO hirerDAO = new HirerDAO();
+        String userCode = "";
+        do { //generazione codice univoco per chiave primaria con prefisso E per non occupare future possibili matricole
+            userCode = "E" + Math.round((Math.random() * 1000000));
+        } while (hirerDAO.getHirer(userCode) != null);
+        String salt = String.valueOf(Math.round(Math.random()*100000));
+        String hashedPassword = Hasher.hashPassword(password, salt);
 
-    public boolean removeReservation(Reservation reservation){
-        ReservationDAO reservationDAO = new ReservationDAO();
-        ListOfReservations listOfReservations = reservationDAO.getReservations_();
+        //avvio transazione per prevenire problemi causati dal successo della sola prima operazione
+        ConnectionManager.closeAutoCommit();
 
-        if(!listOfReservations.haveReservation(reservation)){
-            return false;
+        try {hirerDAO.addHirer(userCode, name, surname, eMail, telephoneNumber);} catch (Exception e){
+            ConnectionManager.rollback(); //TODO throw
         }
 
-        if(reservation.getHirer()!=this.hirer){
-            return false;
+        try {hirerDAO.addHirerPassword(userCode, hashedPassword, salt);
+            ConnectionManager.commit();
+        } catch (Exception e){
+            ConnectionManager.rollback();
+            //return false;//TODO throw
         }
-
-        reservationDAO.removeReservation(this.hirer.getUserCode(), reservation.getItem().getCode(), reservation.getStoragePlace().toString());
-        return true;
     }
 
-    public ArrayList<Lending> getLendings(){
-        LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.getLendingsByUserCode(this.hirer.getUserCode());
-    }
-
-    public ArrayList<Reservation> getReservation(){
-        ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.getReservationsByUserCode(this.hirer.getUserCode());
-    }
-
-    public ListOfReservations getListOfReservation() {
-        ReservationDAO reservationDAO = new ReservationDAO();
-        return reservationDAO.getReservations_();
-    }
-
-    public ListOfLendings getListOfLending() {
-        LendingDAO lendingDAO = new LendingDAO();
-        return lendingDAO.getLendings_();
-    }
 }

@@ -4,7 +4,7 @@ package com.progetto_swe.business_logic;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.Admin;
-import com.progetto_swe.domain_model.UserCredentials;
+import com.progetto_swe.domain_model.Token;
 import com.progetto_swe.orm.AdminDAO;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
@@ -27,15 +27,14 @@ public class LoginAdminController{
 
         //riconosciuto dall'università ma è la prima volta che esegue login
         if (admin == null){
-            if (!adminDAO.addAdmin(userCode, adminInfo.get("name"), adminInfo.get("surname"), adminInfo.get("email"), adminInfo.get("telephoneNumber"), adminInfo.get("workingPlace"))) {
-                //Aggiunta nel db fallito
-                return null; 
-            }
+            adminDAO.addAdmin(userCode, adminInfo.get("name"), adminInfo.get("surname"), adminInfo.get("email"), adminInfo.get("telephoneNumber"), adminInfo.get("workingPlace"));
+                //TODO Aggiunta nel db fallito lanciata eccezioen
+
             admin = adminDAO.getAdmin(userCode);
         }
 
         //aggiunta credenziali
-        admin.setUserCredentials(new UserCredentials(userCode, adminInfo.get("hashedPassword")));
+        admin.setToken(new Token(admin));
 
         //riconosciuto dal sistema universitario e presente nel database della biblioteca
         return admin;

@@ -2,6 +2,7 @@ package com.progetto_swe.orm;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
@@ -16,7 +17,7 @@ public class ThesisDAO {
     public ThesisDAO() {
         this.connection = ConnectionManager.getConnection();
     }
-
+//TODO guarda BookDAO
     public Thesis getThesis(int code) {
         try {
             connection = ConnectionManager.getConnection();
@@ -77,7 +78,7 @@ public class ThesisDAO {
         }
     }
 
-    public boolean removeThesis(int code) {
+    public void removeThesis(int code) {
 
         connection = ConnectionManager.getConnection();
         try {
@@ -85,22 +86,22 @@ public class ThesisDAO {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            if(ps.executeUpdate() == 0){
-                return false;
-            }
+            //if(ps.executeUpdate() == 0){
+            //    return false;
+            //}
 
             query = "DELETE FROM Item WHERE code = ?;";
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false;
         }
     }
 
-    public boolean updateThesis(int originalItemCode,String title, String publicationDate, String language, String category, String link, String author,
+    public void updateThesis(int originalItemCode,String title, String publicationDate, String language, String category, String link, String author,
                                 String supervisors, String university) {
         connection = ConnectionManager.getConnection();
         try {
@@ -114,9 +115,9 @@ public class ThesisDAO {
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
 
-            if(ps.executeUpdate() == 0){
-                return false;
-            }
+            //if(ps.executeUpdate() == 0){
+            //    return false;
+            //}
 
             query = "UPDATE Thesis SET author = ?, supervisors = ?, university = ? WHERE code = ?;";;
             ps = connection.prepareStatement(query);
@@ -125,10 +126,54 @@ public class ThesisDAO {
             ps.setString(3, university);
             ps.setInt(4, originalItemCode);
 
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false;
+        }
+    }
+
+    public ArrayList<Thesis> getAllThesis() {
+        ArrayList<Thesis> thesis = new ArrayList<>();
+        HashMap<Library, PhysicalCopies> physicalCopies;
+        connection = ConnectionManager.getConnection();
+        try {
+            //tutti i thesis
+            String query
+                    = "SELECT * FROM Item I JOIN Thesis T ON I.code = T.code";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                thesis.add(new Thesis(
+                        resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
+                        Language.valueOf(resultSet.getString("language")),
+                        Category.valueOf(resultSet.getString("category")),
+                        resultSet.getString("link"),
+                        resultSet.getInt("number_of_pages"),
+                        resultSet.getString("author"),
+                        resultSet.getString("supervisors"),
+                        resultSet.getString("university")));
+            }
+
+            for(Thesis t : thesis){
+                String query_2 = "SELECT * FROM physical_copies P WHERE P.code = ?;";
+                ps = connection.prepareStatement(query_2);
+                ps.setInt(1, t.getCode());
+                ResultSet copiesSet = ps.executeQuery();
+                physicalCopies = new HashMap<>();
+                while (copiesSet.next()) {
+                    physicalCopies.put(
+                            Library.valueOf(copiesSet.getString("storage_place")),
+                            new PhysicalCopies(copiesSet.getInt("number_of_copies"),
+                                    copiesSet.getInt("number_of_available_copies"),
+                                    copiesSet.getBoolean("borrowable")));
+                }
+                t.setPhysicalCopies(physicalCopies);
+            }
+            return thesis;
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 }

@@ -35,7 +35,7 @@ public class AdminDAO {
         }
     }
 
-    public boolean addAdmin(String userCode, String name, String surname, String email, String telephoneNumber, String workingPlace) {
+    public void addAdmin(String userCode, String name, String surname, String email, String telephoneNumber, String workingPlace) {
         connection = ConnectionManager.getConnection();
         try {
             String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place)"
@@ -47,10 +47,10 @@ public class AdminDAO {
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
             ps.setString(6, workingPlace);
-            return ps.executeUpdate() != 0;
+            ps.executeUpdate(); //TODO controllare se eseguito con valore gia esistente passa 0 o lancia eccezione
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //TODO guarda TODO sopra, ipotetica eccezione
         }
     }
 }

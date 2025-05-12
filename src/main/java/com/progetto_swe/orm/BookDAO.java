@@ -2,6 +2,7 @@ package com.progetto_swe.orm;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
@@ -37,7 +38,7 @@ public class BookDAO {
             return book;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return null;
+            return null;//TODO ipotetica eccezione
         }
     }
 
@@ -78,11 +79,11 @@ public class BookDAO {
             return code;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return -1;
+            return -1;//TODO ipotetica eccezione
         }
     }
 
-    public boolean removeBook(int code) {
+    public void removeBook(int code) {
 
         connection = ConnectionManager.getConnection();
         try {
@@ -97,15 +98,15 @@ public class BookDAO {
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
 
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //TODO ipotetica eccezione
         }
     }
 
-    public boolean updateBook(int originalItemCode, String title, String publicationDate, String language, String category, String link, String isbn,
+    public void updateBook(int originalItemCode, String title, String publicationDate, String language, String category, String link, String isbn,
                               String publishingHouse, String authors) {
         connection = ConnectionManager.getConnection();
         try {
@@ -119,9 +120,9 @@ public class BookDAO {
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
 
-            if(ps.executeUpdate() == 0){
-                return false;
-            }
+            //if(ps.executeUpdate() == 0){
+            //    return false;
+            //} TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
 
             query = "UPDATE Book SET isbn = ?, publishing_house = ?, authors = ? WHERE code = ?;";
 
@@ -131,10 +132,56 @@ public class BookDAO {
             ps.setString(3, authors);
             ps.setInt(4, originalItemCode);
 
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //TODO ipotetica eccezione
+        }
+    }
+
+
+    public ArrayList<Book> getAllBooks() {
+        ArrayList<Book> books = new ArrayList<>();
+        HashMap<Library, PhysicalCopies> physicalCopies;
+        connection = ConnectionManager.getConnection();
+        try {
+            //tutti i book
+            String query = "SELECT * FROM Item I JOIN Book B ON I.code = B.code";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                books.add(new Book(
+                        resultSet.getInt("code"),
+                        resultSet.getString("title"),
+                        LocalDate.parse(resultSet.getString("publication_date")),
+                        Language.valueOf(resultSet.getString("language")),
+                        Category.valueOf(resultSet.getString("category")),
+                        resultSet.getString("link"),
+                        resultSet.getString("isbn"),
+                        resultSet.getString("publishing_house"),
+                        resultSet.getInt("number_of_pages"),
+                        resultSet.getString("authors")));
+            }
+
+            for(Book book : books){
+                String query_2 = "SELECT * FROM physical_copies P WHERE P.code = ?;";
+                ps = connection.prepareStatement(query_2);
+                ps.setInt(1, book.getCode());
+                ResultSet copiesSet = ps.executeQuery();
+                physicalCopies = new HashMap<>();
+                while (copiesSet.next()) {
+                    physicalCopies.put(
+                            Library.valueOf(copiesSet.getString("storage_place")),
+                            new PhysicalCopies(copiesSet.getInt("number_of_copies"),
+                                    copiesSet.getInt("number_of_available_copies"),
+                                    copiesSet.getBoolean("borrowable")));
+                }
+                book.setPhysicalCopies(physicalCopies);
+            }
+            return books;
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            return null; //ipotetica eccezione
         }
     }
 

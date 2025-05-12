@@ -12,7 +12,7 @@ public class ListOfLendingsTest {
 
     @Test
     public void testConstructor(){
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "12345",
                 ucs, null);
         Book book = new Book(1, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing_house", 100, "authors");
@@ -20,17 +20,17 @@ public class ListOfLendingsTest {
         ArrayList<Lending> lendings = new ArrayList<>();
         lendings.add(lending_1);
 
-        ListOfLendings listOfLendings = new ListOfLendings(lendings);
+        RemovedListOfLendings listOfLendings = new RemovedListOfLendings(lendings);
 
         assertEquals(lendings, listOfLendings.getLendings());
     }
 
     @Test
     public void testGetLendingsByHirer(){
-        UserCredentials ucs_1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Token ucs_1 = new Token("usercode_1", "hashed_password_1");
         Hirer hirer_1 = new Hirer("usercode_1", "name_1", "surname_1", "email_1", "12345",
                 ucs_1, null);
-        UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Token ucs_2 = new Token("usercode_2", "hashed_password_2");
         Hirer hirer_2 = new Hirer("usercode_2", "name_2", "surname_2", "email_2", "12355",
                 ucs_2, null);
         Book book_1 = new Book(1, "title_1", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
@@ -41,7 +41,7 @@ public class ListOfLendingsTest {
         lendings.add(lending_1);
         lendings.add(lending_2);
 
-        ListOfLendings listOfLendings = new ListOfLendings(lendings);
+        RemovedListOfLendings listOfLendings = new RemovedListOfLendings(lendings);
 
         ArrayList<Lending> result = new ArrayList<>();
         result.add(lending_1);
@@ -52,10 +52,10 @@ public class ListOfLendingsTest {
 
     @Test
     public void testGetNumberOfLendingsInLibrary(){
-        UserCredentials ucs_1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Token ucs_1 = new Token("usercode_1", "hashed_password_1");
         Hirer hirer_1 = new Hirer("usercode_1", "name_1", "surname_1", "email_1", "12345",
                 ucs_1, null);
-        UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Token ucs_2 = new Token("usercode_2", "hashed_password_2");
         Hirer hirer_2 = new Hirer("usercode_2", "name_2", "surname_2", "email_2", "12355",
                 ucs_2, null);
         Book book_1 = new Book(1, "title_1", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
@@ -67,7 +67,7 @@ public class ListOfLendingsTest {
         lendings.add(lending_2);
         lendings.add(lending_3);
 
-        ListOfLendings listOfLendings = new ListOfLendings(lendings);
+        RemovedListOfLendings listOfLendings = new RemovedListOfLendings(lendings);
 
         assertEquals(2, listOfLendings.getNumberOfLendingsInLibrary(Library.LIBRARY_1, book_1));
         assertNotEquals(3, listOfLendings.getNumberOfLendingsInLibrary(Library.LIBRARY_1, book_1));
@@ -76,10 +76,10 @@ public class ListOfLendingsTest {
 
     @Test
     public void testLendingExist(){
-        UserCredentials ucs_1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Token ucs_1 = new Token("usercode_1", "hashed_password_1");
         Hirer hirer_1 = new Hirer("usercode_1", "name_1", "surname_1", "email_1", "12345",
                 ucs_1, null);
-        UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Token ucs_2 = new Token("usercode_2", "hashed_password_2");
         Hirer hirer_2 = new Hirer("usercode_2", "name_2", "surname_2", "email_2", "12355",
                 ucs_2, null);
         Book book_1 = new Book(1, "title_1", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
@@ -90,7 +90,7 @@ public class ListOfLendingsTest {
         lendings.add(lending_1);
         lendings.add(lending_2);
 
-        ListOfLendings listOfLendings = new ListOfLendings(lendings);
+        RemovedListOfLendings listOfLendings = new RemovedListOfLendings(lendings);
 
         assertTrue(listOfLendings.lendingExist(hirer_1, book_1, Library.LIBRARY_1));
         assertFalse(listOfLendings.lendingExist(hirer_2, book_1, Library.LIBRARY_1));
@@ -98,10 +98,10 @@ public class ListOfLendingsTest {
 
     @Test
     public void testHaveLending(){
-        UserCredentials ucs_1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Token ucs_1 = new Token("usercode_1", "hashed_password_1");
         Hirer hirer_1 = new Hirer("usercode_1", "name_1", "surname_1", "email_1", "12345",
                 ucs_1, null);
-        UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Token ucs_2 = new Token("usercode_2", "hashed_password_2");
         Book book_1 = new Book(1, "title_1", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
         Book book_2 = new Book(2, "title_2", LocalDate.of(2024, 3, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_2", "isbn_2", "publishing_house_2", 200, "authors_2");
         Lending lending_1 = new Lending(LocalDate.of(2025,4,2), hirer_1, book_1, Library.LIBRARY_1);
@@ -109,7 +109,7 @@ public class ListOfLendingsTest {
         ArrayList<Lending> lendings = new ArrayList<>();
         lendings.add(lending_1);
 
-        ListOfLendings listOfLendings = new ListOfLendings(lendings);
+        RemovedListOfLendings listOfLendings = new RemovedListOfLendings(lendings);
 
         assertTrue(listOfLendings.haveLending(lending_1));
         assertFalse(listOfLendings.haveLending(lending_2));
@@ -118,10 +118,10 @@ public class ListOfLendingsTest {
 
     @Test
     public void testGetLendingsByItem(){
-        UserCredentials ucs_1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Token ucs_1 = new Token("usercode_1", "hashed_password_1");
         Hirer hirer_1 = new Hirer("usercode_1", "name_1", "surname_1", "email_1", "12345",
                 ucs_1, null);
-        UserCredentials ucs_2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Token ucs_2 = new Token("usercode_2", "hashed_password_2");
         Book book_1 = new Book(1, "title_1", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_1", "isbn_1", "publishing_house_1", 100, "authors_1");
         Book book_2 = new Book(2, "title_2", LocalDate.of(2024, 3, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link_2", "isbn_2", "publishing_house_2", 200, "authors_2");
         Lending lending_1 = new Lending(LocalDate.of(2025,4,2), hirer_1, book_1, Library.LIBRARY_1);
@@ -132,7 +132,7 @@ public class ListOfLendingsTest {
         lendings.add(lending_2);
         lendings.add(lending_3);
 
-        ListOfLendings listOfLendings = new ListOfLendings(lendings);
+        RemovedListOfLendings listOfLendings = new RemovedListOfLendings(lendings);
 
         ArrayList<Lending> result = new ArrayList<>();
         result.add(lending_1);

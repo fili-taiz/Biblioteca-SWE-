@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CatalogueDAOTest {
+public class ItemDAOTest {
 
     @BeforeEach
     public void setUp() throws SQLException{
@@ -65,11 +65,11 @@ public class CatalogueDAOTest {
 
         Catalogue expectedCatalogue = new Catalogue(expectedItems);
 
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
+        ItemDAO itemDAO = new ItemDAO();
 
-        assertEquals(expectedCatalogue.getItems().size(), catalogueDAO.getCatalogue().getItems().size());
+        assertEquals(expectedCatalogue.getItems().size(), itemDAO.getCatalogue().getItems().size());
 
-        assertTrue(catalogueDAO.getCatalogue().getItems().containsAll(expectedCatalogue.getItems()));
+        assertTrue(itemDAO.getCatalogue().getItems().containsAll(expectedCatalogue.getItems()));
 
         connection.close();
 
@@ -79,8 +79,8 @@ public class CatalogueDAOTest {
     public void getCatalogueEmpty() throws SQLException{
         Connection connection = ConnectionManager.getConnection();
 
-        CatalogueDAO catalogueDAO = new CatalogueDAO();
-        assertNull(catalogueDAO.getCatalogue());
+        ItemDAO itemDAO = new ItemDAO();
+        assertNull(itemDAO.getCatalogue());
         connection.close();
 
     }

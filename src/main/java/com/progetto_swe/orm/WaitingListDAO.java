@@ -37,7 +37,7 @@ public class WaitingListDAO {
         }
     }
 
-    public boolean addToWaitingList(int code, String storagePlace, String email) {
+    public void addToWaitingList(int code, String storagePlace, String email) {
         connection = ConnectionManager.getConnection();
         try {
             String query = "INSERT INTO waiting_list (code, storage_place, email) VALUES (?, ?, ?);";
@@ -45,10 +45,10 @@ public class WaitingListDAO {
             ps.setInt(1, code);
             ps.setString(2, storagePlace);
             ps.setString(3, email);
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false; TODO ipotetica eccezione
         }
     }
 }

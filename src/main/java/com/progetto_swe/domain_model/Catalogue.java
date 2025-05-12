@@ -12,32 +12,7 @@ public class Catalogue{
         this.items = items;
     }
 
-    public ArrayList<Item> searchItem(String keywords, Category category) {
-        String[] splittedKeyword = keywords.split(" ");
-        ArrayList<Item> result = new ArrayList<>();
-        for (Item i : this.items) {
-            for (String keyword : splittedKeyword){
-                if (i.getCategory().equals(category) && i.contains(keyword)) {
-                    result.add(i);
-                }
-            }
-        }
-        return result;
-    }
 
-    public ArrayList<Item> advancedSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
-        String[] splittedKeyword = keywords.split(" ");
-        ArrayList<Item> result = new ArrayList<>();
-        for (Item i : this.items) {
-            for (String keyword : splittedKeyword){
-                if (i.getCategory().equals(category) && i.getLanguage().equals(language) && i.isBorrowable() == borrowable &&
-                        i.getPublicationDate().isAfter(startDate) && i.getPublicationDate().isBefore(endDate) && i.contains(keyword)) {
-                    result.add(i);
-                }
-            }
-        }
-        return result;
-    }
 
     public int contains(Item itemsCopy) {
         for(Item item : items){
@@ -69,7 +44,6 @@ public class Catalogue{
         Catalogue catalogue = (Catalogue) o;
 
         return Objects.equals(this.items, catalogue.items);
-
     }
 
     @Override

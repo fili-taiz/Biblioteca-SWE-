@@ -11,7 +11,7 @@ public class HirerTest {
 
     @Test
     public void testConstructor(){
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00000",
                 ucs,LocalDate.of(2025, 5,6));
 
@@ -26,7 +26,7 @@ public class HirerTest {
 
     @Test
     public void testContains(){
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "12345",
                 ucs, LocalDate.of(2025, 5,6));
 

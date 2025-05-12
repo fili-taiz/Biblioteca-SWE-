@@ -54,7 +54,7 @@ public class ReservationDAOTest {
         expected_reservations.add(r1);
         expected_reservations.add(r2);
 
-        ListOfReservations expected_list_of_reservations = new ListOfReservations(expected_reservations);
+        RemovedListOfReservations expected_list_of_reservations = new RemovedListOfReservations(expected_reservations);
 
         assertEquals(expected_list_of_reservations.getReservations().size(), reservationDAO.getReservations_().getReservations().size());
         assertTrue(reservationDAO.getReservations_().getReservations().containsAll(expected_reservations));

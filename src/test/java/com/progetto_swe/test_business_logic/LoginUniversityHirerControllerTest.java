@@ -2,7 +2,7 @@ package com.progetto_swe.test_business_logic;
 
 import com.progetto_swe.business_logic.LoginUniversityHirerController;
 import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.UserCredentials;
+import com.progetto_swe.domain_model.Token;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.HirerDAO;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ public class LoginUniversityHirerControllerTest {
 
         hirerDAO.addHirerPassword("7564800", "ed7e7a891eb6da74b01f47d6c0646e57b0742deae3f6cc841d6f942f7577f7a8", "865740");
 
-        UserCredentials ucs = new UserCredentials("7564800", "ed7e7a891eb6da74b01f47d6c0646e57b0742deae3f6cc841d6f942f7577f7a8");
+        Token ucs = new Token("7564800", "ed7e7a891eb6da74b01f47d6c0646e57b0742deae3f6cc841d6f942f7577f7a8");
 
         Hirer hirer2 = new Hirer("7564800", "Giovanni", "Bianchi", "giovanni.bianchi@studuni.com", "10001", ucs, null);
 
@@ -55,7 +55,7 @@ public class LoginUniversityHirerControllerTest {
     public void testLoginAdmin_New() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
 
-        UserCredentials ucs = new UserCredentials("7564800", "ed7e7a891eb6da74b01f47d6c0646e57b0742deae3f6cc841d6f942f7577f7a8");
+        Token ucs = new Token("7564800", "ed7e7a891eb6da74b01f47d6c0646e57b0742deae3f6cc841d6f942f7577f7a8");
         Hirer hirer = new Hirer("7564800", "Giovanni", "Bianchi", "giovanni.bianchi@studuni.com", "10001", ucs, null);
         LoginUniversityHirerController loginUniversityHirerController = new LoginUniversityHirerController();
 

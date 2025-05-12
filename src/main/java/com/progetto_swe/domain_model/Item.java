@@ -92,11 +92,11 @@ public abstract class Item {
         return physicalCopies.size();
     }
 
-    public int getNumberOfAvailableCopiesInLibrary(ListOfLendings lendings, ListOfReservations reservations, Library library){
+    public int getNumberOfAvailableCopiesInLibrary(Library library){
         if(physicalCopies.get(library) == null){
             return -1;
         }
-        return physicalCopies.get(library).getNumberOfPhysicalCopies() - lendings.getNumberOfLendingsInLibrary(library, this) - reservations.getNumberOfReservationsInLibrary(library, this);
+        return physicalCopies.get(library).getNumberOfAvailableCopies();
     }
 
     public int getCode(){ return this.code;}

@@ -17,11 +17,21 @@ public class Hasher {
         return new String(hexChars, StandardCharsets.UTF_8);
     }
 
-    public static String hash(String password, String salt) {
+    public static String hashPassword(String password, String salt) {
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("SHA-256");
             return bytesToHex(md.digest((password+salt).getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+        }
+        return null;
+    }
+
+    public static String hash(String string) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+            return bytesToHex(md.digest((string).getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
         }
         return null;

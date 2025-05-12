@@ -8,15 +8,15 @@ public abstract class User {
     protected String surname;
     protected String email;
     protected String telephoneNumber;
-    protected UserCredentials userCredentials;
+    protected Token token;
 
-    public User(String userCode, String name, String surname, String email, String telephoneNumber, UserCredentials userCredentials){
+    public User(String userCode, String name, String surname, String email, String telephoneNumber, Token token){
         this.userCode = userCode;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.telephoneNumber = telephoneNumber;
-        this.userCredentials = userCredentials;
+        this.token = token;
     }
 
     @Override
@@ -41,10 +41,10 @@ public abstract class User {
     public String getSurname() { return this.surname; }
     public String getEmail() { return this.email; }
     public String getTelephoneNumber() { return this.telephoneNumber; }
-    public UserCredentials getUserCredentials() { return this.userCredentials; }
+    public Token getToken() { return this.token; }
 
     public void setUserCode(String userCode) { this.userCode = userCode; }
     public void setName(String name) { this.name = name; }
     public void setSurname(String surname) { this.surname = surname; }
-    public void setUserCredentials(UserCredentials newUserCredentials){ this.userCredentials = newUserCredentials; }
+    public void setToken(Token newToken){ this.token = newToken; }
 }

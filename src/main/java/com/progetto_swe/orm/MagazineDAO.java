@@ -2,6 +2,7 @@ package com.progetto_swe.orm;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
@@ -16,7 +17,7 @@ public class MagazineDAO {
     public MagazineDAO() {
         this.connection = ConnectionManager.getConnection();
     }
-
+//TODO stesse modifiche di eccezioni e paramtri di BookDAO
     public Magazine getMagazine(int code) {
         try {
             connection = ConnectionManager.getConnection();
@@ -81,7 +82,7 @@ public class MagazineDAO {
         }
     }
 
-    public boolean removeMagazine(int code) {
+    public void removeMagazine(int code) {
 
         connection = ConnectionManager.getConnection();
         try {
@@ -89,23 +90,23 @@ public class MagazineDAO {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            if(ps.executeUpdate() == 0){
-                return false;
-            }
+            //if(ps.executeUpdate() == 0){
+            //    return false;
+            //}
 
             query = "DELETE FROM Item WHERE code = ?;";
             ps = connection.prepareStatement(query);
             ps.setInt(1, code);
 
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;
 
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false;
         }
     }
 
-    public boolean updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category, String link, String publishingHouse) {
+    public void updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category, String link, String publishingHouse) {
         connection = ConnectionManager.getConnection();
         try {
             String query
@@ -118,20 +119,63 @@ public class MagazineDAO {
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
 
-            if(ps.executeUpdate() == 0){
-                return false;
-            }
+            //if(ps.executeUpdate() == 0){
+            //    return false;
+            //}
 
             query = "UPDATE Magazine SET publishing_house = ? WHERE code = ?;";
             ps = connection.prepareStatement(query);
             ps.setString(1, publishingHouse);
             ps.setInt(2, originalItemCode);
 
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;
 
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false;
+        }
+    }
+
+    public ArrayList<Magazine> getAllMagazines() {
+        ArrayList<Magazine> magazines = new ArrayList<>();
+        HashMap<Library, PhysicalCopies> physicalCopies;
+        connection = ConnectionManager.getConnection();
+        try {
+            //tutti i magazine
+            String query
+                    = "SELECT * FROM Item I JOIN Magazine M ON I.code = M.code";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                magazines.add(new Magazine(resultSet.getInt("code"),
+                        resultSet.getString("title"),
+                        LocalDate.parse(resultSet.getString("publication_date")),
+                        Language.valueOf(resultSet.getString("language")),
+                        Category.valueOf(resultSet.getString("category")),
+                        resultSet.getString("link"),
+                        resultSet.getInt("number_of_pages"),
+                        resultSet.getString("publishing_house")));
+            }
+
+            for(Magazine magazine : magazines){
+                String query_2 = "SELECT * FROM physical_copies P WHERE P.code = ?;";
+                ps = connection.prepareStatement(query_2);
+                ps.setInt(1, magazine.getCode());
+                ResultSet copiesSet = ps.executeQuery();
+                physicalCopies = new HashMap<>();
+                while (copiesSet.next()) {
+                    physicalCopies.put(
+                            Library.valueOf(copiesSet.getString("storage_place")),
+                            new PhysicalCopies(copiesSet.getInt("number_of_copies"),
+                                    copiesSet.getInt("number_of_available_copies"),
+                                    copiesSet.getBoolean("borrowable")));
+                }
+                magazine.setPhysicalCopies(physicalCopies);
+            }
+            return magazines;
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            return null;
         }
     }
 }

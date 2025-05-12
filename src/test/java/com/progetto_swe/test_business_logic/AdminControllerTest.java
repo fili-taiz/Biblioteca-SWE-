@@ -1,7 +1,6 @@
 package com.progetto_swe.test_business_logic;
 
 import com.progetto_swe.business_logic.AdminController;
-import com.progetto_swe.business_logic.Hasher;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +22,7 @@ public class AdminControllerTest {
 
     @Test
     public void testConstructor(){
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Admin admin = new Admin("usercode", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs);
         assertEquals("usercode", admin.getUserCode());
         assertEquals("name", admin.getName());

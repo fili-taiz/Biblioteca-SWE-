@@ -12,7 +12,7 @@ public class AdminTest {
 
     @Test
     public void testConstructor() {
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Admin admin = new Admin("usercode", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs);
 
         assertEquals("usercode", admin.getUserCode());
@@ -26,7 +26,7 @@ public class AdminTest {
 
     @Test
     public void testSearchItem() {
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Admin admin = new Admin("usercode", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs);
         PhysicalCopies pcs_1 = new PhysicalCopies(0, 0, true);
         PhysicalCopies pcs_2 = new PhysicalCopies(4, 4, true);
@@ -59,7 +59,7 @@ public class AdminTest {
 
     @Test
     public void testAdvancedSearchItem(){
-        UserCredentials ucs = new UserCredentials("usercode", "hashed_password");
+        Token ucs = new Token("usercode", "hashed_password");
         Admin admin = new Admin("usercode", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs);
         PhysicalCopies pcs_1 = new PhysicalCopies(0, 0, true);
         PhysicalCopies pcs_2 = new PhysicalCopies(4, 4, true);
@@ -92,11 +92,11 @@ public class AdminTest {
 
     @Test
     public void testEquals(){
-        UserCredentials ucs1 = new UserCredentials("usercode_1", "hashed_password_1");
+        Token ucs1 = new Token("usercode_1", "hashed_password_1");
         Admin admin1 = new Admin("usercode_1", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs1);
-        UserCredentials ucs2 = new UserCredentials("usercode_2", "hashed_password_2");
+        Token ucs2 = new Token("usercode_2", "hashed_password_2");
         Admin admin2 = new Admin("usercode_2", "name2", "surname2", "email2", "00002", Library.LIBRARY_1, ucs2);
-        UserCredentials ucs3 = new UserCredentials("usercode1", "hashed_password_1");
+        Token ucs3 = new Token("usercode1", "hashed_password_1");
         Admin admin3 = new Admin("usercode_1", "name", "surname", "email", "00000", Library.LIBRARY_1, ucs3);
 
         assertEquals(admin1, admin3);

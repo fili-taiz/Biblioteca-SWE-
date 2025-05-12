@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class PhysicalCopiesDAO {
     private Connection connection;
-
+//TODO Guarda BookDAO
     public PhysicalCopiesDAO(){
         this.connection = ConnectionManager.getConnection();
     }
@@ -35,21 +35,21 @@ public class PhysicalCopiesDAO {
         }
     }
 
-    public boolean removePhysicalCopies(int code, String storagePlace){
+    public void removePhysicalCopies(int code, String storagePlace){
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "DELETE FROM physical_copies P WHERE code = ? AND storage_place = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
             ps.setString(2, storagePlace);
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false;
         }
     }
 
-    public boolean updatePhysicalCopies(int code, String storagePlace, int newNumberOfCopies, boolean borrowable) {
+    public void updatePhysicalCopies(int code, String storagePlace, int newNumberOfCopies, boolean borrowable) {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "UPDATE physical_copies SET number_of_copies = ?, borrowable = ? WHERE code = ? AND storage_place = ?; ";
@@ -58,10 +58,10 @@ public class PhysicalCopiesDAO {
             ps.setBoolean(2, borrowable);
             ps.setInt(3, code);
             ps.setString(4, storagePlace);
-            return ps.executeUpdate() != 0;
+            //return ps.executeUpdate() != 0;
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            //return false;
         }
     }
 

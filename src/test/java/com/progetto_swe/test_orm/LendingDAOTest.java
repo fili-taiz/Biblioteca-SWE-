@@ -54,7 +54,7 @@ public class LendingDAOTest {
         expected_lendings.add(l1);
         expected_lendings.add(l2);
 
-        ListOfLendings expected_list_of_lendings = new ListOfLendings(expected_lendings);
+        RemovedListOfLendings expected_list_of_lendings = new RemovedListOfLendings(expected_lendings);
 
         assertEquals(expected_list_of_lendings.getLendings().size(), lendingDAO.getLendings_().getLendings().size());
         assertTrue(lendingDAO.getLendings_().getLendings().containsAll(expected_lendings));
