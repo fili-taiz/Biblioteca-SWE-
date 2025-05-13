@@ -15,10 +15,10 @@ public class MagazineDAO {
     public MagazineDAO() {
         this.connection = ConnectionManager.getConnection();
     }
-//TODO stesse modifiche di eccezioni e paramtri di BookDAO
+
     public Magazine getMagazine(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
         try {
-            connection = ConnectionManager.getConnection();
             String query = """
                     SELECT * 
                     FROM Item I JOIN Magazine M ON I.code = M.code 
@@ -60,8 +60,8 @@ public class MagazineDAO {
                            int numberOfCopies,
                            boolean borrowable)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-
         connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
             //Creazione Item e Magazine
             String query = """
@@ -91,18 +91,22 @@ public class MagazineDAO {
 
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
+            ConnectionManager.commit();
             return itemCode;
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
     public void removeMagazine(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
-
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
-            String query = "DELETE FROM Magazine WHERE code = ?;";
+            String query = """
+                    DELETE FROM Magazine 
+                    WHERE code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
 
@@ -111,7 +115,10 @@ public class MagazineDAO {
                 throw new IdNotFoundException("Errore: Il Magazine con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
-            query = "DELETE FROM Item WHERE code = ?;";
+            query = """
+                DELETE FROM Item 
+                WHERE code = ?;
+                """;
             ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
 
@@ -129,12 +136,25 @@ public class MagazineDAO {
         }
     }
 
-    public void updateMagazine(int originalItemCode, String title, String publicationDate, String language, String category,
-                               String link, String publishingHouse, String storagePlace, int newNumberOfCopies, boolean borrowable) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+    public void updateMagazine(int originalItemCode,
+                               String title,
+                               String publicationDate,
+                               String language,
+                               String category,
+                               String link,
+                               String publishingHouse,
+                               String storagePlace,
+                               int newNumberOfCopies,
+                               boolean borrowable)
+            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
-            String query
-                    = "UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ?;";
+            String query = """
+                    UPDATE Item 
+                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ? 
+                    WHERE code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
             ps.setDate(2, Date.valueOf(publicationDate));
@@ -148,7 +168,11 @@ public class MagazineDAO {
                 throw new IdNotFoundException("Errore: Magazine con ItemCode [" + originalItemCode + "] non presente nel DB.");
             }
 
-            query = "UPDATE Magazine SET publishing_house = ? WHERE code = ?;";
+            query = """
+                    UPDATE Magazine 
+                    SET publishing_house = ? 
+                    WHERE code = ?;
+                    """;
             ps = connection.prepareStatement(query);
             ps.setString(1, publishingHouse);
             ps.setInt(2, originalItemCode);
@@ -159,7 +183,9 @@ public class MagazineDAO {
             }
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
+            ConnectionManager.commit();
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -168,9 +194,10 @@ public class MagazineDAO {
         ArrayList<Magazine> magazines = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
-            //tutti i magazine
-            String query
-                    = "SELECT * FROM Item I JOIN Magazine M ON I.code = M.code";
+            String query = """
+                    SELECT * 
+                    FROM Item I JOIN Magazine M ON I.code = M.code;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {

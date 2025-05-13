@@ -17,10 +17,14 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public void addLending(String userCode, int itemCode, String storagePlace) throws IdAlreadyExistsException, DatabaseConnectionException {
+    public void addLending(String userCode, int itemCode, String storagePlace)
+            throws IdAlreadyExistsException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "INSERT INTO lending (user_code, code, storage_place, lending_date) VALUES (?, ?, ?, ?); ";
+            String query = """
+                    INSERT INTO lending (user_code, code, storage_place, lending_date) 
+                    VALUES (?, ?, ?, ?);
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
@@ -36,10 +40,15 @@ public class LendingDAO {
         }
     }
 
-    public void removeLending(String userCode, int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
+    public void removeLending(String userCode, int itemCode, String storagePlace)
+            throws IdNotFoundException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
-            String query = "DELETE FROM lending L WHERE user_code = ? AND code = ? AND storage_place = ?;";
+            String query = """
+                    DELETE FROM lending L 
+                    WHERE user_code = ? AND code = ? AND storage_place = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
@@ -60,7 +69,11 @@ public class LendingDAO {
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
         try {
-            String query = "SELECT * FROM lending L WHERE L.user_code = ?;";
+            String query = """
+                    SELECT * 
+                    FROM lending L 
+                    WHERE L.user_code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ResultSet resultSet = ps.executeQuery();
@@ -72,13 +85,20 @@ public class LendingDAO {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
                     lendings.add(new Lending(
                             resultSet.getDate("lending_date").toLocalDate(),
-                            resultSet.getDate("maturity_date").toLocalDate(), hirer, book,
+                            resultSet.getDate("maturity_date").toLocalDate(),
+                            hirer,
+                            book,
                             Library.valueOf(resultSet.getString("storage_place"))));
                 }catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-                    lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(), hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
+                    lendings.add(new Lending(
+                            resultSet.getDate("lending_date").toLocalDate(),
+                            resultSet.getDate("maturity_date").toLocalDate(),
+                            hirer,
+                            magazine,
+                            Library.valueOf(resultSet.getString("storage_place"))));
                 }catch (IdNotFoundException e) {
                 }
             }

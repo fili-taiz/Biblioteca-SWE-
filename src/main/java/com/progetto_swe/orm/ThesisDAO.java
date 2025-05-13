@@ -16,10 +16,10 @@ public class ThesisDAO {
     public ThesisDAO() {
         this.connection = ConnectionManager.getConnection();
     }
-//TODO guarda BookDAO
+
     public Thesis getThesis(int itemCode) throws IdNotFoundException, DatabaseConnectionException{
+        connection = ConnectionManager.getConnection();
         try {
-            connection = ConnectionManager.getConnection();
             String query = """
                     SELECT * 
                     FROM Item I JOIN Thesis T ON I.code = T.code 
@@ -33,7 +33,8 @@ public class ThesisDAO {
                 throw new IdNotFoundException("Errore: Thesis con itemCode [" + itemCode + "] non presente nel DB.");
             }
 
-            Thesis thesis = new Thesis(itemCode,
+            Thesis thesis = new Thesis(
+                    itemCode,
                     resultSet.getString("title"),
                     LocalDate.parse(resultSet.getString("publication_date")),
                     Language.valueOf(resultSet.getString("language")),
@@ -64,8 +65,8 @@ public class ThesisDAO {
                          int numberOfCopies,
                          boolean borrowable)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-
         connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
             //Creazione Item e Thesis
             String query = """
@@ -97,17 +98,21 @@ public class ThesisDAO {
 
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
+            ConnectionManager.commit();
             return itemCode;
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public void removeThesis(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
-
+    public void removeThesis(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
-            String query = "DELETE FROM Thesis WHERE code = ?;";
+            String query = """
+                    DELETE FROM Thesis 
+                    WHERE code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
 
@@ -116,7 +121,10 @@ public class ThesisDAO {
                 throw new IdNotFoundException("Errore: Il Thesis con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
-            query = "DELETE FROM Item WHERE code = ?;";
+            query = """
+                DELETE FROM Item 
+                WHERE code = ?;
+                """;
             ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
 
@@ -134,12 +142,25 @@ public class ThesisDAO {
         }
     }
 
-    public void updateThesis(int originalItemCode,String title, String publicationDate, String language, String category, String link, String author,
-                                String supervisors, String university, String storagePlace, int newNumberOfCopies, boolean borrowable) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
+    public void updateThesis(int originalItemCode,
+                             String title,
+                             String publicationDate,
+                             String language,
+                             String category,
+                             String link,
+                             String author,
+                             String supervisors,
+                             String university,
+                             String storagePlace,
+                             int newNumberOfCopies,
+                             boolean borrowable)
+            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
-            String query
-                    = "UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ? ;";
+            String query = """
+                        UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ?;
+                        """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
             ps.setDate(2, Date.valueOf(publicationDate));
@@ -153,7 +174,11 @@ public class ThesisDAO {
                 throw new IdNotFoundException("Errore: Thesis con ItemCode [" + originalItemCode + "] non presente nel DB.");
             }
 
-            query = "UPDATE Thesis SET author = ?, supervisors = ?, university = ? WHERE code = ?;";;
+            query = """
+                    UPDATE Thesis 
+                    SET author = ?, supervisors = ?, university = ? 
+                    WHERE code = ?;
+                    """;
             ps = connection.prepareStatement(query);
             ps.setString(1, author);
             ps.setString(2, supervisors);
@@ -166,18 +191,22 @@ public class ThesisDAO {
             }
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
+            ConnectionManager.commit();
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public ArrayList<Thesis> getAllThesis() {
+    public ArrayList<Thesis> getAllThesis() throws DatabaseConnectionException {
         ArrayList<Thesis> thesis = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
-            //tutti i thesis
-            String query
-                    = "SELECT * FROM Item I JOIN Thesis T ON I.code = T.code";
+            String query = """
+                    SELECT * 
+                    FROM Item I JOIN Thesis T ON 
+                    I.code = T.code;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {

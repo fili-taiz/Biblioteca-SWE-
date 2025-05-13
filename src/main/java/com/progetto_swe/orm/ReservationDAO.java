@@ -15,12 +15,15 @@ public class ReservationDAO {
     public ReservationDAO(){
         this.connection = ConnectionManager.getConnection();
     }
-//TODO guarda LendingDAO
-    public void addReservation(String userCode, int itemCode, String storagePlace) throws IdAlreadyExistsException {
+
+    public void addReservation(String userCode, int itemCode, String storagePlace)
+            throws IdAlreadyExistsException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "INSERT INTO Reservation (user_code, code, storage_place, reservation_date)"
-                    + "VALUES (?, ?, ?, ?); ";
+            String query = """ 
+                    INSERT INTO Reservation (user_code, code, storage_place, reservation_date)
+                    VALUES (?, ?, ?, ?); 
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
@@ -35,10 +38,15 @@ public class ReservationDAO {
         }
     }
 
-    public void removeReservation(String userCode, int itemCode, String storagePlace) throws IdNotFoundException {
+    public void removeReservation(String userCode, int itemCode, String storagePlace)
+            throws IdNotFoundException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
-            String query = "DELETE FROM Reservation R WHERE user_code = ? AND code = ? AND storage_place = ?;";
+            String query = """ 
+                    DELETE FROM Reservation R 
+                    WHERE user_code = ? AND code = ? AND storage_place = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
@@ -47,17 +55,23 @@ public class ReservationDAO {
                 ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Prestito di Hirer con userCode [" + itemCode + "] e Item con itemCode [" + itemCode + "] presso sede [" + storagePlace + "] non presente nel DB.");
             }
+            ConnectionManager.commit();
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public ArrayList<Reservation> getReservationsByUserCode(String userCode) throws IdNotFoundException{
+    public ArrayList<Reservation> getReservationsByUserCode(String userCode)
+            throws IdNotFoundException, DatabaseConnectionException{
         this.connection = ConnectionManager.getConnection();
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
         try {
-            String query = "SELECT * FROM Reservation R WHERE R.user_code = ?;";
+            String query = """
+                    SELECT * 
+                    FROM Reservation R 
+                    WHERE R.user_code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ResultSet resultSet = ps.executeQuery();
@@ -79,7 +93,7 @@ public class ReservationDAO {
                 }
             }
             return reservations;
-        } catch (SQLException e) {//Eccezione generica
+        } catch (SQLException e) {
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }

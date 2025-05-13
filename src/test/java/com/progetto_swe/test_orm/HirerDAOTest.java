@@ -3,8 +3,6 @@ package com.progetto_swe.test_orm;
 import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.HirerDAO;
-import com.progetto_swe.orm.database_exception.DataAccessException;
-import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -97,7 +95,8 @@ public class HirerDAOTest {
         Connection connection = ConnectionManager.getConnection();
 
         HirerDAO hirerDAO = new HirerDAO();
-        assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
+        assertTrue(hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
+        assertFalse(hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
 
         connection.close();
 
@@ -108,8 +107,8 @@ public class HirerDAOTest {
         Connection connection = ConnectionManager.getConnection();
         HirerDAO hirerDAO = new HirerDAO();
         hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
-
-        assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirerPassword("uc1", "hp1", "salt"));
+        assertTrue(hirerDAO.addHirerPassword("uc1", "hp1", "salt"));
+        assertFalse(hirerDAO.addHirerPassword("uc2", "hp2", "salt"));
 
         connection.close();
 
@@ -132,13 +131,14 @@ public class HirerDAOTest {
         ArrayList<Hirer> expected = new ArrayList<>();
         expected.add(h1);
         expected.add(h2);
+        ListOfHirers listOfHirers_e = new ListOfHirers(expected);
 
-        assertEquals(expected, hirerDAO.getHirers_().size());
-        assertTrue(hirerDAO.getHirers_().containsAll(expected));
+        assertEquals(listOfHirers_e.getHirers().size(), hirerDAO.getHirers_().getHirers().size());
+        assertTrue(hirerDAO.getHirers_().getHirers().containsAll(listOfHirers_e.getHirers()));
 
         Hirer h3 = new Hirer("uc3", "name3", "surname3", "email3", "telephonenumber3", null, LocalDate.of(2024, 4, 5));
 
-        assertFalse(hirerDAO.getHirers_().contains(h3));
+        assertFalse(hirerDAO.getHirers_().getHirers().contains(h3));
 
         connection.close();
 
