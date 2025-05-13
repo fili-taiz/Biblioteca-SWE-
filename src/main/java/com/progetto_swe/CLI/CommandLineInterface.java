@@ -6,68 +6,101 @@ import java.util.Scanner;
 
 import com.progetto_swe.business_logic.*;
 import com.progetto_swe.domain_model.Hirer;
+import com.progetto_swe.domain_model.Admin;
 
 public class CommandLineInterface {
     static int screenWidth = 90;
-    String role = "utente anonimo";
-
+    String role = "UTENTE ANONIMO";
+/*
     public void start() {
         Scanner scanner = new Scanner(System.in);
         do {
-            role = role.toLowerCase();
             switch (role) {
-                case "utente anonimo": {
+                case "UTENTE ANONIMO": {
                     AnonymousCLI anonymousCLI = new AnonymousCLI();
                     role = anonymousCLI.start();
                     break;
                 }
 
-                case "noleggiatore esterno": {
+                case "NOLEGGIATORE ESTERNO": {
                     clearScreen();
                     LoginExternalHirerController loginExternalHirerController = new LoginExternalHirerController();
+
+                    //ottiene le credenziali
                     System.out.println("Inserisci il tuo codice utente: ");
                     String userCode = scanner.nextLine();
                     System.out.println("Inserisci la tua password: ");
                     String password = scanner.nextLine();
+
                     Hirer hirer = loginExternalHirerController.loginExternalHirer(userCode, password);
-                    HirerController hirerController = new HirerController(hirer);
-                    HirerCLI hirerCLI = new HirerCLI(hirerController);
-                    role = hirerCLI.start();
+                    if (hirer == null) {
+                        System.out.println("Errore: nome utente o password errati.");
+                    } else {
+                        HirerController hirerController = new HirerController(hirer);
+                        HirerCLI hirerCLI = new HirerCLI(hirerController);
+                        role = hirerCLI.start();
+                    }
                     break;
                 }
 
-                case "noleggiatore universitario": {
+                case "NOLEGGIATORE UNIVERSITARIO": {
                     clearScreen();
                     LoginUniversityHirerController loginUniversityHirer = new LoginUniversityHirerController();
+
+                    //ottiene le credenziali
                     System.out.println("Inserisci il tuo codice utente: ");
                     String userCode = scanner.nextLine();
                     System.out.println("Inserisci la tua password: ");
                     String password = scanner.nextLine();
+
                     Hirer hirer = loginUniversityHirer.loginUniversityHirer(userCode, password);
-                    HirerCLI hirerCLI = new HirerCLI(new HirerController(hirer));
-                    role = hirerCLI.start();
+                    if(hirer == null) {
+                        System.out.println("Errore: nome utente o password errati.");
+                    } else {
+                        HirerCLI hirerCLI = new HirerCLI(new HirerController(hirer));
+                        role = hirerCLI.start();
+                    }
                     break;
                 }
 
-                case "amministratore bibliotecario": {
+                case "AMMINISTRATORE BIBLIOTECARIO": {
                     clearScreen();
                     LoginAdminController loginAdminController = new LoginAdminController();
                     System.out.println("Inserisci il tuo codice utente: ");
                     String userCode = scanner.nextLine();
                     System.out.println("Inserisci la tua password: ");
                     String password = scanner.nextLine();
-                    AdminController adminController = new AdminController(loginAdminController.loginAdmin(userCode, password));
-                    AdminCLI adminCLI = new AdminCLI();
-                    role = adminCLI.start();
+
+                    Admin admin = loginAdminController.loginAdmin(userCode, password);
+                    if(admin == null) {
+                        System.out.println("Errore: nome utente o password errati.");
+                    } else {
+                        AdminCLI adminCLI = new AdminCLI(new AdminController(admin), admin.getWorkingPlace());
+                        role = adminCLI.start();
+                    }
+                    break;
+                }
+
+                case "LOGIN" : {
+                    System.out.println("Inserisci il ruolo con cui vuoi effettuare l'accesso al sito tra quelli seguenti: \n" +
+                            "[NOLEGGIATORE ESTERNO], [NOLEGGIATORE UNIVERSITARIO], [AMMINISTRATORE BIBLIOTECARIO]; ");
+                    role = scanner.nextLine().toUpperCase();
+                    break;
+                }
+
+                default: {
+                    clearScreen();
+                    System.out.println("Errore: non hai inserito un ruolo corretto.");
+                    role = "LOGIN";
                     break;
                 }
             }
-        } while (!role.equals("Esci"));
+        } while (!role.equals("ESCI"));
     }
 
 
     public static void printBiblioteca() {
-        String biblioteca = "Un uomo entra in una Biblioteca, SPLASH! ";
+        String biblioteca = "Un uomo entra in una Biblioteca, SPLASH!";
         System.out.print("─".repeat((int) Math.floor((screenWidth - biblioteca.length()) / 2.0)));
         System.out.println(biblioteca);
         System.out.print("─".repeat((int) Math.ceil((screenWidth - biblioteca.length()) / 2.0)));
@@ -85,18 +118,22 @@ public class CommandLineInterface {
         printBiblioteca();
     }
 
-    public static void printCard(String title, ArrayList<String[]> rows, int colToTruncate){
+
+
+
+    //funzioni di Layout
+    public static void printCard(String title, ArrayList<String[]> rows, int colToTruncate) {
         int[] columnWidths = calculateColumnWidths(rows);
 
         int maxWidth = calculateRowWidth(columnWidths);
-        if(screenWidth - 2 < maxWidth){
+        if (screenWidth - 2 < maxWidth) {
             maxWidth = lengthOfLongestStringToTruncate(rows, colToTruncate) - (screenWidth - 2 - maxWidth);
         }
 
         System.out.println("┌" + title + "─".repeat(maxWidth - title.length() - 2) + "┐\n");
         for (String[] row : rows) {
             System.out.print("|");
-            for (int i = 0; i < row.length ; i++) {
+            for (int i = 0; i < row.length; i++) {
                 System.out.printf("%-" + columnWidths[i] + "s ", truncate(row[i], maxWidth));
             }
             System.out.println("|");
@@ -104,23 +141,23 @@ public class CommandLineInterface {
         System.out.println("└" + "─".repeat(maxWidth - 2) + "┘\n");
     }
 
-    public static void printTable(String[] header, ArrayList<String[]> rows, int colToTruncate){
+    public static void printTable(String[] header, ArrayList<String[]> rows, int colToTruncate) {
         rows.add(0, header);
 
         int[] columnWidths = calculateColumnWidths(rows);
 
         int maxWidth = calculateRowWidth(columnWidths);
-        if(screenWidth < maxWidth){
+        if (screenWidth < maxWidth) {
             maxWidth = lengthOfLongestStringToTruncate(rows, colToTruncate) - (screenWidth - maxWidth);
         }
 
-        for (int i = 0; i < rows.get(0).length ; i++) {
+        for (int i = 0; i < rows.get(0).length; i++) {
             System.out.printf("%-" + columnWidths[i] + "s ", truncate(rows.get(0)[i], maxWidth));
         }
 
         System.out.println("-".repeat(maxWidth));
         for (String[] row : rows) {
-            for (int i = 1; i < row.length ; i++) {
+            for (int i = 1; i < row.length; i++) {
                 System.out.printf("%-" + columnWidths[i] + "s ", truncate(row[i], maxWidth));
             }
             System.out.println();
@@ -163,6 +200,5 @@ public class CommandLineInterface {
             }
         }
         return maxLength;
-    }
-
+    }*/
 }

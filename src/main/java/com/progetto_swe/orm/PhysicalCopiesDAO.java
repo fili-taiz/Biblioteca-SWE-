@@ -2,9 +2,7 @@ package com.progetto_swe.orm;
 
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.database_exception.CRUD_exception;
-import com.progetto_swe.orm.database_exception.DataAccessException;
-import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
+import com.progetto_swe.orm.database_exception.*;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -18,54 +16,73 @@ public class PhysicalCopiesDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public boolean addPhysicalCopies(int code, String storagePlace, int numberOfCopies, boolean borrowable){
+    public boolean addPhysicalCopies(int itemCode,
+                                     String storagePlace,
+                                     int numberOfCopies,
+                                     boolean borrowable)
+            throws IdAlreadyExistsException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable, nuber_of_available_copies) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
             ps.setInt(3, numberOfCopies);
             ps.setBoolean(4, borrowable);
             ps.setInt(5, numberOfCopies);
             return ps.executeUpdate() != 0;
         } catch (SQLException e) {
+            if(e.getSQLState().equals("23505")){
+                throw new IdAlreadyExistsException("Errore: Articolo con userCode [" + itemCode + "] già presente nella sede [" + storagePlace + "].");
+            }
             System.out.println("SQLException: " + e.getMessage());
-            return false;
+            return false;//TODO eccezione generica
         }
     }
 
-    public void removePhysicalCopies(int code, String storagePlace){
+    public void removePhysicalCopies(int itemCode, String storagePlace) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "DELETE FROM physical_copies P WHERE code = ? AND storage_place = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
-            //return ps.executeUpdate() != 0;
-        } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //return false;
+
+            if(ps.executeUpdate() != 1) {
+                ConnectionManager.rollback();
+                throw new IdNotFoundException("Errore: L'Item con itemCode [" + itemCode + "] non ha copie presso la sede [" + storagePlace + "].");
+            }
+
+            WaitingListDAO waitingListDAO = new WaitingListDAO();
+            waitingListDAO.removeWaitingList(itemCode, storagePlace);
+        } catch (SQLException e) {//TODO aggiungere controllo che per la rimozione di un articolo il numero di available e total copies deve combaciare
+            ConnectionManager.rollback();
+            if(e.getSQLState().equals("23503")){
+                throw new ConstrainViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
+            }
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public void updatePhysicalCopies(int code, String storagePlace, int newNumberOfCopies, boolean borrowable) {
+    public void updatePhysicalCopies(int itemCode, String storagePlace, int newNumberOfCopies, boolean borrowable) throws IdNotFoundException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = "UPDATE physical_copies SET number_of_copies = ?, borrowable = ? WHERE code = ? AND storage_place = ?; ";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, newNumberOfCopies);
             ps.setBoolean(2, borrowable);
-            ps.setInt(3, code);
+            ps.setInt(3, itemCode);
             ps.setString(4, storagePlace);
-            //return ps.executeUpdate() != 0;
+
+            if(ps.executeUpdate() != 1) {
+                throw new IdNotFoundException("Errore: Item con ItemCode [" + itemCode + "] non ha copie nella sede [" + storagePlace + "].");
+            }
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //return false;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public HashMap<Library, PhysicalCopies> getPhysicalCopies(int code) {
+    public HashMap<Library, PhysicalCopies> getPhysicalCopies(int code) throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
             String query = "SELECT * FROM physical_copies P WHERE P.code = ?;";
@@ -78,8 +95,7 @@ public class PhysicalCopiesDAO {
             }
             return physicalCopies;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 }

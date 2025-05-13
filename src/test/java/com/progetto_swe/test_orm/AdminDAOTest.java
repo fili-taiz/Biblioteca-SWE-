@@ -98,6 +98,12 @@ public class AdminDAOTest {
 
     }
 
+    @Test
+    public void test() {
+        AdminDAO adminDAO = new AdminDAO();
+        adminDAO.addAdmin("userCode", "name", "surname", "email", "telephoneNumber", "workingPlace");
+    }
+
 
 
 

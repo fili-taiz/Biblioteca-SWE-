@@ -18,6 +18,18 @@ import java.nio.charset.StandardCharsets;
 
 public class Main {
     public static void main(String[] args) {
+        try{
+
+        } catch (Exception e) {//TODO SQLexception
+            System.out.println("Eccezione di connessione al server, problemi nell'applicazione");
+        }
+
+
+
+
+
+
+
         clearScreen();
         //ConnectionManager.query("Select * From Hirer");
         System.out.println(Math.round((Math.random()*1000000)));

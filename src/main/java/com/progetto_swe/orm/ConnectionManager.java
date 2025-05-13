@@ -1,13 +1,10 @@
 package com.progetto_swe.orm;
 
-import com.progetto_swe.orm.database_exception.DataAccessException;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class ConnectionManager {
     private static Connection connection;
@@ -19,7 +16,7 @@ public class ConnectionManager {
         try {
             connection = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
@@ -32,17 +29,17 @@ public class ConnectionManager {
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(url, username, password);
             }
+            return connection;
         } catch (SQLException e) {
-            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
-        return connection;
     }
 
     public static void closeAutoCommit() {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
@@ -50,7 +47,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
-            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
@@ -59,7 +56,7 @@ public class ConnectionManager {
             connection.commit();
             openAutoCommit();
         } catch (SQLException e) {
-            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
@@ -68,7 +65,7 @@ public class ConnectionManager {
             connection.rollback();
             openAutoCommit();
         } catch (SQLException e) {
-            throw new RuntimeException(new DatabaseConnectionException("Connection error!", e));
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 }

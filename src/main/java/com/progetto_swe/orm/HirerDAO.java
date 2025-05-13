@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.database_exception.CRUD_exception;
-import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.*;
 import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
 
 public class HirerDAO {
@@ -15,7 +14,7 @@ public class HirerDAO {
     private Connection connection;
 
     //creazione Hirer con solo i dati inerenti Hirer
-    public Hirer getHirer(String userCode) {
+    public Hirer getHirer(String userCode) throws IdNotFoundException, DatabaseConnectionException {
         try {
             connection = ConnectionManager.getConnection();
             String query
@@ -26,24 +25,32 @@ public class HirerDAO {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ResultSet resultSet = ps.executeQuery();
-            if (resultSet.next()) {
-                LocalDate unbannedDate = null;
-                if(resultSet.getDate("unbanned_date") != null){
-                    unbannedDate = resultSet.getDate("unbanned_date").toLocalDate();
-                }
-                return new Hirer(userCode, resultSet.getString("name"), resultSet.getString("surname"),
-                        resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate);
-            } else{
-                System.out.println("There isn't any hirer in the database with usercode = " + userCode);
-                return null;
+
+            if(!resultSet.next()) {
+                throw new IdNotFoundException("Errore: Hirer con userCode [" + userCode + "] non è presente nel DB.");
             }
+
+            LocalDate unbannedDate = null;
+            if(resultSet.getDate("unbanned_date") != null){
+                unbannedDate = resultSet.getDate("unbanned_date").toLocalDate();
+            }
+
+            Hirer hirer = new Hirer(
+                    userCode,
+                    resultSet.getString("name"),
+                    resultSet.getString("surname"),
+                    resultSet.getString("email"),
+                    resultSet.getString("telephone_number"),
+                    null,
+                    unbannedDate);
+            hirer.setToken(new Token(hirer));
+            return hirer;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public HashMap<String, String> getSaltAndHashedPassword(String userCode) {
+    public HashMap<String, String> getSaltAndHashedPassword(String userCode) throws IdNotFoundException, DatabaseConnectionException {
         try {
             connection = ConnectionManager.getConnection();
             String query = "SELECT UC.salt, UC.hashed_password FROM user_credentials UC WHERE UC.user_code = ?;";
@@ -51,21 +58,21 @@ public class HirerDAO {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ResultSet resultSet = ps.executeQuery();
-            if (resultSet.next()) {
-                HashMap<String, String> saltAndHashedPassword = new HashMap<>();
-                saltAndHashedPassword.put("salt", resultSet.getString("salt"));
-                saltAndHashedPassword.put("hashedPassword", resultSet.getString("hashed_password"));
-                return saltAndHashedPassword;
-            }else{
-                throw new DataAccessException("There is no hirer in the database with usercode = " +userCode, null);
+
+            if(!resultSet.next()) {
+                throw new IdNotFoundException("Errore: Credenziali per Hirer con userCode [" + userCode + "] non presenti nel DB.");
             }
+
+            HashMap<String, String> saltAndHashedPassword = new HashMap<>();
+            saltAndHashedPassword.put("salt", resultSet.getString("salt"));
+            saltAndHashedPassword.put("hashedPassword", resultSet.getString("hashed_password"));
+            return saltAndHashedPassword;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public void addHirer(String userCode, String name, String surname, String email, String telephoneNumber){
+    public void addHirer(String userCode, String name, String surname, String email, String telephoneNumber) throws IdAlreadyExistsException, DatabaseConnectionException {
         try {
             connection = ConnectionManager.getConnection();
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
@@ -75,14 +82,16 @@ public class HirerDAO {
             ps.setString(3, surname);
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
-            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
+            ps.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //ipotetica eccezione
+            if(e.getSQLState().equals("23505")){
+                throw new IdAlreadyExistsException("Errore: Hirer con userCode [" + userCode + "] già presente nel DB.");
+            }
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public void addHirerPassword(String userCode, String hashedPassword, String salt) {
+    public void addHirerPassword(String userCode, String hashedPassword, String salt) throws IdAlreadyExistsException, DatabaseConnectionException {
         try {
             connection = ConnectionManager.getConnection();
             String query = "INSERT INTO user_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
@@ -90,14 +99,16 @@ public class HirerDAO {
             ps.setString(1, userCode);
             ps.setString(2, hashedPassword);
             ps.setString(3, salt);
-            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
+            ps.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //return false; TODO ipotetica eccezione
+            if(e.getSQLState().equals("23505")){
+                throw new IdAlreadyExistsException("Errore: Credenziali per Hirer con userCode [" + userCode + "] già presenti nel DB.");
+            }
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public ArrayList<Hirer> getHirers_() {
+    public ArrayList<Hirer> getHirers_() throws DatabaseConnectionException {
         ArrayList<Hirer> result = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
@@ -112,13 +123,9 @@ public class HirerDAO {
                 result.add(new Hirer(resultSet.getString("user_code"), resultSet.getString("name"), resultSet.getString("surname"),
                         resultSet.getString("email"), resultSet.getString("telephone_number"), null, unbannedDate));
             }
-            if(result.isEmpty()){
-                throw new DataAccessException("There aren't hirers in the database!", null);
-            }
             return result;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null; //TODO ipotetica eccezione
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 

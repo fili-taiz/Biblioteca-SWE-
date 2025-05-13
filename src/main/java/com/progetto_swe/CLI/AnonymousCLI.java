@@ -11,64 +11,70 @@ public class AnonymousCLI {
 
     private AnonymousUserController anonymousUserController = new AnonymousUserController();
     private Scanner scanner = new Scanner(System.in);
-
+/*
     public String start() {
+        CommandLineInterface.clearScreen();
         String scelta;
         do {
-            CommandLineInterface.clearScreen();
             //leggere input user
             System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
                     "Ricerca: ricercare un'articolo all'interno della biblioteca; \n" +
                     "Ricerca avanzata: ricercare con filtri; \n" +
                     "Login: effettuare l'accesso al sito identificandoti con le tue credenziali; \n" +
-                    "Esci: se vuoi uscire dall'applicazione");
-            scelta = scanner.nextLine().toLowerCase();
+                    "Esci: se vuoi uscire dall'applicazione.");
+            scelta = scanner.nextLine().toUpperCase();
 
             switch (scelta) {
-                case "ricerca": {
-                    ArrayList<Item> items = ricerca();
 
-                    String code;
-                    do {
+                case "RICERCA": {
+                    try {
+                        String operazione;
+                        do {
+                            ArrayList<Item> items = ricerca();
+                            operazione = paginaArticoli(items);
+                        } while (!operazione.equals("ESCI"));
+                    } catch (Exception e) { //TODO eccezione Categoria inesistente
                         CommandLineInterface.clearScreen();
-                        stampaArticoli(items);
-
-                        System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                                "[Un codice di un articolo]: visualizzare i dettagli di un certo articolo*" +
-                                "Indietro: tornare alla pagina precedente");
-                        System.out.println("\u001B[31m " +
-                                "[Attenzione] non hai effettuato al login nel sito, le operazioni di prestito possono solo essere effettuate se hai effettuato il login.\n" +
-                                "Se effettui il login dopo una ricerca il risultato della ricerca andrà perduta e dovrai rieffettuare la ricerca da capo \u001B[0m");
-                        code = scanner.nextLine().toLowerCase();
-                        stampaArticolo(items.get(Integer.valueOf(code)));
-                    } while (!code.equals("indietro"));
+                        System.out.println("Errore: non hai inserito una categoria corretta.");
+                    }
                     break;
                 }
 
-                case "ricerca avanzata": {
-                    ArrayList<Item> items = ricercaAvanzata();
-                    String code;
-                    do {
-                        stampaArticoli(items);
-                        System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                                "[Un codice di un articolo]: visualizzare i dettagli di un certo articolo*" +
-                                "Indietro: tornare alla pagina precedente");
-                        System.out.println("\u001B[31m " +
-                                "[Attenzione] non hai effettuato al login nel sito, le operazioni di prestito possono solo essere effettuate se hai effettuato il login.\n" +
-                                "Se effettui il login dopo una ricerca il risultato della ricerca andrà perduta e dovrai rieffettuare la ricerca da capo \u001B[0m");
-                        code = scanner.nextLine().toLowerCase();
-                        stampaArticolo(items.get(Integer.valueOf(code)));
-                    } while (!code.equals("indietro"));
+                case "RICERCA AVANZATA": {
+                    try {
+                        String operazione;
+                        do {
+                            ArrayList<Item> items = ricercaAvanzata();
+                            operazione = paginaArticoli(items);
+                        } while (!operazione.equals("ESCI"));
+                    } catch (NumberFormatException e) { //TODO eccezione Categoria inesistente
+                        CommandLineInterface.clearScreen();
+                        System.out.println("Errore: non hai inserito una categoria corretta.");
+                        break;
+                    } catch (Exception e) { //TODO eccezione Lingua inesistente
+                        CommandLineInterface.clearScreen();
+                        System.out.println("Errore: non hai inserito una lingua corretta.");
+                    }
                     break;
                 }
 
-                case "login": {
-                    System.out.println("Inserisci il ruolo con cui vuoi effettuare l'accesso al sito");
-                    return scanner.nextLine().toLowerCase();
+                case "LOGIN": {
+                    System.out.println("Inserisci il ruolo con cui vuoi effettuare l'accesso al sito tra quelli seguenti: \n" +
+                            "[NOLEGGIATORE ESTERNO], [NOLEGGIATORE UNIVERSITARIO], [AMMINISTRATORE BIBLIOTECARIO]; ");
+                    return scanner.nextLine().toUpperCase();
                 }
             }
-        } while (!scelta.equals("esci"));
-        return "esci";
+        } while (!scelta.equals("ESCI"));
+        return "ESCI";
+    }
+
+    private int getPosition(ArrayList<Item> items, int code ){
+        for(int i = 0 ; i < items.size(); i++){
+            if(items.get(i).getCode() == code){
+                return i;
+            }
+        }
+        return -1; //TODO eccezione ID errato
     }
 
     private ArrayList<Item> ricerca() {
@@ -77,6 +83,7 @@ public class AnonymousCLI {
             System.out.print(c + ", ");
         }
         System.out.print("\b;");
+
         Category category = Category.valueOf(scanner.nextLine().toUpperCase());
 
         System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
@@ -102,11 +109,8 @@ public class AnonymousCLI {
         System.out.println("\b;");
         Language language = Language.valueOf(scanner.nextLine());
 
-        System.out.println("Inserisci: " +
-                "Si: se l'articolo deve essere noleggiabile in una nostra biblioteca" +
-                "No: se l'articolo può non essere noleggiabile");
-        System.out.print("\b;");
-        boolean borrowable = scanner.nextLine().equals("Si");
+        System.out.println("Inserisci [Si] se l'articolo deve essere noleggiabile in una nostra biblioteca: ");
+        boolean borrowable = scanner.nextLine().toUpperCase().equals("SI");
 
         System.out.println("Inserisci l'intervallo in cui è stato pubblicato l'articolo che stai cercando: \n" +
                 "Data inizio: [formato GG/MM/AAAA]");
@@ -115,13 +119,47 @@ public class AnonymousCLI {
         LocalDate endDate = LocalDate.parse(scanner.nextLine());
 
         System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
-        String keywords = scanner.nextLine();
+        String keywords = scanner.nextLine().toUpperCase();
         return anonymousUserController.advanceSearchItem(keywords, category, language, borrowable, startDate, endDate);
+    }
+
+    private String paginaArticoli(ArrayList<Item> items) {
+        CommandLineInterface.clearScreen();
+        String code;
+        do {
+            stampaArticoli(items);
+
+            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
+                    "[Un codice di un articolo]: visualizzare i dettagli di un certo articolo; " +
+                    "Indietro: tornare alla pagina precedente; " +
+                    "Esci: tornare alla home page. ");
+            code = scanner.nextLine().toUpperCase();
+            try{
+                int itemCode = Integer.parseInt(code);
+                paginaArticolo(items.get(getPosition(items, itemCode)));
+            } catch (NumberFormatException e) {
+                CommandLineInterface.clearScreen();
+                System.out.println("Errore: non hai inserito un codice corretto.");
+            } // catch id inserito non presente
+        } while (!code.equals("INDIETRO") && !code.equals("ESCI"));
+        return code;
+    }
+
+    private void paginaArticolo(Item item) {
+        CommandLineInterface.clearScreen();
+
+        String operazione;
+        do {
+            stampaArticolo(item);
+            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
+                    "Indietro: tornare alla pagina precedente; ");
+            operazione = scanner.nextLine().toUpperCase();
+        } while (!operazione.equals("INDIETRO"));
     }
 
     private void stampaArticoli(ArrayList<Item> items) {
         CommandLineInterface.clearScreen();
-        String[] header = {"Nome Articolo", "Autore", "Categoria", "Data Pubblicazione"};
+        String[] header = {"Titolo Articolo", "Autore", "Categoria", "Data Pubblicazione"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Item item : items) {
             data.add(item.getValues());
@@ -137,9 +175,7 @@ public class AnonymousCLI {
         String[] header = {"Sede", "Numero copie", "Stato"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Library library : item.getPhysicalCopies().keySet()) {
-            ListOfLendings lendings = anonymousUserController.getListOfLending();
-            ListOfReservations reservations = anonymousUserController.getListOfReservation();
-            data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library)), state(item.getNumberOfAvailableCopiesInLibrary(lendings, reservations, library), item.isBorrowable(library))});
+            data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(library)), state(item.getNumberOfAvailableCopiesInLibrary(library), item.isBorrowable(library))});
         }
         CommandLineInterface.printTable(header, data, 0);
     }
@@ -152,5 +188,5 @@ public class AnonymousCLI {
             return "Esaurito";
         }
         return "Prenotabile";
-    }
+    }*/
 }

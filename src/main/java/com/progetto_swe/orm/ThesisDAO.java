@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.database_exception.CRUD_exception;
-import com.progetto_swe.orm.database_exception.DataAccessException;
-import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
+import com.progetto_swe.orm.database_exception.*;
+import net.bytebuddy.matcher.DeclaringAnnotationMatcher;
 
 public class ThesisDAO {
 
@@ -18,36 +17,62 @@ public class ThesisDAO {
         this.connection = ConnectionManager.getConnection();
     }
 //TODO guarda BookDAO
-    public Thesis getThesis(int code) {
+    public Thesis getThesis(int itemCode) throws IdNotFoundException, DatabaseConnectionException{
         try {
             connection = ConnectionManager.getConnection();
-            String query = "SELECT * FROM Item I JOIN Thesis T ON I.code = T.code WHERE I.code = ?;";
+            String query = """
+                    SELECT * 
+                    FROM Item I JOIN Thesis T ON I.code = T.code 
+                    WHERE I.code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ResultSet resultSet = ps.executeQuery();
+
             if(!resultSet.next()) {
-                //System.out.println("There is no book in the database with code = " + code + "!");
-                return null;
+                throw new IdNotFoundException("Errore: Thesis con itemCode [" + itemCode + "] non presente nel DB.");
             }
-            Thesis thesis = new Thesis(resultSet.getInt("code"), resultSet.getString("title"), LocalDate.parse(resultSet.getString("publication_date")),
-                    Language.valueOf(resultSet.getString("language")), Category.valueOf(resultSet.getString("category")), resultSet.getString("link"), resultSet.getInt("number_of_pages"), resultSet.getString("author"),
-                    resultSet.getString("supervisors"), resultSet.getString("university"));
+
+            Thesis thesis = new Thesis(itemCode,
+                    resultSet.getString("title"),
+                    LocalDate.parse(resultSet.getString("publication_date")),
+                    Language.valueOf(resultSet.getString("language")),
+                    Category.valueOf(resultSet.getString("category")),
+                    resultSet.getString("link"),
+                    resultSet.getInt("number_of_pages"),
+                    resultSet.getString("author"),
+                    resultSet.getString("supervisors"),
+                    resultSet.getString("university"));
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            thesis.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(code));
+            thesis.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
             return thesis;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public int addThesis(String title, String publicationDate, String language, String category, String link, int number_of_pages, String author, String supervisors, String university) {
+    public int addThesis(String title,
+                         String publicationDate,
+                         String language,
+                         String category,
+                         String link,
+                         int number_of_pages,
+                         String author,
+                         String supervisors,
+                         String university,
+                         String storagePlace,
+                         int numberOfCopies,
+                         boolean borrowable)
+            throws IdAlreadyExistsException, DatabaseConnectionException {
 
         connection = ConnectionManager.getConnection();
         try {
             //Creazione Item e Thesis
-            String query = "INSERT INTO Item (title, publication_date, language, category, link, number_of_pages) VALUES (?, ?, ?, ?, ?, ?) "
-                    + " RETURNING code;";
+            String query = """
+                    INSERT INTO Item (title, publication_date, language, category, link, number_of_pages) 
+                    VALUES (?, ?, ?, ?, ?, ?) 
+                    RETURNING code;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, title);
             ps.setDate(2, Date.valueOf(publicationDate));
@@ -56,53 +81,61 @@ public class ThesisDAO {
             ps.setString(5, link);
             ps.setInt(6, number_of_pages);
 
-            ps.executeUpdate();
-            ResultSet generatedKeys = ps.getGeneratedKeys();
-            if (!generatedKeys.next()) {
-                throw new CRUD_exception("Error executing insert!", null);
-            }
-            int code = generatedKeys.getInt(1);
+            ResultSet resultSet = ps.executeQuery();
+            int itemCode = resultSet.getInt("code");
 
-            query = "INSERT INTO Thesis (code, author, supervisors, university) VALUES (?, ?, ?, ?);";
+            query = """
+                    INSERT INTO Thesis (code, author, supervisors, university) 
+                    VALUES (?, ?, ?, ?);
+                    """;
             ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ps.setString(2, author);
             ps.setString(3, supervisors);
             ps.setString(4, university);
             ps.executeUpdate();
 
-            return code;
+            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+            physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
+            return itemCode;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return -1;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public void removeThesis(int code) {
+    public void removeThesis(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
 
         connection = ConnectionManager.getConnection();
         try {
             String query = "DELETE FROM Thesis WHERE code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
 
-            //if(ps.executeUpdate() == 0){
-            //    return false;
-            //}
+            if(ps.executeUpdate() != 1) {
+                ConnectionManager.rollback();
+                throw new IdNotFoundException("Errore: Il Thesis con itemCode [" + itemCode + "] non è presente nel DB.");
+            }
 
             query = "DELETE FROM Item WHERE code = ?;";
             ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
 
-            //return ps.executeUpdate() != 0;
+            if(ps.executeUpdate() != 1) {
+                ConnectionManager.rollback();
+                throw new IdNotFoundException("Errore: L'Item che vuoi rimuovere non è un Thesis. [problema su chiamata del metodo]");
+            }
+            ConnectionManager.commit();
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //return false;
+            ConnectionManager.rollback();
+            if(e.getSQLState().equals("23503")){
+                throw new ConstrainViolationException("Errore: Thesis con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
+            }
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
     public void updateThesis(int originalItemCode,String title, String publicationDate, String language, String category, String link, String author,
-                                String supervisors, String university) {
+                                String supervisors, String university, String storagePlace, int newNumberOfCopies, boolean borrowable) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
         connection = ConnectionManager.getConnection();
         try {
             String query
@@ -115,9 +148,10 @@ public class ThesisDAO {
             ps.setString(5, link);
             ps.setInt(6, originalItemCode);
 
-            //if(ps.executeUpdate() == 0){
-            //    return false;
-            //}
+            if(ps.executeUpdate() != 1) {
+                ConnectionManager.rollback();
+                throw new IdNotFoundException("Errore: Thesis con ItemCode [" + originalItemCode + "] non presente nel DB.");
+            }
 
             query = "UPDATE Thesis SET author = ?, supervisors = ?, university = ? WHERE code = ?;";;
             ps = connection.prepareStatement(query);
@@ -126,16 +160,19 @@ public class ThesisDAO {
             ps.setString(3, university);
             ps.setInt(4, originalItemCode);
 
-            //return ps.executeUpdate() != 0;
+            if(ps.executeUpdate() != 1) {
+                ConnectionManager.rollback();
+                throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] non è un Thesis.");
+            }
+            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //return false;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
     public ArrayList<Thesis> getAllThesis() {
         ArrayList<Thesis> thesis = new ArrayList<>();
-        HashMap<Library, PhysicalCopies> physicalCopies;
         connection = ConnectionManager.getConnection();
         try {
             //tutti i thesis
@@ -156,24 +193,12 @@ public class ThesisDAO {
             }
 
             for(Thesis t : thesis){
-                String query_2 = "SELECT * FROM physical_copies P WHERE P.code = ?;";
-                ps = connection.prepareStatement(query_2);
-                ps.setInt(1, t.getCode());
-                ResultSet copiesSet = ps.executeQuery();
-                physicalCopies = new HashMap<>();
-                while (copiesSet.next()) {
-                    physicalCopies.put(
-                            Library.valueOf(copiesSet.getString("storage_place")),
-                            new PhysicalCopies(copiesSet.getInt("number_of_copies"),
-                                    copiesSet.getInt("number_of_available_copies"),
-                                    copiesSet.getBoolean("borrowable")));
-                }
-                t.setPhysicalCopies(physicalCopies);
+                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+                t.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(t.getCode()));
             }
             return thesis;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 }

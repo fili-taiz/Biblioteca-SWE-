@@ -53,17 +53,17 @@ public class ItemController {
 
 
     public void addBook(String title,
-                           String publicationDate,
-                           String language,
-                           String category,
-                           String link,
-                           String isbn,
-                           String publishingHouse,
-                           int numberOfPages,
-                           String authors,
-                           int numberOfCopies,
-                           boolean isBorrowable,
-                           Token token) {
+                        String publicationDate,
+                        String language,
+                        String category,
+                        String link,
+                        String isbn,
+                        String publishingHouse,
+                        int numberOfPages,
+                        String authors,
+                        int numberOfCopies,
+                        boolean borrowable,
+                        Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             //TODO lancia eccezione
@@ -75,18 +75,27 @@ public class ItemController {
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
             if(i.sameField(bookCopy)) {
-                addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, isBorrowable);
+                addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
                 return; //return true;
             }
         }
 
         try{
-            ConnectionManager.closeAutoCommit();
-            int itemCode = bookDAO.addBook(title, publicationDate, language, category, link, isbn, publishingHouse, numberOfPages, authors);
-            addPhysicalCopies(itemCode, Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, isBorrowable);
-            ConnectionManager.commit();
-            //return true;
-        } catch (Exception e) {
+            int itemCode = bookDAO.addBook(
+                    title,
+                    publicationDate,
+                    language,
+                    category,
+                    link,
+                    isbn,
+                    publishingHouse,
+                    numberOfPages,
+                    authors,
+                    token.getTokenWorkingPlace(),
+                    numberOfCopies,
+                    borrowable);
+            //return itemCode; //TODO controllare se serve ritornare il codice
+        } catch (Exception e) {//RODO gestione
             e.getMessage();
             e.printStackTrace();
         }
@@ -94,15 +103,15 @@ public class ItemController {
     }//TODO gestisci anche quelli dopo
 
     public void addMagazine(String title,
-                               String publicationDate,
-                               String language,
-                               String category,
-                               String link,
-                               int numberOfPages,
-                               String publishingHouse,
-                               int numberOfCopies,
-                               boolean isBorrowable,
-                               Token token) {
+                            String publicationDate,
+                            String language,
+                            String category,
+                            String link,
+                            int numberOfPages,
+                            String publishingHouse,
+                            int numberOfCopies,
+                            boolean borrowable,
+                            Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             //TODO lancia eccezione
@@ -114,16 +123,23 @@ public class ItemController {
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
             if(i.sameField(magazineCopy)) {
-                addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, isBorrowable);
+                addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
                 //return true;
             }
         }
 
         try{
-            ConnectionManager.closeAutoCommit();
-            int itemCode = magazineDAO.addMagazine(title, publicationDate, language, category, link, publishingHouse, numberOfPages);
-            addPhysicalCopies(itemCode, Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, isBorrowable);
-            ConnectionManager.commit();
+            int itemCode = magazineDAO.addMagazine(
+                    title,
+                    publicationDate,
+                    language,
+                    category,
+                    link,
+                    publishingHouse,
+                    numberOfPages,
+                    token.getTokenWorkingPlace(),
+                    numberOfCopies,
+                    borrowable);
             //return true;
         } catch (Exception e) {
             e.getMessage();
@@ -133,17 +149,17 @@ public class ItemController {
     }
 
     public void addThesis(String title,
-                             String publicationDate,
-                             String language,
-                             String category,
-                             String link,
-                             int numberOfPages,
-                             String author,
-                             String supervisors,
-                             String university,
-                             int numberOfCopies,
-                             boolean isBorrowable,
-                             Token token) {
+                          String publicationDate,
+                          String language,
+                          String category,
+                          String link,
+                          int numberOfPages,
+                          String author,
+                          String supervisors,
+                          String university,
+                          int numberOfCopies,
+                          boolean borrowable,
+                          Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             //TODO lancia eccezione
@@ -155,15 +171,26 @@ public class ItemController {
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
             if(i.sameField(thesisCopy)) {
-                addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, isBorrowable);
+                addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
                 //return true;
             }
         }
 
         try{
             ConnectionManager.closeAutoCommit();
-            int itemCode = thesisDAO.addThesis(title, publicationDate, language, category, link, numberOfPages, author, supervisors, university);
-            addPhysicalCopies(itemCode, Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, isBorrowable);
+            int itemCode = thesisDAO.addThesis(
+                    title,
+                    publicationDate,
+                    language,
+                    category,
+                    link,
+                    numberOfPages,
+                    author,
+                    supervisors,
+                    university,
+                    token.getTokenWorkingPlace(),
+                    numberOfCopies,
+                    borrowable);
             ConnectionManager.commit();
             //return true;
         } catch (Exception e) {
@@ -195,17 +222,14 @@ public class ItemController {
             physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             //return true;
         }
-        ConnectionManager.closeAutoCommit();
 
         BookDAO bookDAO = new BookDAO();
         Book book = bookDAO.getBook(itemCode);
         try {
             if(book.getLink().isEmpty()){
                 bookDAO.removeBook(itemCode);
-                ConnectionManager.commit();
             }
         } catch (Exception e) {
-            ConnectionManager.rollback();
             //throw eccezione
         }
         //return true;
@@ -222,17 +246,14 @@ public class ItemController {
             physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             //return true;
         }
-        ConnectionManager.closeAutoCommit();
 
         MagazineDAO magazineDAO = new MagazineDAO();
         Magazine magazine = magazineDAO.getMagazine(itemCode);
         try {
             if(magazine.getLink().isEmpty()){
                 magazineDAO.removeMagazine(itemCode);
-                ConnectionManager.commit();
             }
         } catch (Exception e) {
-            ConnectionManager.rollback();
             //throw eccezione
         }
         //return true;
@@ -249,17 +270,14 @@ public class ItemController {
             physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             //return true;
         }
-        ConnectionManager.closeAutoCommit();
 
         ThesisDAO thesisDAO = new ThesisDAO();
         Thesis thesis = thesisDAO.getThesis(itemCode);
         try {
             if(thesis.getLink().isEmpty()){
                 thesisDAO.removeThesis(itemCode);
-                ConnectionManager.commit();
             }
         } catch (Exception e) {
-            ConnectionManager.rollback();
             //throw eccezione
         }
         //return true;
@@ -290,21 +308,11 @@ public class ItemController {
         //} TODO update lancia eccezione se non esistente
 
         BookDAO bookDAO = new BookDAO();
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
 
-        ConnectionManager.closeAutoCommit();
         try{
-            bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn, publishingHouse, authors);
-        } catch (Exception e) {
-            ConnectionManager.rollback();
-            //TODO lancia eccezione
-        }
+            bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn, publishingHouse, authors, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
 
-        try {
-            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
-            ConnectionManager.commit();
         }catch (Exception e){
-            ConnectionManager.rollback();
             //TODO lancia eccezione
         }
         //return true;
@@ -331,20 +339,9 @@ public class ItemController {
         //} TODO update lancia eccezione se non esistente
 
         MagazineDAO magazineDAO = new MagazineDAO();
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-
-        ConnectionManager.closeAutoCommit();
         try{
-            magazineDAO.updateMagazine(originalItemCode, title, publicationDate, language, category, link, publishingHouse);
+            magazineDAO.updateMagazine(originalItemCode, title, publicationDate, language, category, link, publishingHouse, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
         } catch (Exception e) {
-            ConnectionManager.rollback();
-            //TODO lancia eccezione
-        }
-
-        try {
-            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
-            ConnectionManager.commit();
-        }catch (Exception e){
             ConnectionManager.rollback();
             //TODO lancia eccezione
         }
@@ -372,23 +369,12 @@ public class ItemController {
         //} TODO update lancia eccezione se non esistente
 
         ThesisDAO thesisDAO = new ThesisDAO();
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-
-        ConnectionManager.closeAutoCommit();
         try{
-            thesisDAO.updateThesis(originalItemCode, title, publicationDate, language, category, link, author, supervisors, univeristy);
+            thesisDAO.updateThesis(originalItemCode, title, publicationDate, language, category, link, author, supervisors, univeristy, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
         } catch (Exception e) {
-            ConnectionManager.rollback();
             //TODO lancia eccezione
         }
 
-        try {
-            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
-            ConnectionManager.commit();
-        }catch (Exception e){
-            ConnectionManager.rollback();
-            //TODO lancia eccezione
-        }
         //return true;
     }
 }

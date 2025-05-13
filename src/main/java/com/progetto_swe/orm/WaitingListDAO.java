@@ -1,9 +1,7 @@
 package com.progetto_swe.orm;
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.database_exception.CRUD_exception;
-import com.progetto_swe.orm.database_exception.DataAccessException;
-import com.progetto_swe.orm.database_exception.DatabaseConnectionException;
+import com.progetto_swe.orm.database_exception.*;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -17,13 +15,13 @@ public class WaitingListDAO {
         this.connection = ConnectionManager.getConnection();
     }
 
-    public ArrayList<String> getWaitingList(int code, String storagePlace) {
+    public ArrayList<String> getWaitingList(int itemCode, String storagePlace) throws DatabaseConnectionException {
         try {
             ArrayList<String> emails = new ArrayList<>();
             connection = ConnectionManager.getConnection();
             String query = "SELECT W.email FROM waiting_list W WHERE W.code = ? AND W.storage_place = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
             ResultSet resultSet = ps.executeQuery();
 
@@ -32,23 +30,36 @@ public class WaitingListDAO {
             }
             return emails;
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            return null;
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
-    public void addToWaitingList(int code, String storagePlace, String email) {
+    public void addToWaitingList(int itemCode, String storagePlace, String email) throws IdAlreadyExistsException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
             String query = "INSERT INTO waiting_list (code, storage_place, email) VALUES (?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
             ps.setString(3, email);
-            //return ps.executeUpdate() != 0; TODO controllo se tupla non esistente restituisce 0 oppure lancia eccezione
+            ps.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            //return false; TODO ipotetica eccezione
+            if(e.getSQLState().equals("23505")){
+                throw new IdAlreadyExistsException("Errore: Hirer con email [" + email + "] già in lista d'attesa.");
+            }
+            throw new DatabaseConnectionException(e.getCause().toString());
+        }
+    }
+
+    public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException {
+        this.connection = ConnectionManager.getConnection();
+        try {
+            String query = "DELETE FROM lending L WHERE code = ? AND storage_place = ?;";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, itemCode);
+            ps.setString(2, storagePlace);
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 }
