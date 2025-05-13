@@ -88,10 +88,10 @@ public class PhysicalCopiesDAO {
             String query = "SELECT * FROM physical_copies P WHERE P.code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, code);
-            ResultSet copiesSet = ps.executeQuery();
+            ResultSet resultSet = ps.executeQuery();
             HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
-            while (copiesSet.next()) {
-                physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")), new PhysicalCopies(copiesSet.getInt("number_of_copies"), copiesSet.getInt("number_of_available_copies"), copiesSet.getBoolean("borrowable")));
+            while (resultSet.next()) {
+                physicalCopies.put(Library.valueOf(resultSet.getString("storage_place")), new PhysicalCopies(resultSet.getInt("number_of_copies"), resultSet.getInt("number_of_available_copies"), resultSet.getBoolean("borrowable")));
             }
             return physicalCopies;
         } catch (SQLException e) {

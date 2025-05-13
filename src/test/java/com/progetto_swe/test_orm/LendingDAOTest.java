@@ -29,8 +29,8 @@ public class LendingDAOTest {
         Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
-        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
-        magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50);
+        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true);
+        magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50, Library.LIBRARY_1.toString(), 5, true);
 
         HirerDAO hirerDAO = new HirerDAO();
         Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
@@ -48,16 +48,15 @@ public class LendingDAOTest {
 
         ArrayList<Lending> expected_lendings = new ArrayList<>();
 
-        Lending l1 = new Lending(LocalDate.now(), hirer, book, Library.LIBRARY_1);
-        Lending l2 = new Lending(LocalDate.now(), hirer, magazine, Library.LIBRARY_2);
+        Lending l1 = new Lending(LocalDate.now(), LocalDate.of(2025, 06, 13), hirer, book, Library.LIBRARY_1);
+        Lending l2 = new Lending(LocalDate.now(), LocalDate.of(2025, 06, 13) hirer, magazine, Library.LIBRARY_2);
 
         expected_lendings.add(l1);
         expected_lendings.add(l2);
 
-        RemovedListOfLendings expected_list_of_lendings = new RemovedListOfLendings(expected_lendings);
 
-        assertEquals(expected_list_of_lendings.getLendings().size(), lendingDAO.getLendings_().getLendings().size());
-        assertTrue(lendingDAO.getLendings_().getLendings().containsAll(expected_lendings));
+        assertEquals(expected_lendings.size(), lendingDAO.getLendingsByUserCode("uc1").size());
+        assertTrue(lendingDAO.getLendingsByUserCode("uc1").containsAll(expected_lendings));
 
         Lending l3 = new Lending(LocalDate.now(), hirer, magazine, Library.LIBRARY_3);
 

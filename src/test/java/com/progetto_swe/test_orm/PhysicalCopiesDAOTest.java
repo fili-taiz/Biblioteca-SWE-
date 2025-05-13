@@ -4,6 +4,8 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.BookDAO;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.PhysicalCopiesDAO;
+import com.progetto_swe.orm.database_exception.ConstrainViolationException;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +33,7 @@ public class PhysicalCopiesDAOTest {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         BookDAO bookDAO = new BookDAO();
 
-        bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+        bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true);
         assertTrue(physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true));
         assertFalse(physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true));
 
@@ -46,10 +48,20 @@ public class PhysicalCopiesDAOTest {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         BookDAO bookDAO = new BookDAO();
 
-        bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1" );
+        int book_code_1 = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
-        assertTrue(physicalCopiesDAO.removePhysicalCopies(1, Library.LIBRARY_1.toString()));
-        assertFalse(physicalCopiesDAO.removePhysicalCopies(1, Library.LIBRARY_2.toString()));
+        int book_code_2 = bookDAO.addBook("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", "isbn2", "publishing house 2", 202, "authors2", Library.LIBRARY_1.toString(), 7, true );
+        physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
+
+        Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
+        Token token = new Token(hirer);
+        hirer.setToken(token);
+
+        Lending lending = new Lending(LocalDate.of(2025, 04, 4), LocalDate.of(2025, 05, 04), hirer, bookDAO.getBook(book_code_2), Library.LIBRARY_1);
+
+        assertThrows(IdNotFoundException.class, () -> physicalCopiesDAO.removePhysicalCopies(3, Library.LIBRARY_1.toString()));
+        assertThrows(ConstrainViolationException.class, () -> physicalCopiesDAO.removePhysicalCopies(2, Library.LIBRARY_1.toString()));
+
 
         connection.close();
 
@@ -62,10 +74,11 @@ public class PhysicalCopiesDAOTest {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         BookDAO bookDAO = new BookDAO();
 
-        bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+        bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
-        assertTrue(physicalCopiesDAO.updatePhysicalCopies(1, Library.LIBRARY_1.toString(), 14, true));
-        assertFalse(physicalCopiesDAO.updatePhysicalCopies(2, Library.LIBRARY_2.toString(), 14, true));
+        physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
+
+        assertThrows(IdNotFoundException.class, () -> physicalCopiesDAO.updatePhysicalCopies(1, Library.LIBRARY_1.toString(), 14, true));
 
         connection.close();
 
@@ -84,7 +97,8 @@ public class PhysicalCopiesDAOTest {
         b1.setPhysicalCopies(pcExpected);
         BookDAO bookDAO = new BookDAO();
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1");
+        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
+        physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 10, true);
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_2.toString(), 12, true);
 

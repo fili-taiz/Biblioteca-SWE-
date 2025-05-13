@@ -11,25 +11,31 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.sql.*;
 
 
-import com.progetto_swe.orm.database_exception.DataAccessException;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.postgresql.util.PSQLException;
 
 
 public class AdminDAOTest {
+    Connection connection = ConnectionManager.getConnection();
+
 
     @BeforeEach
     public void setUp() throws SQLException{
-        Connection connection = ConnectionManager.getConnection();
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE admin RESTART IDENTITY CASCADE;");
         ps.execute();
+    }
+
+    @AfterEach
+    public void tearDown() throws SQLException{
+        connection.close();
     }
 
 
     @Test
     public void testGetAdmin() throws SQLException {
-        Connection connection = ConnectionManager.getConnection();
 
         String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
@@ -54,9 +60,7 @@ public class AdminDAOTest {
         assertEquals(admin.getTelephoneNumber(), "333");
         assertEquals(admin.getWorkingPlace(), Library.LIBRARY_1);
 
-        assertNull(adminDAO.getAdmin("456"));
-        connection.close();
-
+        assertThrows(IdNotFoundException.class, () -> {adminDAO.getAdmin("456");} );
 
     }
 

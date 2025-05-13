@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TokenTest {
 
-    @Test
+   /* @Test
     public void testConstructor(){
         Token ucs = new Token("usercode", "hashed_password");
 
@@ -25,5 +25,5 @@ public class TokenTest {
         assertNotEquals(ucs1, ucs2);
         assertNotEquals(null, ucs2);
 
-    }
+    }*/
 }

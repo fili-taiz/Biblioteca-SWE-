@@ -11,24 +11,26 @@ public class HirerTest {
 
     @Test
     public void testConstructor(){
-        Token ucs = new Token("usercode", "hashed_password");
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00000",
-                ucs,LocalDate.of(2025, 5,6));
+                null,LocalDate.of(2025, 5,6));
+        Token token = new Token(hirer);
+        hirer.setToken(token);
 
         assertEquals("usercode", hirer.getUserCode());
         assertEquals("name", hirer.getName());
         assertEquals("surname", hirer.getSurname());
         assertEquals("email", hirer.getEmail());
         assertEquals("00000", hirer.getTelephoneNumber());
-        assertEquals(ucs, hirer.getUserCredentials());
+        assertEquals(token, hirer.getToken());
         assertEquals(LocalDate.of(2025, 5, 6), hirer.getUnbannedDate());
     }
 
     @Test
     public void testContains(){
-        Token ucs = new Token("usercode", "hashed_password");
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "12345",
-                ucs, LocalDate.of(2025, 5,6));
+                null, LocalDate.of(2025, 5,6));
+        Token token = new Token(hirer);
+        hirer.setToken(token);
 
         assertTrue(hirer.contains("user"));
         assertTrue(hirer.contains("nam"));
