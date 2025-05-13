@@ -1,4 +1,6 @@
 package com.progetto_swe.domain_model;
+
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,15 +77,17 @@ public abstract class Item {
 
 
     public boolean isBorrowable(Library library) {
-        if(physicalCopies.get(library) == null)
+        if(physicalCopies.get(library) == null){
             return false;
-
+        }
         return physicalCopies.get(library).isBorrowable();
     }
 
     public boolean isBorrowable() {
         for(PhysicalCopies p : physicalCopies.values()){
-            if(p.isBorrowable()) return true;
+            if(p.isBorrowable()){
+                return true;
+            }
         }
         return false;
     }
@@ -94,9 +98,16 @@ public abstract class Item {
 
     public int getNumberOfAvailableCopiesInLibrary(Library library){
         if(physicalCopies.get(library) == null){
-            return -1;
+            return 0;
         }
         return physicalCopies.get(library).getNumberOfAvailableCopies();
+    }
+
+    public int getNumberOfCopiesInLibrary(Library library){
+        if(physicalCopies.get(library) == null){
+            return 0;
+        }
+        return physicalCopies.get(library).getNumberOfPhysicalCopies();
     }
 
     public int getCode(){ return this.code;}
@@ -107,16 +118,6 @@ public abstract class Item {
     public String getLink(){ return this.link;}
     public int getNumberOfPages() { return this.numberOfPages; }
 
-    public PhysicalCopies getLibraryPhysicalCopies(Library library) {
-        if(physicalCopies.get(library) == null){
-            return null;
-        }
-        return physicalCopies.get(library);
-    }
-
-    public HashMap<Library, PhysicalCopies> getPhysicalCopies() {
-        return physicalCopies;
-    }
 
     public void setCode(int newCode){ this.code = newCode; }
     public void setCategory(Category newCategory){ this.category = newCategory;}

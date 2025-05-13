@@ -1,12 +1,9 @@
 package com.progetto_swe.orm;
 
-import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.*;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class WaitingListDAO {
     private Connection connection;

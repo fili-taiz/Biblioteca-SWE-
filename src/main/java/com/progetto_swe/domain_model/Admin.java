@@ -1,13 +1,17 @@
 package com.progetto_swe.domain_model;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Admin extends User{
     private Library workingPlace;
 
-    public Admin(String userCode, String name, String surname, String email, String telephoneNumber, Library workingPlace, Token userProfile) {
+    public Admin(String userCode,
+                 String name,
+                 String surname,
+                 String email,
+                 String telephoneNumber,
+                 Library workingPlace,
+                 Token userProfile) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.workingPlace = workingPlace;
     }
@@ -21,8 +25,12 @@ public class Admin extends User{
             return false;
         }
         Admin admin = (Admin) o;
-        return Objects.equals(this.getUserCode(), admin.getUserCode()) && Objects.equals(this.getName(), admin.getName()) && Objects.equals(this.getSurname(), admin.getSurname())
-                && Objects.equals(this.getEmail(), admin.getEmail()) && Objects.equals(this.getTelephoneNumber(), admin.getTelephoneNumber()) && Objects.equals(this.getWorkingPlace(), admin.getWorkingPlace());
+        return Objects.equals(this.getUserCode(), admin.getUserCode()) &&
+                Objects.equals(this.getName(), admin.getName()) &&
+                Objects.equals(this.getSurname(), admin.getSurname()) &&
+                Objects.equals(this.getEmail(), admin.getEmail()) &&
+                Objects.equals(this.getTelephoneNumber(), admin.getTelephoneNumber()) &&
+                Objects.equals(this.getWorkingPlace(), admin.getWorkingPlace());
     }
 
     @Override

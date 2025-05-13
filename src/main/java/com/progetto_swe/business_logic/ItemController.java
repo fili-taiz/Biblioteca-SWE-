@@ -1,21 +1,21 @@
 package com.progetto_swe.business_logic;
 
+import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ItemController {
-    public ArrayList<Item> searchItem(String keywords, Category category) {
+    public ArrayList<Item> searchItem(String keywords, String category) {
         ArrayList<Item> items = getAllItems();
 
         String[] splittedKeyword = keywords.split(" ");
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : items) {
             for (String keyword : splittedKeyword){
-                if (i.getCategory().equals(category) && i.contains(keyword)) {
+                if (i.getCategory().equals(Category.valueOf(category)) && i.contains(keyword)) {
                     result.add(i);
                 }
             }
@@ -36,14 +36,18 @@ public class ItemController {
     }
 
 
-    public ArrayList<Item> advanceSearchItem(String keywords, Category category, Language language, boolean borrowable, LocalDate startDate, LocalDate endDate) {
+    public ArrayList<Item> advanceSearchItem(String keywords, String category, String language, boolean borrowable, String startDate, String endDate) {
         ArrayList<Item> items = getAllItems();
         String[] splittedKeyword = keywords.split(" ");
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : items) {
             for (String keyword : splittedKeyword){
-                if (i.getCategory().equals(category) && i.getLanguage().equals(language) && i.isBorrowable() == borrowable &&
-                        i.getPublicationDate().isAfter(startDate) && i.getPublicationDate().isBefore(endDate) && i.contains(keyword)) {
+                if (i.getCategory().equals(Category.valueOf(category)) &&
+                        i.getLanguage().equals(Language.valueOf(language)) &&
+                        i.isBorrowable() == borrowable &&
+                        i.getPublicationDate().isAfter(LocalDate.parse(startDate)) &&
+                        i.getPublicationDate().isBefore(LocalDate.parse(endDate)) &&
+                        i.contains(keyword)) {
                     result.add(i);
                 }
             }
@@ -66,22 +70,31 @@ public class ItemController {
                         Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
 
-        Book bookCopy = new Book(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, isbn, publishingHouse, numberOfPages, authors);
+        Book bookCopy = new Book(
+                title,
+                LocalDate.parse(publicationDate),
+                Language.valueOf(language),
+                Category.valueOf(category),
+                link,
+                isbn,
+                publishingHouse,
+                numberOfPages,
+                authors);
         BookDAO bookDAO = new BookDAO();
 
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
             if(i.sameField(bookCopy)) {
                 addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
-                return; //return true;
+                return;
             }
         }
 
-        try{
-            int itemCode = bookDAO.addBook(
+        //TODO probabile inutile
+        int itemCode = bookDAO.addBook(
                     title,
                     publicationDate,
                     language,
@@ -94,13 +107,7 @@ public class ItemController {
                     token.getTokenWorkingPlace(),
                     numberOfCopies,
                     borrowable);
-            //return itemCode; //TODO controllare se serve ritornare il codice
-        } catch (Exception e) {//RODO gestione
-            e.getMessage();
-            e.printStackTrace();
-        }
-        //return false;
-    }//TODO gestisci anche quelli dopo
+    }
 
     public void addMagazine(String title,
                             String publicationDate,
@@ -114,38 +121,39 @@ public class ItemController {
                             Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
 
-        Magazine magazineCopy = new Magazine(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, publishingHouse);
+        Magazine magazineCopy = new Magazine(
+                title,
+                LocalDate.parse(publicationDate),
+                Language.valueOf(language),
+                Category.valueOf(category),
+                link,
+                numberOfPages,
+                publishingHouse);
         MagazineDAO magazineDAO = new MagazineDAO();
 
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
             if(i.sameField(magazineCopy)) {
                 addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
-                //return true;
+                return;
             }
         }
 
-        try{
-            int itemCode = magazineDAO.addMagazine(
-                    title,
-                    publicationDate,
-                    language,
-                    category,
-                    link,
-                    publishingHouse,
-                    numberOfPages,
-                    token.getTokenWorkingPlace(),
-                    numberOfCopies,
-                    borrowable);
-            //return true;
-        } catch (Exception e) {
-            e.getMessage();
-            e.printStackTrace();
-        }
-        //return false;
+        //TODO probabile inutile
+        int itemCode = magazineDAO.addMagazine(
+                title,
+                publicationDate,
+                language,
+                category,
+                link,
+                publishingHouse,
+                numberOfPages,
+                token.getTokenWorkingPlace(),
+                numberOfCopies,
+                borrowable);
     }
 
     public void addThesis(String title,
@@ -162,125 +170,123 @@ public class ItemController {
                           Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
 
-        Thesis thesisCopy = new Thesis(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link, numberOfPages, author, supervisors, university);
+        Thesis thesisCopy = new Thesis(
+                title,
+                LocalDate.parse(publicationDate),
+                Language.valueOf(language),
+                Category.valueOf(category),
+                link,
+                numberOfPages,
+                author,
+                supervisors,
+                university);
         ThesisDAO thesisDAO = new ThesisDAO();
 
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
             if(i.sameField(thesisCopy)) {
                 addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
-                //return true;
+                return;
             }
         }
 
-        try{
-            ConnectionManager.closeAutoCommit();
-            int itemCode = thesisDAO.addThesis(
-                    title,
-                    publicationDate,
-                    language,
-                    category,
-                    link,
-                    numberOfPages,
-                    author,
-                    supervisors,
-                    university,
-                    token.getTokenWorkingPlace(),
-                    numberOfCopies,
-                    borrowable);
-            ConnectionManager.commit();
-            //return true;
-        } catch (Exception e) {
-            e.getMessage();
-            e.printStackTrace();
-        }
-        //return false;
+        //TODO prob inutile
+        int itemCode = thesisDAO.addThesis(
+                title,
+                publicationDate,
+                language,
+                category,
+                link,
+                numberOfPages,
+                author,
+                supervisors,
+                university,
+                token.getTokenWorkingPlace(),
+                numberOfCopies,
+                borrowable);
     }
 
-    public void addPhysicalCopies(int itemCode, Library storagePlace, int numberOfCopies, boolean borrowable) {
+    private void addPhysicalCopies(int itemCode, Library storagePlace, int numberOfCopies, boolean borrowable) {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         int physicalCopies = physicalCopiesDAO.getPhysicalCopies(itemCode).get(storagePlace).getNumberOfPhysicalCopies();
         if (physicalCopies == 0){
             physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace.toString(), numberOfCopies, borrowable);
         }else {
             physicalCopiesDAO.updatePhysicalCopies(itemCode, storagePlace.toString(), (physicalCopies + numberOfCopies), borrowable);
-        }//TODO controlla eccezioni
+        }
     }
 
 
 
     public void removeBook(int itemCode, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-        if(!physicalCopiesDAO.getPhysicalCopies(itemCode).isEmpty()){
-            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
-            //return true;
-        }
-
         BookDAO bookDAO = new BookDAO();
         Book book = bookDAO.getBook(itemCode);
-        try {
+
+        if(book.getNumberOfLibraries() == 0){
             if(book.getLink().isEmpty()){
                 bookDAO.removeBook(itemCode);
             }
-        } catch (Exception e) {
-            //throw eccezione
         }
-        //return true;
+        if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
+            throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        }
+        if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
+            throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        }
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
     }
 
 
     public void removeMagazine(int itemCode, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-        if(!physicalCopiesDAO.getPhysicalCopies(itemCode).isEmpty()){
-            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
-            //return true;
-        }
-
         MagazineDAO magazineDAO = new MagazineDAO();
         Magazine magazine = magazineDAO.getMagazine(itemCode);
-        try {
+
+        if(magazine.getNumberOfLibraries() == 0){
             if(magazine.getLink().isEmpty()){
                 magazineDAO.removeMagazine(itemCode);
             }
-        } catch (Exception e) {
-            //throw eccezione
         }
-        //return true;
+        if(magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
+            throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        }
+        if(magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != magazine.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
+            throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        }
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
     }
 
 
     public void removeThesis(int itemCode, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-        if(!physicalCopiesDAO.getPhysicalCopies(itemCode).isEmpty()){
-            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
-            //return true;
-        }
-
         ThesisDAO thesisDAO = new ThesisDAO();
         Thesis thesis = thesisDAO.getThesis(itemCode);
-        try {
+
+        if(thesis.getNumberOfLibraries() == 0){
             if(thesis.getLink().isEmpty()){
                 thesisDAO.removeThesis(itemCode);
             }
-        } catch (Exception e) {
-            //throw eccezione
         }
-        //return true;
+        if(thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
+            throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        }
+        if(thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != thesis.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
+            throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        }
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
     }
 
 
@@ -300,81 +306,98 @@ public class ItemController {
                               Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-
-        //if(catalogue.getItem(originalItemCode) == null){
-        //    return false;
-        //} TODO update lancia eccezione se non esistente
+        LocalDate.parse(publicationDate);
+        Language.valueOf(language);
+        Category.valueOf(category);
 
         BookDAO bookDAO = new BookDAO();
-
-        try{
-            bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn, publishingHouse, authors, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
-
-        }catch (Exception e){
-            //TODO lancia eccezione
-        }
-        //return true;
+        bookDAO.updateBook(
+                originalItemCode,
+                title,
+                publicationDate,
+                language,
+                category,
+                link,
+                isbn,
+                publishingHouse,
+                authors,
+                token.getTokenWorkingPlace(),
+                numberOfCopies,
+                borrowable,
+                numberOfPages);
     }
 
     public void updateMagazine(int originalItemCode,
-                                  String title,
-                                  String publicationDate,
-                                  boolean borrowable,
-                                  String language,
-                                  String category,
-                                  String link,
-                                  String isbn,
-                                  String publishingHouse,
-                                  int numberOfCopies,
-                                  Token token) {
+                               String title,
+                               String publicationDate,
+                               boolean borrowable,
+                               String language,
+                               String category,
+                               String link,
+                               String publishingHouse,
+                               int numberOfCopies,
+                               Token token,
+                               int numberOfPages) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-
-        //if(catalogue.getItem(originalItemCode) == null){
-        //    return false;
-        //} TODO update lancia eccezione se non esistente
+        LocalDate.parse(publicationDate);
+        Language.valueOf(language);
+        Category.valueOf(category);
 
         MagazineDAO magazineDAO = new MagazineDAO();
-        try{
-            magazineDAO.updateMagazine(originalItemCode, title, publicationDate, language, category, link, publishingHouse, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
-        } catch (Exception e) {
-            ConnectionManager.rollback();
-            //TODO lancia eccezione
-        }
-        //return true;
+
+        magazineDAO.updateMagazine(
+                originalItemCode,
+                title,
+                publicationDate,
+                language,
+                category,
+                link,
+                publishingHouse,
+                token.getTokenWorkingPlace(),
+                numberOfCopies,
+                borrowable,
+                numberOfPages);
     }
 
     public void updateThesis(int originalItemCode,
-                                String title,
-                                String publicationDate,
-                                boolean borrowable,
-                                String language,
-                                String category,
-                                String link,
-                                String author,
-                                String supervisors,
-                                String univeristy,
-                                int numberOfCopies,
-                                Token token) {
+                             String title,
+                             String publicationDate,
+                             boolean borrowable,
+                             String language,
+                             String category,
+                             String link,
+                             String author,
+                             String supervisors,
+                             String univeristy,
+                             int numberOfCopies,
+                             Token token,
+                             int numberOfPages) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-
-        //if(catalogue.getItem(originalItemCode) == null){
-        //    return false;
-        //} TODO update lancia eccezione se non esistente
+        LocalDate.parse(publicationDate);
+        Language.valueOf(language);
+        Category.valueOf(category);
 
         ThesisDAO thesisDAO = new ThesisDAO();
-        try{
-            thesisDAO.updateThesis(originalItemCode, title, publicationDate, language, category, link, author, supervisors, univeristy, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
-        } catch (Exception e) {
-            //TODO lancia eccezione
-        }
-
-        //return true;
+        thesisDAO.updateThesis(
+                originalItemCode,
+                title,
+                publicationDate,
+                language,
+                category,
+                link,
+                author,
+                supervisors,
+                univeristy,
+                token.getTokenWorkingPlace(),
+                numberOfCopies,
+                borrowable,
+                numberOfPages);
     }
 }

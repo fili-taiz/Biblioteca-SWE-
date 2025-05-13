@@ -32,7 +32,10 @@ public class Reservation {
             return false;
         }
         Reservation reservation = (Reservation) o;
-        return (this.reservationDate.equals(reservation.reservationDate)) && (this.hirer.equals(reservation.hirer)) && (this.item.equals(reservation.item)) && (this.storagePlace.equals(reservation.storagePlace));
+        return this.reservationDate.equals(reservation.reservationDate) &&
+                this.hirer.equals(reservation.hirer) &&
+                this.item.equals(reservation.item) &&
+                this.storagePlace.equals(reservation.storagePlace);
     }
 
     @Override

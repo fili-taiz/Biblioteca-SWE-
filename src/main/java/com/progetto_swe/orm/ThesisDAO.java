@@ -3,11 +3,9 @@ package com.progetto_swe.orm;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.*;
-import net.bytebuddy.matcher.DeclaringAnnotationMatcher;
 
 public class ThesisDAO {
 
@@ -106,7 +104,7 @@ public class ThesisDAO {
         }
     }
 
-    public void removeThesis(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+    public void removeThesis(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
             String query = """
@@ -136,7 +134,7 @@ public class ThesisDAO {
         } catch (SQLException e) {
             ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
-                throw new ConstrainViolationException("Errore: Thesis con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
+                throw new ConstraintViolationException("Errore: Thesis con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
@@ -153,13 +151,14 @@ public class ThesisDAO {
                              String university,
                              String storagePlace,
                              int newNumberOfCopies,
-                             boolean borrowable)
-            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+                             boolean borrowable,
+                             int numberOfPages)
+            throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
             String query = """
-                        UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ?;
+                        UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? WHERE code = ?;
                         """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);

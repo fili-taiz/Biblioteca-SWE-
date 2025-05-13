@@ -1,6 +1,5 @@
 package com.progetto_swe.test_business_logic;
 
-import com.progetto_swe.business_logic.LoginUniversityHirerController;
 import com.progetto_swe.domain_model.Hirer;
 import com.progetto_swe.domain_model.Token;
 import com.progetto_swe.orm.ConnectionManager;

@@ -1,10 +1,5 @@
 package com.progetto_swe.CLI;
 
-import com.progetto_swe.business_logic.AnonymousUserController;
-import com.progetto_swe.domain_model.*;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class AnonymousCLI {

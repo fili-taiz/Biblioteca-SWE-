@@ -76,12 +76,9 @@ public class HirerDAO {
                          String name,
                          String surname,
                          String email,
-                         String telephoneNumber,
-                         String hashedPassword,
-                         String salt)
+                         String telephoneNumber)
             throws IdAlreadyExistsException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
@@ -91,10 +88,7 @@ public class HirerDAO {
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
             ps.executeUpdate();
-            addHirerPassword(userCode, hashedPassword, salt);
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer con userCode [" + userCode + "] già presente nel DB.");
             }

@@ -23,8 +23,8 @@ public class Hasher {
             md = MessageDigest.getInstance("SHA-256");
             return bytesToHex(md.digest((password+salt).getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     public static String hash(String string) {
@@ -33,7 +33,7 @@ public class Hasher {
             md = MessageDigest.getInstance("SHA-256");
             return bytesToHex(md.digest((string).getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }

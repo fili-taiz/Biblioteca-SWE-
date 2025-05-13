@@ -1,14 +1,18 @@
 package com.progetto_swe.domain_model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Hirer extends User{
     private LocalDate unbannedDate;
 
-    public Hirer(String userCode, String name, String surname, String email, String telephoneNumber,
-                 Token userProfile, LocalDate unbannedDate) {
+    public Hirer(String userCode,
+                 String name,
+                 String surname,
+                 String email,
+                 String telephoneNumber,
+                 Token userProfile,
+                 LocalDate unbannedDate) {
         super(userCode, name, surname, email, telephoneNumber, userProfile);
         this.unbannedDate = unbannedDate;
     }
