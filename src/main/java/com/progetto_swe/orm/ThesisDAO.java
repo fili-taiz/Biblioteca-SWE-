@@ -62,7 +62,7 @@ public class ThesisDAO {
                          String storagePlace,
                          int numberOfCopies,
                          boolean borrowable)
-            throws IdAlreadyExistsException, DatabaseConnectionException {
+            throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
