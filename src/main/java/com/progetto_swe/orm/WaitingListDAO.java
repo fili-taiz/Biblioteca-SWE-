@@ -69,10 +69,7 @@ public class WaitingListDAO {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
-            if(ps.executeUpdate() == 0) {
-                ConnectionManager.rollback();
-                throw new IdNotFoundException("Errore: Non c'è nessuno in attesa dell'item con itemCode [" + itemCode + "] ");
-            }
+
         } catch (SQLException e) {
             connection.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
