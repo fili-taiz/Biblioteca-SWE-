@@ -76,11 +76,10 @@ public class MagazineDAO {
             ps.setString(5, link);
             ps.setInt(6, number_of_pages);
 
-            ps.execute();
-            ResultSet resultSet = ps.getResultSet();
+            ResultSet resultSet = ps.executeQuery();
             resultSet.next();
-
-            int itemCode = resultSet.getInt(1);
+            int itemCode = resultSet.getInt("code");
+            
             String query_2 = """
                     INSERT INTO Magazine (code, publishing_house) 
                     VALUES (?, ?);

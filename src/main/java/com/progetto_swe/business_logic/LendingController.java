@@ -1,16 +1,14 @@
 package com.progetto_swe.business_logic;
 
 import com.progetto_swe.MailSender.MailSender;
+import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.LendingDAO;
-import com.progetto_swe.orm.ReservationDAO;
 import com.progetto_swe.orm.WaitingListDAO;
 
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class LendingController {
     public ArrayList<Lending> getLendings(String userCode) {
@@ -19,70 +17,43 @@ public class LendingController {
     }
 
 
-    public void registerReturnOfItem(Hirer hirer, Item item, Library storagePlace, Token token) {
-        Objects.requireNonNull(hirer);//TODO aggiungi requireNonNull
+    public void registerReturnOfItem(Hirer hirer, Item item, String storagePlace, Token token) {
         if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-        if (!token.getTokenWorkingPlace().equals(storagePlace.toString())) {
-            //TODO lancia eccezione
+        if (!token.getTokenWorkingPlace().equals(storagePlace)) {
+            throw new ActionDeniedException("Errore: Non puoi registrare questa operazione, il libro non è stato noleggiato nella sede in cui lavori.");
         }
-        if (hirer == null) {
-            //return false;
-        }
-        if (item == null) {
-            //return false;
-        }//TODO eccezioni
-        //if(!lendingDAO.getLendings_().haveLending(lending)){//gestisco lanciando eccezione
-        //    return false;
-        //}
+        Library.valueOf(storagePlace);
 
         LendingDAO lendingDAO = new LendingDAO();
-
-        /*cancella lending */
-        try {
-            lendingDAO.removeLending(hirer.getUserCode(), item.getCode(), storagePlace.toString());
-            WaitingListDAO waitingListDAO = new WaitingListDAO();
-            ArrayList<String> emails = waitingListDAO.getWaitingList(item.getCode(), storagePlace.toString());
-            for (String email : emails) {
-                MailSender.sendReturnSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());//notifica libro disponibile per prenotazione e noleggio
-            }
-        } catch (Exception e) {
-        }//TODO
-
+        lendingDAO.removeLending(hirer.getUserCode(), item.getCode(), token.getTokenWorkingPlace());
+        MailSender.sendReturnSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());
+        WaitingListDAO waitingListDAO = new WaitingListDAO();
+        ArrayList<String> emails = waitingListDAO.getWaitingList(item.getCode(), storagePlace);
+        for (String email : emails) {
+            MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);//notifica libro disponibile per prenotazione e noleggio
+        }
     }
 
     public void registerLending(Hirer hirer, Item item, Token token) {
         if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
-            //TODO lancia eccezione
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
-        if (!token.getTokenWorkingPlace().equals(token.getTokenWorkingPlace())) {
-            //TODO lancia eccezione
-        }
+
         if (hirer.getUnbannedDate() != null) {
-            //return false;
+            throw new ActionDeniedException("Errore: l'Hirer con userCode [" + hirer.getUserCode() +"] è bannato non può eseguire un prestito.");
         }
-        if (!item.getLibraryPhysicalCopies(Library.valueOf(token.getTokenWorkingPlace())).isBorrowable()) {
-            //return false;
+        if (!item.isBorrowable(Library.valueOf(token.getTokenWorkingPlace()))) {
+            throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non è noleggiabile.");
         }
-        if (item.getLibraryPhysicalCopies(Library.valueOf(token.getTokenWorkingPlace())).getNumberOfAvailableCopies() <= 0) {
-            //return false;
+        if (item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) <= 0) {
+            throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" + token.getTokenWorkingPlace() + "].");
         }
 
-        ReservationDAO reservationDAO = new ReservationDAO();
         LendingDAO lendingDAO = new LendingDAO();
-
-        //if(lendingDAO.getLendings_().lendingExist(hirer, item, this.admin.getWorkingPlace())){
-        //    return false;
-        //} controllo da eccezione
-
-        try {
-            lendingDAO.addLending(hirer.getUserCode(), item.getCode(), token.getTokenWorkingPlace());
-            MailSender.sendLendingSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(), token.getTokenWorkingPlace(), LocalDate.now().plusMonths(1));
-
-        } catch (Exception e) {
-
-        }
+        lendingDAO.addLending(hirer.getUserCode(), item.getCode(), token.getTokenWorkingPlace());
+        MailSender.sendLendingSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(), token.getTokenWorkingPlace(), LocalDate.now().plusMonths(1));
     }
 
 }

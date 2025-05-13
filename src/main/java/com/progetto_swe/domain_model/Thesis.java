@@ -8,14 +8,31 @@ public class Thesis extends Item {
     private String supervisors;
     private String university;
 
-    public Thesis(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages, String author, String supervisors, String university) {
+    public Thesis(int code,
+                  String title,
+                  LocalDate publicationDate,
+                  Language language,
+                  Category category,
+                  String link,
+                  int number_of_pages,
+                  String author,
+                  String supervisors,
+                  String university) {
         super(code, title, publicationDate, language, category, link, number_of_pages);
         this.author = author;
         this.supervisors = supervisors;
         this.university = university;
     }
 
-    public Thesis(String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages, String author, String supervisors, String university) {
+    public Thesis(String title,
+                  LocalDate publicationDate,
+                  Language language,
+                  Category category,
+                  String link,
+                  int number_of_pages,
+                  String author,
+                  String supervisors,
+                  String university) {
         super(-1, title, publicationDate, language, category, link, number_of_pages);
         this.author = author;
         this.supervisors = supervisors;

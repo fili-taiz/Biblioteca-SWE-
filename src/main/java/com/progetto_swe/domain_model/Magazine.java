@@ -6,13 +6,24 @@ import java.util.ArrayList;
 public class Magazine extends Item {
     private String publishingHouse;
 
-    public Magazine(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages,
+    public Magazine(int code,
+                    String title,
+                    LocalDate publicationDate,
+                    Language language,
+                    Category category,
+                    String link,
+                    int number_of_pages,
                     String publishingHouse) {
         super(code, title, publicationDate, language, category, link, number_of_pages);
         this.publishingHouse = publishingHouse;
     }
 
-    public Magazine(String title, LocalDate publicationDate, Language language, Category category, String link, int number_of_pages,
+    public Magazine(String title,
+                    LocalDate publicationDate,
+                    Language language,
+                    Category category,
+                    String link,
+                    int number_of_pages,
                     String publishingHouse) {
         super(-1, title, publicationDate, language, category, link, number_of_pages);
         this.publishingHouse = publishingHouse;

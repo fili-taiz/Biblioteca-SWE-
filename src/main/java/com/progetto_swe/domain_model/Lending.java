@@ -27,7 +27,11 @@ public class Lending {
             return false;
         }
         Lending lending = (Lending) o;
-        return (this.lendingDate.equals(lending.lendingDate)) && (this.maturityDate.equals(lending.maturityDate)) && (this.hirer.equals(lending.hirer)) && (this.item.equals(lending.item)) && (this.storagePlace.equals(lending.storagePlace));
+        return this.lendingDate.equals(lending.lendingDate) &&
+                this.maturityDate.equals(lending.maturityDate) &&
+                this.hirer.equals(lending.hirer) &&
+                this.item.equals(lending.item) &&
+                this.storagePlace.equals(lending.storagePlace);
     }
 
     @Override

@@ -80,22 +80,20 @@ public class BookDAO {
             ps.setString(5, link);
             ps.setInt(6, numberOfPages);
 
-            ps.execute();
-            ResultSet resultSet = ps.getResultSet();
+            ResultSet resultSet = ps.executeQuery();
             resultSet.next();
-
-            int itemCode = resultSet.getInt(1);
+            int itemCode = resultSet.getInt("code");
 
             String query_2 = """
                     INSERT INTO Book (code, isbn, publishing_house, authors) 
                     VALUES (?, ?, ?, ?);
                     """;
-            ps = connection.prepareStatement(query_2);
-            ps.setInt(1, itemCode);
-            ps.setString(2, isbn);
-            ps.setString(3, publishingHouse);
-            ps.setString(4, authors);
-            ps.executeUpdate();
+            PreparedStatement ps2 = connection.prepareStatement(query_2);
+            ps2.setInt(1, itemCode);
+            ps2.setString(2, isbn);
+            ps2.setString(3, publishingHouse);
+            ps2.setString(4, authors);
+            ps2.executeUpdate();
 
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
@@ -137,6 +135,10 @@ public class BookDAO {
             ConnectionManager.commit();
         } catch (SQLException e) {
             ConnectionManager.rollback();
+            if(e.getSQLState().equals("23503")){
+                throw new ConstraintViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato " +
+                        "perché sono ancora presenti Copie/Prenotazioni/Prestiti. ");
+            }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -160,7 +162,7 @@ public class BookDAO {
         try {
             String query = """
                     UPDATE Item 
-                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? 
+                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ? , number_of_pages = ?
                     WHERE code = ?;
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
@@ -177,7 +179,11 @@ public class BookDAO {
                 throw new IdNotFoundException("Errore: Book con ItemCode [" + originalItemCode + "] non presente nel DB.");
             }
 
-            query = "UPDATE Book SET isbn = ?, publishing_house = ?, authors = ? WHERE code = ?;";
+            query = """
+                    UPDATE Book 
+                    SET isbn = ?, publishing_house = ?, authors = ? 
+                    WHERE code = ?;
+                    """;
             ps = connection.prepareStatement(query);
             ps.setString(1, isbn);
             ps.setString(2, publishingHouse);

@@ -143,13 +143,13 @@ public class MailSender {
     }
 
     //mandato da postgre
-    public static void sendNotifyWaitingListMail(String recepient, String userCode, int itemCode, String title, String storagePlace) {
+    public static void sendNotifyWaitingListMail(String recepient, int itemCode, String title, String storagePlace) {
         String subject = "ARTICOLO DISPONIBILE";
         String content = "l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
                         " presso " + storagePlace + " è disponibile.<br> " +
                         "Le è stata mandata questa mail perché si era aggiunta alla lista d'attesa per questo articolo" +
                         "<br> alla sede \"" + storagePlace + "\".";
-        String html = createhtml(subject, userCode, content);
+        String html = createhtml(subject, "", content);
         sendMail(recepient, subject, html);
     }
 

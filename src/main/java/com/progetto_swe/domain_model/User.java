@@ -28,7 +28,11 @@ public abstract class User {
             return false;
         }
         User user = (User) o;
-        return (Objects.equals(this.userCode, user.userCode)) && Objects.equals(this.name, user.name) && Objects.equals(this.surname, user.surname) && Objects.equals(this.email, user.email) && Objects.equals(this.telephoneNumber, user.telephoneNumber);
+        return Objects.equals(this.userCode, user.userCode) &&
+                Objects.equals(this.name, user.name) &&
+                Objects.equals(this.surname, user.surname) &&
+                Objects.equals(this.email, user.email) &&
+                Objects.equals(this.telephoneNumber, user.telephoneNumber);
     }
 
     @Override
