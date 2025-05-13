@@ -26,7 +26,6 @@ public class AdminController {
         //riconosciuto dall'università ma è la prima volta che esegue login
         if (admin == null){
             adminDAO.addAdmin(userCode, adminInfo.get("name"), adminInfo.get("surname"), adminInfo.get("email"), adminInfo.get("telephoneNumber"), adminInfo.get("workingPlace"));
-            //TODO Aggiunta nel db fallito lanciata eccezioen
 
             admin = adminDAO.getAdmin(userCode);
         }

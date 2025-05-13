@@ -61,7 +61,7 @@ public class PhysicalCopiesDAO {
             WaitingListDAO waitingListDAO = new WaitingListDAO();
             waitingListDAO.removeWaitingList(itemCode, storagePlace);
             ConnectionManager.commit();
-        } catch (SQLException e) {//TODO aggiungere controllo che per la rimozione di un articolo il numero di available e total copies deve combaciare
+        } catch (SQLException e) {
             ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [SEI UN COGLIONE]");
