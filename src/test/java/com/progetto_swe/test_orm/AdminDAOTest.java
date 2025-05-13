@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.sql.*;
 
 
-import com.progetto_swe.orm.database_exception.DataAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.postgresql.util.PSQLException;

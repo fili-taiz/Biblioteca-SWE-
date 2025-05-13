@@ -19,7 +19,11 @@ public class WaitingListDAO {
         try {
             ArrayList<String> emails = new ArrayList<>();
             connection = ConnectionManager.getConnection();
-            String query = "SELECT W.email FROM waiting_list W WHERE W.code = ? AND W.storage_place = ?;";
+            String query = """
+                    SELECT W.email 
+                    FROM waiting_list W 
+                    WHERE W.code = ? AND W.storage_place = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
@@ -34,10 +38,14 @@ public class WaitingListDAO {
         }
     }
 
-    public void addToWaitingList(int itemCode, String storagePlace, String email) throws IdAlreadyExistsException, DatabaseConnectionException {
+    public void addToWaitingList(int itemCode, String storagePlace, String email)
+            throws IdAlreadyExistsException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
-            String query = "INSERT INTO waiting_list (code, storage_place, email) VALUES (?, ?, ?);";
+            String query = """
+                    INSERT INTO waiting_list (code, storage_place, email) 
+                    VALUES (?, ?, ?);
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
@@ -54,7 +62,10 @@ public class WaitingListDAO {
     public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
-            String query = "DELETE FROM lending L WHERE code = ? AND storage_place = ?;";
+            String query = """
+                    DELETE FROM lending L 
+                    WHERE code = ? AND storage_place = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);

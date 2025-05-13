@@ -54,7 +54,6 @@ public class AdminDAO {
                          String telephoneNumber,
                          String workingPlace)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-
         connection = ConnectionManager.getConnection();
         try {
             String query = """

@@ -15,8 +15,8 @@ public class HirerDAO {
 
     //creazione Hirer con solo i dati inerenti Hirer
     public Hirer getHirer(String userCode) throws IdNotFoundException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
         try {
-            connection = ConnectionManager.getConnection();
             String query
                     = "SELECT * "
                     + "FROM hirer H LEFT JOIN banned_hirers B ON H.user_code=B.user_code "
@@ -51,8 +51,8 @@ public class HirerDAO {
     }
 
     public HashMap<String, String> getSaltAndHashedPassword(String userCode) throws IdNotFoundException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
         try {
-            connection = ConnectionManager.getConnection();
             String query = "SELECT UC.salt, UC.hashed_password FROM user_credentials UC WHERE UC.user_code = ?;";
 
             PreparedStatement ps = connection.prepareStatement(query);
@@ -72,9 +72,17 @@ public class HirerDAO {
         }
     }
 
-    public void addHirer(String userCode, String name, String surname, String email, String telephoneNumber) throws IdAlreadyExistsException, DatabaseConnectionException {
+    public void addHirer(String userCode,
+                         String name,
+                         String surname,
+                         String email,
+                         String telephoneNumber,
+                         String hashedPassword,
+                         String salt)
+            throws IdAlreadyExistsException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
-            connection = ConnectionManager.getConnection();
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
@@ -83,7 +91,10 @@ public class HirerDAO {
             ps.setString(4, email);
             ps.setString(5, telephoneNumber);
             ps.executeUpdate();
+            addHirerPassword(userCode, hashedPassword, salt);
+            ConnectionManager.commit();
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer con userCode [" + userCode + "] già presente nel DB.");
             }
@@ -91,9 +102,10 @@ public class HirerDAO {
         }
     }
 
-    public void addHirerPassword(String userCode, String hashedPassword, String salt) throws IdAlreadyExistsException, DatabaseConnectionException {
+    public void addHirerPassword(String userCode, String hashedPassword, String salt)
+            throws IdAlreadyExistsException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
         try {
-            connection = ConnectionManager.getConnection();
             String query = "INSERT INTO user_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);

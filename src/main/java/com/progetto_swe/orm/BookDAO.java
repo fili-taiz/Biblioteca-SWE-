@@ -17,8 +17,8 @@ public class BookDAO {
     }
 
     public Book getBook(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
+        connection = ConnectionManager.getConnection();
         try {
-            connection = ConnectionManager.getConnection();
             String query = """
                     SELECT * 
                     FROM Item I JOIN Book B ON I.code = B.code 
@@ -64,8 +64,8 @@ public class BookDAO {
                        int numberOfCopies,
                        boolean borrowable)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-
         connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
         try {
             //Creazione Item e Book
             String query = """
@@ -97,18 +97,22 @@ public class BookDAO {
 
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
+            ConnectionManager.commit();
             return itemCode;
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
     public void removeBook(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
-//TODO gestire transazioni dentro le classi DAO
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
-            String query = "DELETE FROM Book WHERE code = ?;";
+            String query = """
+                    DELETE FROM Book 
+                    WHERE code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
 
@@ -117,19 +121,25 @@ public class BookDAO {
                 throw new IdNotFoundException("Errore: Il Book con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
-            query = "DELETE FROM Item WHERE code = ?;";
+            query = """
+                    DELETE FROM Item 
+                    WHERE code = ?;
+                    """;
             ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
                 ConnectionManager.rollback();
-                throw new IdNotFoundException("Errore: L'Item con ItemCode [" + itemCode + "] che vuoi rimuovere non è un Book. [problema su chiamata del metodo]");
+                throw new IdNotFoundException("Errore: L'Item con ItemCode [" + itemCode + "] che vuoi rimuovere non è un Book. " +
+                        "[SEI UN COGLIONE]");
             }
             ConnectionManager.commit();
         } catch (SQLException e) {
             ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
-                throw new ConstrainViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
+                throw new ConstrainViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato " +
+                        "perché sono ancora presenti Copie/Prenotazioni/Prestiti. " +
+                        "[SEI UN COGLIONE]");
             }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
@@ -146,12 +156,16 @@ public class BookDAO {
                            String authors,
                            String storagePlace,
                            int newNumberOfCopies,
-                           boolean borrowable) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
+                           boolean borrowable)
+            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
-            String query
-                    = "UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ? WHERE code = ?;";
+            String query = """
+                    UPDATE Item 
+                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ? 
+                    WHERE code = ?;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
             ps.setDate(2, Date.valueOf(publicationDate));
@@ -178,7 +192,9 @@ public class BookDAO {
             }
             PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
             physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
+            ConnectionManager.commit();
         } catch (SQLException e) {
+            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -188,8 +204,10 @@ public class BookDAO {
         ArrayList<Book> books = new ArrayList<>();
         connection = ConnectionManager.getConnection();
         try {
-            //tutti i book
-            String query = "SELECT * FROM Item I JOIN Book B ON I.code = B.code";
+            String query = """
+                    SELECT * 
+                    FROM Item I JOIN Book B ON I.code = B.code;
+                    """;
             PreparedStatement ps = connection.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {

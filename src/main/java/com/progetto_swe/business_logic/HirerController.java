@@ -50,11 +50,8 @@ public class HirerController {
         //avvio transazione per prevenire problemi causati dal successo della sola prima operazione
         ConnectionManager.closeAutoCommit();
 
-        try {hirerDAO.addHirer(userCode, name, surname, eMail, telephoneNumber);} catch (Exception e){
-            ConnectionManager.rollback(); //TODO throw
-        }
+        hirerDAO.addHirer(userCode, name, surname, eMail, telephoneNumber, hashedPassword, salt);
 
-        try {hirerDAO.addHirerPassword(userCode, hashedPassword, salt);
             ConnectionManager.commit();
         } catch (Exception e){
             ConnectionManager.rollback();
