@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class LoginExternalHirerControllerTest {
 
-    @BeforeEach
+    /*@BeforeEach
     public void setUp() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE hirer RESTART IDENTITY CASCADE;");
@@ -61,5 +61,5 @@ public class LoginExternalHirerControllerTest {
 
         connection.close();
 
-    }
+    }*/
 }

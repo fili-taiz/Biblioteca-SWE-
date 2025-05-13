@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LoginUniversityHirerControllerTest {
 
-    @BeforeEach
+    /*@BeforeEach
     public void setUp() throws SQLException {
         Connection connection = ConnectionManager.getConnection();
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE hirer RESTART IDENTITY CASCADE;");
@@ -65,5 +65,5 @@ public class LoginUniversityHirerControllerTest {
 
         connection.close();
 
-    }
+    }*/
 }

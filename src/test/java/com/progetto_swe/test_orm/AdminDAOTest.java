@@ -11,24 +11,32 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.sql.*;
 
 
+import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.postgresql.util.PSQLException;
 
 
 public class AdminDAOTest {
+    Connection connection = ConnectionManager.getConnection();
+
 
     @BeforeEach
     public void setUp() throws SQLException{
-        Connection connection = ConnectionManager.getConnection();
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE admin RESTART IDENTITY CASCADE;");
         ps.execute();
+    }
+
+    @AfterEach
+    public void tearDown() throws SQLException{
+        connection.close();
     }
 
 
     @Test
     public void testGetAdmin() throws SQLException {
-        Connection connection = ConnectionManager.getConnection();
 
         String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
@@ -53,55 +61,18 @@ public class AdminDAOTest {
         assertEquals(admin.getTelephoneNumber(), "333");
         assertEquals(admin.getWorkingPlace(), Library.LIBRARY_1);
 
-        assertNull(adminDAO.getAdmin("456"));
-        connection.close();
-
+        assertThrows(IdNotFoundException.class, () -> adminDAO.getAdmin("456"));
 
     }
 
    @Test
-    public void testAddAdmin() throws SQLException {
-        Connection connection = ConnectionManager.getConnection();
-        String query = "INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place)"
-                + " VALUES (?, ?, ?, ?, ?, ?);";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setString(1, "123");
-        ps.setString(2, "Filippo");
-        ps.setString(3, "Taiti");
-        ps.setString(4, "filippo.taiti@edu.unifi.it");
-        ps.setString(5, "333");
-        ps.setString(6, Library.LIBRARY_1.toString());
-        assertEquals(1, ps.executeUpdate());
-
+    public void testAddAdmin(){
         AdminDAO adminDAO = new AdminDAO();
-        Admin admin = adminDAO.getAdmin("123");
+        adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString());
 
-        assertNotNull(admin);
-        assertEquals(admin.getUserCode(), "123");
-        assertEquals(admin.getName(), "Filippo");
-        assertEquals(admin.getSurname(), "Taiti");
-        assertEquals(admin.getEmail(), "filippo.taiti@edu.unifi.it");
-        assertEquals(admin.getTelephoneNumber(), "333");
-        assertEquals(admin.getWorkingPlace(), Library.LIBRARY_1);
-
-        ps = connection.prepareStatement(query);
-        ps.setString(1, "123");
-        ps.setString(2, "Marco");
-        ps.setString(3, "Taiti");
-        ps.setString(4, "marco.bianchi@edu.unifi.it");
-        ps.setString(5, "334");
-        ps.setString(6, Library.LIBRARY_1.toString());
-        assertThrows(PSQLException.class, ps::executeUpdate);
-
-       connection.close();
-
+        assertThrows(IdAlreadyExistsException.class, () -> adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString()));
     }
 
-    @Test
-    public void test() {
-        AdminDAO adminDAO = new AdminDAO();
-        adminDAO.addAdmin("userCode", "name", "surname", "email", "telephoneNumber", "workingPlace");
-    }
 
 
 

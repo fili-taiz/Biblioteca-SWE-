@@ -14,7 +14,7 @@ public class LendingTest {
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00000",
                 null, null);
         Item item = new Magazine(1, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
-        Lending lending = new Lending(LocalDate.of(2025,5,6), hirer, item, Library.LIBRARY_1);
+        Lending lending = new Lending(LocalDate.of(2025,5,6), LocalDate.of(2025, 6, 6), hirer, item, Library.LIBRARY_1);
 
         assertEquals(LocalDate.of(2025,5,6), lending.getLendingDate());
         assertEquals(hirer, lending.getHirer());
@@ -28,9 +28,9 @@ public class LendingTest {
                 null, null);
         Item item_1 = new Magazine(1, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
         Item item_2 = new Magazine(2, "title", LocalDate.of(2024, 5, 6), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 100, "publishing_house");
-        Lending lending_1 = new Lending(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
-        Lending lending_2 = new Lending(LocalDate.of(2025,5,6), hirer, item_1, Library.LIBRARY_1);
-        Lending lending_3 = new Lending(LocalDate.of(2025,5,6), hirer, item_2, Library.LIBRARY_1);
+        Lending lending_1 = new Lending(LocalDate.of(2025,5,6), LocalDate.of(2025, 6, 6), hirer, item_1, Library.LIBRARY_1);
+        Lending lending_2 = new Lending(LocalDate.of(2025,5,6), LocalDate.of(2025, 6, 6), hirer, item_1, Library.LIBRARY_1);
+        Lending lending_3 = new Lending(LocalDate.of(2025,5,6), LocalDate.of(2025, 6, 6), hirer, item_2, Library.LIBRARY_1);
 
         assertEquals(lending_1, lending_2);
         assertNotEquals(lending_1, lending_3);

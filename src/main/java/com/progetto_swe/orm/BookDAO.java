@@ -3,7 +3,6 @@ package com.progetto_swe.orm;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.*;
@@ -63,7 +62,7 @@ public class BookDAO {
                        String storagePlace,
                        int numberOfCopies,
                        boolean borrowable)
-            throws IdAlreadyExistsException, DatabaseConnectionException {
+            throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
@@ -73,7 +72,7 @@ public class BookDAO {
                     VALUES (?, ?, ?, ?, ?, ?) 
                     RETURNING code;
                     """;
-            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
             ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
@@ -81,14 +80,17 @@ public class BookDAO {
             ps.setString(5, link);
             ps.setInt(6, numberOfPages);
 
-            ResultSet resultSet = ps.executeQuery();
-            int itemCode = resultSet.getInt("code");
+            ps.execute();
+            ResultSet resultSet = ps.getResultSet();
+            resultSet.next();
 
-            query = """
+            int itemCode = resultSet.getInt(1);
+
+            String query_2 = """
                     INSERT INTO Book (code, isbn, publishing_house, authors) 
                     VALUES (?, ?, ?, ?);
                     """;
-            ps = connection.prepareStatement(query);
+            ps = connection.prepareStatement(query_2);
             ps.setInt(1, itemCode);
             ps.setString(2, isbn);
             ps.setString(3, publishingHouse);
@@ -105,7 +107,7 @@ public class BookDAO {
         }
     }
 
-    public void removeBook(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+    public void removeBook(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
@@ -121,26 +123,20 @@ public class BookDAO {
                 throw new IdNotFoundException("Errore: Il Book con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
-            query = """
+            String query_2 = """
                     DELETE FROM Item 
                     WHERE code = ?;
                     """;
-            ps = connection.prepareStatement(query);
+            ps = connection.prepareStatement(query_2);
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
                 ConnectionManager.rollback();
-                throw new IdNotFoundException("Errore: L'Item con ItemCode [" + itemCode + "] che vuoi rimuovere non è un Book. " +
-                        "[SEI UN COGLIONE]");
+                throw new IdNotFoundException("Errore: L'Item con ItemCode [" + itemCode + "] che vuoi rimuovere non è un Book. ");
             }
             ConnectionManager.commit();
         } catch (SQLException e) {
             ConnectionManager.rollback();
-            if(e.getSQLState().equals("23503")){
-                throw new ConstrainViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato " +
-                        "perché sono ancora presenti Copie/Prenotazioni/Prestiti. " +
-                        "[SEI UN COGLIONE]");
-            }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -156,14 +152,15 @@ public class BookDAO {
                            String authors,
                            String storagePlace,
                            int newNumberOfCopies,
-                           boolean borrowable)
-            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException{
+                           boolean borrowable,
+                           int numberOfPages)
+            throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException{
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
             String query = """
                     UPDATE Item 
-                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ? 
+                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? 
                     WHERE code = ?;
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
@@ -172,7 +169,8 @@ public class BookDAO {
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
-            ps.setInt(6, originalItemCode);
+            ps.setInt(6, numberOfPages);
+            ps.setInt(7, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
                 ConnectionManager.rollback();

@@ -35,7 +35,7 @@ public class HirerController {
     }
 
     //la password non è inserita dall'utente è il codice di verifica dell'email ottenuto in fase di registrazione
-    public void registerExternalHirer(String password, String name, String surname, String eMail, String telephoneNumber, Token token) {
+   /* public void registerExternalHirer(String password, String name, String surname, String eMail, String telephoneNumber, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             //TODO lancia eccezione
         }
@@ -57,6 +57,6 @@ public class HirerController {
             ConnectionManager.rollback();
             //return false;//TODO throw
         }
-    }
+    }*/
 
 }

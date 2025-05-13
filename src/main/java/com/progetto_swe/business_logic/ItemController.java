@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ItemController {
-    public ArrayList<Item> searchItem(String keywords, Category category) {
+  /*  public ArrayList<Item> searchItem(String keywords, Category category) {
         ArrayList<Item> items = getAllItems();
 
         String[] splittedKeyword = keywords.split(" ");
@@ -376,5 +376,5 @@ public class ItemController {
         }
 
         //return true;
-    }
+    }*/
 }

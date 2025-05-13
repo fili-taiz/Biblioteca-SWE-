@@ -10,7 +10,7 @@ import com.progetto_swe.university_authentication_system.UniversityAuthenticatio
 
 public class LoginUniversityHirerController {
 
-    public Hirer loginUniversityHirer(String userCode, String password){
+    /*public Hirer loginUniversityHirer(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
 
         //ottengo informazioni di questo UniversityHirer se la password combacia con quella nel database universitario
@@ -40,5 +40,5 @@ public class LoginUniversityHirerController {
 
         //riconosciuto dal sistema universitario e presente nel database della biblioteca
         return hirer;
-    }
+    }*/
 }

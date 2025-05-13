@@ -3,7 +3,6 @@ package com.progetto_swe.orm;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.*;
@@ -59,7 +58,7 @@ public class MagazineDAO {
                            String storagePlace,
                            int numberOfCopies,
                            boolean borrowable)
-            throws IdAlreadyExistsException, DatabaseConnectionException {
+            throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
@@ -69,7 +68,7 @@ public class MagazineDAO {
                     VALUES (?, ?, ?, ?, ?, ?) 
                     RETURNING code; 
                     """;
-            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, title);
             ps.setDate(2, Date.valueOf(publicationDate));
             ps.setString(3, language);
@@ -77,14 +76,16 @@ public class MagazineDAO {
             ps.setString(5, link);
             ps.setInt(6, number_of_pages);
 
-            ResultSet resultSet = ps.executeQuery();
-            int itemCode = resultSet.getInt("code");
+            ps.execute();
+            ResultSet resultSet = ps.getResultSet();
+            resultSet.next();
 
-            query = """
+            int itemCode = resultSet.getInt(1);
+            String query_2 = """
                     INSERT INTO Magazine (code, publishing_house) 
                     VALUES (?, ?);
                     """;
-            ps = connection.prepareStatement(query);
+            ps = connection.prepareStatement(query_2);
             ps.setInt(1, itemCode);
             ps.setString(2, publishingHouse);
             ps.executeUpdate();
@@ -99,7 +100,7 @@ public class MagazineDAO {
         }
     }
 
-    public void removeMagazine(int itemCode) throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+    public void removeMagazine(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
@@ -130,7 +131,7 @@ public class MagazineDAO {
         } catch (SQLException e) {
             ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
-                throw new ConstrainViolationException("Errore: Magazine con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
+                throw new ConstraintViolationException("Errore: Magazine con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
@@ -145,14 +146,15 @@ public class MagazineDAO {
                                String publishingHouse,
                                String storagePlace,
                                int newNumberOfCopies,
-                               boolean borrowable)
-            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+                               boolean borrowable,
+                               int numberOfPages)
+            throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
             String query = """
                     UPDATE Item 
-                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ? 
+                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ?, 
                     WHERE code = ?;
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
@@ -161,7 +163,8 @@ public class MagazineDAO {
             ps.setString(3, language);
             ps.setString(4, category);
             ps.setString(5, link);
-            ps.setInt(6, originalItemCode);
+            ps.setInt(6, numberOfPages);
+            ps.setInt(7, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
                 ConnectionManager.rollback();

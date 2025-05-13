@@ -59,17 +59,22 @@ public class WaitingListDAO {
         }
     }
 
-    public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException {
+    public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException, SQLException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = """
-                    DELETE FROM lending L 
+                    DELETE FROM waiting_list L 
                     WHERE code = ? AND storage_place = ?;
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
+            if(ps.executeUpdate() == 0) {
+                ConnectionManager.rollback();
+                throw new IdNotFoundException("Errore: Non c'è nessuno in attesa dell'item con itemCode [" + itemCode + "] ");
+            }
         } catch (SQLException e) {
+            connection.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }

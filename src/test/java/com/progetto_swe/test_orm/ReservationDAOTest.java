@@ -2,6 +2,9 @@ package com.progetto_swe.test_orm;
 
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
+import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,27 +18,34 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ReservationDAOTest {
+    Connection connection = ConnectionManager.getConnection();
+
     @BeforeEach
     public void setUp() throws SQLException {
-        Connection connection = ConnectionManager.getConnection();
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE reservation, hirer, physical_copies, book, magazine, thesis, item RESTART IDENTITY CASCADE;");
         ps.execute();
     }
 
+    @AfterEach
+    public void tearDown() throws SQLException{
+        connection.close();
+    }
+
     @Test
-    public void testGetReservations_() throws SQLException{
-        Connection connection = ConnectionManager.getConnection();
+    public void testGetReservations_(){
 
         Book book = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
         Magazine magazine = new Magazine(2, "titolo2", LocalDate.of(2023,4,7), Language.LANGUAGE_1, Category.CATEGORY_1, "link2", 50, "publishing house 2");
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
-        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
-        magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50);
+        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true );
+        magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,7).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "publishing house 2", 50, Library.LIBRARY_1.toString(), 5, true);
 
         HirerDAO hirerDAO = new HirerDAO();
         Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+        Token token = new Token(hirer);
+        hirer.setToken(token);
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
 
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
@@ -54,56 +64,45 @@ public class ReservationDAOTest {
         expected_reservations.add(r1);
         expected_reservations.add(r2);
 
-        RemovedListOfReservations expected_list_of_reservations = new RemovedListOfReservations(expected_reservations);
+        assertEquals(expected_reservations.size(), reservationDAO.getReservationsByUserCode("uc1").size());
+        assertTrue(reservationDAO.getReservationsByUserCode("uc1").containsAll(expected_reservations));
 
-        assertEquals(expected_list_of_reservations.getReservations().size(), reservationDAO.getReservations_().getReservations().size());
-        assertTrue(reservationDAO.getReservations_().getReservations().containsAll(expected_reservations));
 
-        Reservation r3 = new Reservation(LocalDate.now(), hirer, magazine, Library.LIBRARY_3);
+        assertThrows(SQLException.class, () -> reservationDAO.getReservationsByUserCode("uc2"));
 
-        assertFalse(reservationDAO.getReservations_().getReservations().contains(r3));
-
-        connection.close();
 
     }
 
     @Test
-    public void testAddReservation() throws SQLException{
-        Connection connection = ConnectionManager.getConnection();
+    public void testAddReservation(){
 
         ReservationDAO reservationDAO = new ReservationDAO();
         BookDAO bookDAO = new BookDAO();
-        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
+        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
         HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-        physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
-
-        assertTrue(reservationDAO.addReservation("uc1", 1, Library.LIBRARY_1.toString()));
-        assertFalse(reservationDAO.addReservation("uc1", 1, Library.LIBRARY_2.toString()));
-
-        connection.close();
-
-    }
-
-    @Test
-    public void testRemoveReservation() throws SQLException{
-        Connection connection = ConnectionManager.getConnection();
-
-        ReservationDAO reservationDAO = new ReservationDAO();
-        BookDAO bookDAO = new BookDAO();
-        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1" );
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
 
         reservationDAO.addReservation("uc1", 1, Library.LIBRARY_1.toString());
-        assertTrue(reservationDAO.removeReservation("uc1", 1, Library.LIBRARY_1.toString()));
-        assertFalse(reservationDAO.removeReservation("uc1", 1, Library.LIBRARY_2.toString()));
-        assertFalse(reservationDAO.removeReservation("uc2", 1, Library.LIBRARY_2.toString()));
 
-        connection.close();
+        assertThrows(IdAlreadyExistsException.class, () -> reservationDAO.addReservation("uc1", 1, Library.LIBRARY_2.toString()));
+
+    }
+
+    @Test
+    public void testRemoveReservation(){
+
+        ReservationDAO reservationDAO = new ReservationDAO();
+        BookDAO bookDAO = new BookDAO();
+        bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
+        HirerDAO hirerDAO = new HirerDAO();
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
+        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+        physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
+
+        reservationDAO.addReservation("uc1", 1, Library.LIBRARY_1.toString());
+        assertThrows(IdNotFoundException.class, () -> reservationDAO.removeReservation("uc2", 1, Library.LIBRARY_1.toString()));
 
     }
 }

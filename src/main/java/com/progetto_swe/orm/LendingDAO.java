@@ -22,15 +22,15 @@ public class LendingDAO {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = """
-                    INSERT INTO lending (user_code, code, storage_place, lending_date) 
-                    VALUES (?, ?, ?, ?);
+                    INSERT INTO lending (user_code, code, storage_place, lending_date, maturity_date) 
+                    VALUES (?, ?, ?, ?, ?);
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
             ps.setDate(4, java.sql.Date.valueOf(LocalDate.now()));
-            ps.setDate(4, java.sql.Date.valueOf(LocalDate.now().plusMonths(1)));
+            ps.setDate(5, java.sql.Date.valueOf(LocalDate.now().plusMonths(1)));
             ps.executeUpdate();
         } catch (SQLException e) {
             if(e.getSQLState().equals("23505")){

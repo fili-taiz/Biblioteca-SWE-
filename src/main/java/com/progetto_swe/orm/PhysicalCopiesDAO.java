@@ -5,8 +5,6 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.*;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PhysicalCopiesDAO {
@@ -20,11 +18,11 @@ public class PhysicalCopiesDAO {
                                      String storagePlace,
                                      int numberOfCopies,
                                      boolean borrowable)
-            throws IdAlreadyExistsException, DatabaseConnectionException {
+            throws DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = """ 
-                    INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable, nuber_of_available_copies) 
+                    INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable, number_of_available_copies) 
                     VALUES (?, ?, ?, ?, ?);
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
@@ -35,15 +33,12 @@ public class PhysicalCopiesDAO {
             ps.setInt(5, numberOfCopies);
             ps.executeUpdate();
         } catch (SQLException e) {
-            if(e.getSQLState().equals("23505")){
-                throw new IdAlreadyExistsException("Errore: Articolo con userCode [" + itemCode + "] già presente nella sede [" + storagePlace + "].");
-            }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
 
     public void removePhysicalCopies(int itemCode, String storagePlace)
-            throws IdNotFoundException, ConstrainViolationException, DatabaseConnectionException {
+            throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         ConnectionManager.closeAutoCommit();
         try {
@@ -66,7 +61,7 @@ public class PhysicalCopiesDAO {
         } catch (SQLException e) {//TODO aggiungere controllo che per la rimozione di un articolo il numero di available e total copies deve combaciare
             ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
-                throw new ConstrainViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [SEI UN COGLIONE]");
+                throw new ConstraintViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti.");
             }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
