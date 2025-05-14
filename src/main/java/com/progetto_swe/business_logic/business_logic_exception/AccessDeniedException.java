@@ -5,3 +5,6 @@ public class AccessDeniedException extends RuntimeException {
         super(message);
     }
 }
+
+
+

@@ -29,22 +29,12 @@ public class HirerController {
         try{
             hirer = hirerDAO.getHirer(userCode);
         }catch (IdNotFoundException e) { //riconosciuto dall'università ma è la prima volta che esegue login
-            hirerDAO.addHirer(
-                    userCode,
-                    hirerInfo.get("name"),
-                    hirerInfo.get("surname"),
-                    hirerInfo.get("email"),
+            hirerDAO.addHirer( userCode, hirerInfo.get("name"), hirerInfo.get("surname"), hirerInfo.get("email"),
                     hirerInfo.get("telephoneNumber"));
-            hirer = new Hirer(
-                    userCode,
-                    hirerInfo.get("name"),
-                    hirerInfo.get("surname"),
-                    hirerInfo.get("email"),
+            hirer = new Hirer(userCode, hirerInfo.get("name"), hirerInfo.get("surname"), hirerInfo.get("email"),
                     hirerInfo.get("telephoneNumber"),
-                    null,
-                    null);
+                    null, null);
         }
-
         //aggiunta credenziali
         hirer.setToken(new Token(hirer));
 
@@ -75,19 +65,18 @@ public class HirerController {
         waitingListDAO.addToWaitingList(item.getCode(), storagePlace, mail);
     }
 
-    public ArrayList<Hirer> searchHirer(String keywords) {
+    public ArrayList<Hirer> searchHirer(String keyword) {
         HirerDAO hirerDAO = new HirerDAO();
         ArrayList<Hirer> hirers = hirerDAO.getHirers_();
         ArrayList<Hirer> result = new ArrayList<>();
         for(Hirer h : hirers){
-            if(!h.contains(keywords)){
+            if(!h.contains(keyword)){
                 result.add(h);
             }
         }
         return result;
     }
 
-    //la password non è inserita dall'utente è il codice di verifica dell'email ottenuto in fase di registrazione
     public void registerExternalHirer(String name, String surname, String email, String telephoneNumber, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
@@ -96,16 +85,16 @@ public class HirerController {
         String password = "Password" + Math.round((Math.random() * 1000000));
         String userCode = "";
         try{
-            do { //generazione codice univoco per chiave primaria con prefisso E per non occupare future possibili matricole
+            do {
                 userCode = "E" + Math.round((Math.random() * 1000000));
                 hirerDAO.getHirer(userCode);
             } while (true);
-        } catch (IdNotFoundException e) {//userCode valido
+        } catch (IdNotFoundException e) {
         }
         String salt = String.valueOf(Math.round(Math.random()*100000));
         String hashedPassword = Hasher.hashPassword(password, salt);
 
-        //avvio transazione per prevenire problemi causati dal successo della sola prima operazione
+
         ConnectionManager.closeAutoCommit();
         try{
             hirerDAO.addHirer(userCode, name, surname, email, telephoneNumber);

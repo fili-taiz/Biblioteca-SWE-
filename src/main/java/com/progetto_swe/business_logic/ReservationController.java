@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class ReservationController {
+
     public ArrayList<Reservation> getReservations(String userCode) {
         ReservationDAO reservationDAO = new ReservationDAO();
         return reservationDAO.getReservationsByUserCode(userCode);
@@ -29,7 +30,7 @@ public class ReservationController {
         WaitingListDAO waitingListDAO = new WaitingListDAO();
         ArrayList<String> emails = waitingListDAO.getWaitingList(item.getCode(), storagePlace);
         for (String email : emails) {
-            MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);//notifica libro disponibile per prenotazione e noleggio
+            MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);
         }
         return true;
     }
@@ -71,7 +72,8 @@ public class ReservationController {
         try {
             lendingController.registerLending(hirer, item, token);
             ConnectionManager.commit();
-            MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(), storagePlace, LocalDate.now().plusMonths(1).toString());
+            MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(),
+                    storagePlace, LocalDate.now().plusMonths(1).toString());
         }catch (Exception e){
             ConnectionManager.rollback();
             throw e;

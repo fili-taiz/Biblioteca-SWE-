@@ -31,7 +31,8 @@ public class AdminController {
 
         //riconosciuto dall'università ma è la prima volta che esegue login
         if (admin == null){
-            adminDAO.addAdmin(userCode, adminInfo.get("name"), adminInfo.get("surname"), adminInfo.get("email"), adminInfo.get("telephoneNumber"), adminInfo.get("workingPlace"));
+            adminDAO.addAdmin(userCode, adminInfo.get("name"), adminInfo.get("surname"), adminInfo.get("email"),
+                    adminInfo.get("telephoneNumber"), adminInfo.get("workingPlace"));
 
             admin = adminDAO.getAdmin(userCode);
         }
@@ -43,3 +44,4 @@ public class AdminController {
         return admin;
     }
 }
+

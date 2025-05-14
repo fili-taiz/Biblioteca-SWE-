@@ -5,3 +5,5 @@ public class ActionDeniedException extends RuntimeException {
         super(message);
     }
 }
+
+

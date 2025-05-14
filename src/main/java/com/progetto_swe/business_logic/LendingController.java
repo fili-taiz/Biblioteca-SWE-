@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class LendingController {
+
     public ArrayList<Lending> getLendings(String userCode) {
         LendingDAO lendingDAO = new LendingDAO();
         return lendingDAO.getLendingsByUserCode(userCode);
@@ -48,12 +49,14 @@ public class LendingController {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non è noleggiabile.");
         }
         if (item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) <= 1) {
-            throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" + token.getTokenWorkingPlace() + "].");
+            throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" +
+                    token.getTokenWorkingPlace() + "].");
         }
 
         LendingDAO lendingDAO = new LendingDAO();
         lendingDAO.addLending(hirer.getUserCode(), item.getCode(), token.getTokenWorkingPlace());
-        MailSender.sendLendingSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(), token.getTokenWorkingPlace(), LocalDate.now().plusMonths(1));
+        MailSender.sendLendingSuccessMail(hirer.getEmail(), hirer.getUserCode(),
+                item.getCode(), item.getTitle(), token.getTokenWorkingPlace(), LocalDate.now().plusMonths(1));
     }
 
 }

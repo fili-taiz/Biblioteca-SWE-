@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class ItemController {
+
     public ArrayList<Item> searchItem(String keywords, String category) {
         ArrayList<Item> items = getAllItems();
 
@@ -56,33 +57,15 @@ public class ItemController {
     }
 
 
-    public void addBook(String title,
-                        String publicationDate,
-                        String language,
-                        String category,
-                        String link,
-                        String isbn,
-                        String publishingHouse,
-                        int numberOfPages,
-                        String authors,
-                        int numberOfCopies,
-                        boolean borrowable,
-                        Token token) {
+    public void addBook(String title, String publicationDate, String language, String category, String link, String isbn, String publishingHouse,
+                        int numberOfPages, String authors, int numberOfCopies, boolean borrowable, Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
 
-        Book bookCopy = new Book(
-                title,
-                LocalDate.parse(publicationDate),
-                Language.valueOf(language),
-                Category.valueOf(category),
-                link,
-                isbn,
-                publishingHouse,
-                numberOfPages,
-                authors);
+        Book bookCopy = new Book(title, LocalDate.parse(publicationDate), Language.valueOf(language), Category.valueOf(category), link,
+                isbn, publishingHouse, numberOfPages, authors);
         BookDAO bookDAO = new BookDAO();
 
         ArrayList<Item> items = getAllItems();
@@ -93,20 +76,8 @@ public class ItemController {
             }
         }
 
-        //TODO probabile inutile
-        int itemCode = bookDAO.addBook(
-                    title,
-                    publicationDate,
-                    language,
-                    category,
-                    link,
-                    isbn,
-                    publishingHouse,
-                    numberOfPages,
-                    authors,
-                    token.getTokenWorkingPlace(),
-                    numberOfCopies,
-                    borrowable);
+        int itemCode = bookDAO.addBook(title, publicationDate, language, category, link, isbn, publishingHouse, numberOfPages,
+                    authors, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
     }
 
     public void addMagazine(String title,
@@ -142,7 +113,6 @@ public class ItemController {
             }
         }
 
-        //TODO probabile inutile
         int itemCode = magazineDAO.addMagazine(
                 title,
                 publicationDate,
@@ -193,7 +163,6 @@ public class ItemController {
             }
         }
 
-        //TODO prob inutile
         int itemCode = thesisDAO.addThesis(
                 title,
                 publicationDate,
@@ -236,8 +205,10 @@ public class ItemController {
         if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
             throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
         }
-        if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
-            throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+        if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) !=
+                book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
+            throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" +
+                    token.getTokenWorkingPlace() + "]");
         }
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
@@ -291,18 +262,8 @@ public class ItemController {
 
 
 
-    public void updateBook(int originalItemCode,
-                              String title,
-                              String publicationDate,
-                              boolean borrowable,
-                              String language,
-                              String category,
-                              String link,
-                              String isbn,
-                              String publishingHouse,
-                              int numberOfPages,
-                              String authors,
-                              int numberOfCopies,
+    public void updateBook(int originalItemCode, String title, String publicationDate, boolean borrowable, String language, String category,
+                              String link, String isbn, String publishingHouse, int numberOfPages, String authors, int numberOfCopies,
                               Token token) {
 
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
@@ -313,20 +274,8 @@ public class ItemController {
         Category.valueOf(category);
 
         BookDAO bookDAO = new BookDAO();
-        bookDAO.updateBook(
-                originalItemCode,
-                title,
-                publicationDate,
-                language,
-                category,
-                link,
-                isbn,
-                publishingHouse,
-                authors,
-                token.getTokenWorkingPlace(),
-                numberOfCopies,
-                borrowable,
-                numberOfPages);
+        bookDAO.updateBook(originalItemCode, title, publicationDate, language, category, link, isbn,
+                publishingHouse, authors, token.getTokenWorkingPlace(), numberOfCopies, borrowable, numberOfPages);
     }
 
     public void updateMagazine(int originalItemCode,
