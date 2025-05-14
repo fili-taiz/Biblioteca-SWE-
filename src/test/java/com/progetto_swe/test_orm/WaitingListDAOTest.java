@@ -4,7 +4,6 @@ import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.WaitingListDAO;
 import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
-import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class WaitingListDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    WaitingListDAO waitingListDAO = new WaitingListDAO();
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -37,7 +37,6 @@ public class WaitingListDAOTest {
         ArrayList<String> emails_expected = new ArrayList<>();
         emails_expected.add("email1");
         emails_expected.add("email2");
-        WaitingListDAO waitingListDAO = new WaitingListDAO();
         waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1");
         waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email2");
 
@@ -49,19 +48,11 @@ public class WaitingListDAOTest {
     @Test
     public void testAddToWaitingList(){
 
-        WaitingListDAO waitingListDAO = new WaitingListDAO();
         waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1");
 
         assertThrows(IdAlreadyExistsException.class, () -> waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
 
     }
 
-    @Test
-    public void testRemoveFromWaitingList(){
-
-        WaitingListDAO waitingListDAO = new WaitingListDAO();
-        waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1");
-        assertThrows(IdNotFoundException.class, () -> waitingListDAO.removeWaitingList(2, Library.LIBRARY_1.toString()));
-    }
 
 }

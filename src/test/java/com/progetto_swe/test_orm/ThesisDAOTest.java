@@ -1,9 +1,8 @@
 package com.progetto_swe.test_orm;
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.ThesisDAO;
-import com.progetto_swe.orm.ConnectionManager;
-import com.progetto_swe.orm.PhysicalCopiesDAO;
+import com.progetto_swe.orm.*;
+import com.progetto_swe.orm.database_exception.ConstraintViolationException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,11 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ThesisDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    ThesisDAO thesisDAO = new ThesisDAO();
 
 
     @BeforeEach
     public void setUp() throws SQLException {
-        String query = "TRUNCATE TABLE Thesis, Item RESTART IDENTITY CASCADE;";
+        String query = "TRUNCATE TABLE Thesis, Item, Hirer RESTART IDENTITY CASCADE;";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.execute();
     }
@@ -36,7 +36,6 @@ public class ThesisDAOTest {
     @Test
     public void testGetThesis(){
 
-        ThesisDAO thesisDAO = new ThesisDAO();
         int thesis_code = thesisDAO.addThesis("titolo", LocalDate.of(2023, 4, 5).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link", 50, "author", "supervisors", "university", Library.LIBRARY_1.toString(), 1, false);
 
         Thesis thesis_1 = new Thesis(thesis_code, "titolo", LocalDate.of(2023, 4, 5), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 50, "author", "supervisors", "university");
@@ -51,7 +50,6 @@ public class ThesisDAOTest {
     @Test
     public void testAddThesis(){
 
-        ThesisDAO thesisDAO = new ThesisDAO();
         Thesis thesis_1 = new Thesis(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", 50, "author1", "supervisors", "university");
 
         assertEquals(thesis_1.getCode(), thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  50, "author1", "supervisors", "university", Library.LIBRARY_1.toString(), 1, false));
@@ -62,8 +60,8 @@ public class ThesisDAOTest {
     @Test
     public void testUpdateThesis(){
 
-        ThesisDAO thesisDAO = new ThesisDAO();
         thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", 50, "author1", "supervisors", "university", Library.LIBRARY_1.toString(), 1, false);
+
 
         assertThrows(IdNotFoundException.class, () -> thesisDAO.updateThesis(3, "titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_2.toString(), Category.CATEGORY_2.toString(), "link2", "author2", "supervisors", "university", Library.LIBRARY_1.toString(), 2, false, 50));
 
@@ -72,18 +70,24 @@ public class ThesisDAOTest {
     @Test
     public void testRemoveThesis(){
 
-        ThesisDAO thesisDAO = new ThesisDAO();
+        int thesis_code = thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", 50, "author1", "supervisors", "university", Library.LIBRARY_1.toString(), 1, false);
+        HirerDAO hirerDAO = new HirerDAO();
+        hirerDAO.addHirer("uc1", "name", "surname", "email", "00000");
+        LendingDAO lendingDAO = new LendingDAO();
+        lendingDAO.addLending("uc1", thesis_code, Library.LIBRARY_1.toString());
+
 
         thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", 50, "author1", "supervisors", "university", Library.LIBRARY_1.toString(), 1, false);
 
+
         assertThrows(IdNotFoundException.class, () -> thesisDAO.removeThesis(3));
+        assertThrows(ConstraintViolationException.class, () -> thesisDAO.removeThesis(thesis_code));
 
 
     }
 
     @Test
     public void testGetAllThesis(){
-        ThesisDAO thesisDAO = new ThesisDAO();
         int code_1 = thesisDAO.addThesis("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", 50, "author1", "supervisors", "university", Library.LIBRARY_1.toString(), 1, false);
         int code_2 = thesisDAO.addThesis("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", 55, "author2", "supervisors_2", "university_2", Library.LIBRARY_1.toString(), 1, false);
 

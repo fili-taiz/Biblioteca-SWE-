@@ -36,7 +36,7 @@ public class Lending {
 
     @Override
     public int hashCode() {
-        return Objects.hash(lendingDate, hirer, item, storagePlace);
+        return Objects.hash(lendingDate, maturityDate, hirer, item, storagePlace);
     }
 
 

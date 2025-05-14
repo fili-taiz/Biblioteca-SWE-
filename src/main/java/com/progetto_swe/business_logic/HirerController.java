@@ -67,8 +67,8 @@ public class HirerController {
         return hirer;
     }
 
-    public void addInWaitingList(Item item, String mail, String storagePlace){
-        if(item.isBorrowable(Library.valueOf(storagePlace))){
+    public void addToWaitingList(Item item, String mail, String storagePlace){
+        if(!item.isBorrowable(Library.valueOf(storagePlace))){
             throw new ActionDeniedException("Errore: L'Item con itemCode [" +  item.getCode() + "] non è noleggiabile nella sede [" + storagePlace + "].");
         }
         WaitingListDAO waitingListDAO = new WaitingListDAO();

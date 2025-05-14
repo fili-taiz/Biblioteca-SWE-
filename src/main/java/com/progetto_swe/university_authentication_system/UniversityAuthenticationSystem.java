@@ -56,38 +56,37 @@ public class UniversityAuthenticationSystem {
 
             String query
                     = "SELECT U.salt, U.hashed_password "
-                    + "FROM University_People U"
+                    + "FROM university_people U"
                     + " WHERE U.user_code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ResultSet resultSet = ps.executeQuery();
             if (!resultSet.next()) {
-                return null;
+                return hirerInfo;
             }
             if(!check(password, resultSet.getString("salt"), resultSet.getString("hashed_password"))){
-                return null;
+                return hirerInfo;
             }
             String query_2
                     = "SELECT * "
-                    + "FROM University_People U"
+                    + "FROM university_people U"
                     + " WHERE U.user_code = ?; ";
             PreparedStatement ps2 = connection.prepareStatement(query_2);
             ps2.setString(1, userCode);
             resultSet = ps2.executeQuery();
-            if (resultSet.next()) {
-                hirerInfo.put("userCode", userCode);
-                hirerInfo.put("name", resultSet.getString("name"));
-                hirerInfo.put("surname", resultSet.getString("surname"));
-                hirerInfo.put("email", resultSet.getString("email"));
-                hirerInfo.put("telephoneNumber", resultSet.getString("telephone_number"));
-                hirerInfo.put("salt", resultSet.getString("salt"));
-                hirerInfo.put("hashedPassword", resultSet.getString("hashed_password"));
-                return hirerInfo;
-            }
+            resultSet.next();
+            hirerInfo.put("userCode", userCode);
+            hirerInfo.put("name", resultSet.getString("name"));
+            hirerInfo.put("surname", resultSet.getString("surname"));
+            hirerInfo.put("email", resultSet.getString("email"));
+            hirerInfo.put("telephoneNumber", resultSet.getString("telephone_number"));
+            hirerInfo.put("salt", resultSet.getString("salt"));
+            hirerInfo.put("hashedPassword", resultSet.getString("hashed_password"));
+
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
         }
-        return null;
+        return hirerInfo;
     }
 
     //creazione Admin con profilo
@@ -98,38 +97,37 @@ public class UniversityAuthenticationSystem {
 
             String query
                     = "SELECT L.salt, L.hashed_password "
-                    + "FROM Library_Admin L"
+                    + "FROM library_admin L"
                     + " WHERE L.user_code = ?;";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, userCode);
             ResultSet resultSet = ps.executeQuery();
             if (!resultSet.next()) {
-                return null;
+                return adminInfo;
             }
             if(!check(password, resultSet.getString("salt"), resultSet.getString("hashed_password"))){
-                return null;
+                return adminInfo;
             }
             String query_2
                     = "SELECT * "
-                    + "FROM Library_Admin L"
+                    + "FROM library_admin L"
                     + " WHERE L.user_code = ?; ";
             PreparedStatement ps2 = connection.prepareStatement(query_2);
             ps2.setString(1, userCode);
             resultSet = ps2.executeQuery();
-            if (resultSet.next()) {
-                adminInfo.put("userCode", userCode);
-                adminInfo.put("name", resultSet.getString("name"));
-                adminInfo.put("surname", resultSet.getString("surname"));
-                adminInfo.put("email", resultSet.getString("email"));
-                adminInfo.put("telephoneNumber", resultSet.getString("telephone_number"));
-                adminInfo.put("workingPlace", resultSet.getString("working_place"));
-                adminInfo.put("salt", resultSet.getString("salt"));
-                adminInfo.put("hashedPassword", resultSet.getString("hashed_password"));
-                return adminInfo;
-            }
+            resultSet.next();
+            adminInfo.put("userCode", userCode);
+            adminInfo.put("name", resultSet.getString("name"));
+            adminInfo.put("surname", resultSet.getString("surname"));
+            adminInfo.put("email", resultSet.getString("email"));
+            adminInfo.put("telephoneNumber", resultSet.getString("telephone_number"));
+            adminInfo.put("workingPlace", resultSet.getString("working_place"));
+            adminInfo.put("salt", resultSet.getString("salt"));
+            adminInfo.put("hashedPassword", resultSet.getString("hashed_password"));
+
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
         }
-        return null;
+        return adminInfo;
     }
 }

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    HirerDAO hirerDAO = new HirerDAO();
 
 
     @BeforeEach
@@ -39,11 +40,9 @@ public class HirerDAOTest {
     @Test
     public void testGetHirer(){
 
-        HirerDAO hirerDAO = new HirerDAO();
-
         Hirer h1 = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
 
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hahsed_password_1", "salt_1");
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
 
         assertEquals(h1, hirerDAO.getHirer("uc1"));
         assertThrows(IdNotFoundException.class, () -> hirerDAO.getHirer("uc2"));
@@ -52,10 +51,10 @@ public class HirerDAOTest {
     }
 
     @Test
-    public void testGetSaltAndHashedPassword() throws SQLException{
+    public void testGetSaltAndHashedPassword(){
 
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+        hirerDAO.addHirerPassword("uc1", "hashed_password_1", "salt_1");
 
         HashMap<String, String> expected = new HashMap<>();
         expected.put("salt", "salt_1");
@@ -76,17 +75,17 @@ public class HirerDAOTest {
     @Test
     public void testAddHirer(){
 
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
 
-        assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1"));
+        assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
 
     }
 
     @Test
     public void testAddHirerPassword(){
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
+
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+        hirerDAO.addHirerPassword("uc1", "hashed_password_1", "salt_1");
 
         assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirerPassword("uc1", "hp1", "salt"));
 
@@ -102,9 +101,8 @@ public class HirerDAOTest {
         Hirer h2 = new Hirer("uc2", "name2", "surname2", "email2", "telephonenumber2", null, LocalDate.of(2024, 4, 3));
         Token token_2 = new Token(h2);
         h1.setToken(token_2);
-        HirerDAO hirerDAO = new HirerDAO();
-        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1", "hashed_password_1", "salt_1");
-        hirerDAO.addHirer("uc2", "name2", "surname2", "email2", "telephonenumber2", "hashed_password_2", "salt_2");
+        hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
+        hirerDAO.addHirer("uc2", "name2", "surname2", "email2", "telephonenumber2");
         String query = "INSERT INTO banned_hirers(user_code, unbanned_date) VALUES (?, ?);";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setString(1, "uc2");

@@ -1,10 +1,8 @@
 package com.progetto_swe.test_orm;
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.MagazineDAO;
-import com.progetto_swe.orm.ConnectionManager;
-import com.progetto_swe.orm.PhysicalCopiesDAO;
-import com.progetto_swe.orm.ThesisDAO;
+import com.progetto_swe.orm.*;
+import com.progetto_swe.orm.database_exception.ConstraintViolationException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MagazineDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    MagazineDAO magazineDAO = new MagazineDAO();
 
     @BeforeEach
-    public void setUp() throws Exception {
-        String query = "TRUNCATE TABLE Magazine, Item RESTART IDENTITY CASCADE;";
+    public void setUp() throws SQLException {
+        String query = "TRUNCATE TABLE Magazine, Item, Hirer RESTART IDENTITY CASCADE;";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.execute();
     }
@@ -35,7 +34,6 @@ public class MagazineDAOTest {
 
     @Test
     public void testGetMagazine(){
-        MagazineDAO magazineDAO = new MagazineDAO();
         int magazine_code = magazineDAO.addMagazine("titolo", LocalDate.of(2023,4,5).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link", "publishing house", 50, Library.LIBRARY_1.toString(), 5, true);
         Magazine magazine_1 = new Magazine(magazine_code, "titolo", LocalDate.of(2023,4,5), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 50, "publishing house");
         Magazine magazine_2 = new Magazine(magazine_code+1, "titolo2", LocalDate.of(2023,4,5), Language.LANGUAGE_1, Category.CATEGORY_1, "link", 55, "publishing house");
@@ -49,7 +47,6 @@ public class MagazineDAOTest {
     @Test
     public void testAddMagazine(){
 
-        MagazineDAO magazineDAO = new MagazineDAO();
         Magazine magazine_1 = new Magazine(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", 50, "publishing house 1");
 
         assertEquals(magazine_1.getCode(), magazineDAO.addMagazine("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "publishing house 1", 50, Library.LIBRARY_1.toString(), 5, true));
@@ -59,7 +56,6 @@ public class MagazineDAOTest {
 
     @Test
     public void testUpdateMagazine(){
-        MagazineDAO magazineDAO = new MagazineDAO();
 
         Magazine magazine_2 = new Magazine(2, "titolo2", LocalDate.of(2023,4,2), Language.LANGUAGE_2, Category.CATEGORY_2, "link2", 55, "publishing house 2");
         magazineDAO.addMagazine("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "publishing house 1", 50, Library.LIBRARY_1.toString(), 5, true);
@@ -71,16 +67,21 @@ public class MagazineDAOTest {
     @Test
     public void testRemoveMagazine(){
 
-        MagazineDAO magazineDAO = new MagazineDAO();
+        int magazine_code =  magazineDAO.addMagazine("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "publishing house 1", 50, Library.LIBRARY_1.toString(), 5, true);
+        HirerDAO hirerDAO = new HirerDAO();
+        hirerDAO.addHirer("uc1", "name", "surname", "email", "00000");
+        LendingDAO lendingDAO = new LendingDAO();
+        lendingDAO.addLending("uc1", magazine_code, Library.LIBRARY_1.toString());
 
         assertThrows(IdNotFoundException.class, () -> magazineDAO.removeMagazine(3));
+        assertThrows(ConstraintViolationException.class, () -> magazineDAO.removeMagazine(magazine_code));
 
 
     }
 
     @Test
     public void testGetAllMagazines(){
-        MagazineDAO magazineDAO = new MagazineDAO();
+
         int code_1 = magazineDAO.addMagazine("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "publishing house 1", 200,  Library.LIBRARY_1.toString(), 10,   false);
         int code_2 = magazineDAO.addMagazine("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", "publishing house 2", 220, Library.LIBRARY_1.toString(), 10,  false);
 

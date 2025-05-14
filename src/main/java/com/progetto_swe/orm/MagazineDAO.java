@@ -153,7 +153,7 @@ public class MagazineDAO {
         try {
             String query = """
                     UPDATE Item 
-                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ?, 
+                    SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? 
                     WHERE code = ?;
                     """;
             PreparedStatement ps = connection.prepareStatement(query);

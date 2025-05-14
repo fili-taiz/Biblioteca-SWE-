@@ -77,7 +77,10 @@ public class Book extends Item {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
+        if (o == null) {
+            return false;
+        }
+        if(this.getClass() != o.getClass()){
             return false;
         }
 

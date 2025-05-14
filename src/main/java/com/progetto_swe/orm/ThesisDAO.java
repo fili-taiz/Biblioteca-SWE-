@@ -109,6 +109,8 @@ public class ThesisDAO {
 
     public void removeThesis(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
+        ConnectionManager.closeAutoCommit();
+
         try {
             String query = """
                     DELETE FROM Thesis 
@@ -122,11 +124,11 @@ public class ThesisDAO {
                 throw new IdNotFoundException("Errore: Il Thesis con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
-            query = """
+            String query_2 = """
                 DELETE FROM Item 
                 WHERE code = ?;
                 """;
-            ps = connection.prepareStatement(query);
+            ps = connection.prepareStatement(query_2);
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {

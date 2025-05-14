@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.progetto_swe.business_logic.business_logic_exception.AccessDeniedException;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import com.progetto_swe.university_authentication_system.UniversityAuthenticationSystem;
 
 public class AdminController {
@@ -21,7 +22,12 @@ public class AdminController {
 
         //ottengo informazioni di questo Admin nel database bibliotecario
         AdminDAO adminDAO = new AdminDAO();
-        Admin admin = adminDAO.getAdmin(userCode);
+        Admin admin;
+        try{
+            admin = adminDAO.getAdmin(userCode);
+        }catch(IdNotFoundException e){
+            admin = null;
+        }
 
         //riconosciuto dall'università ma è la prima volta che esegue login
         if (admin == null){

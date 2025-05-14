@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalCopiesDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -37,7 +38,7 @@ public class PhysicalCopiesDAOTest {
 
     @Test
     public void testAddPhysicalCopies(){
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+
         BookDAO bookDAO = new BookDAO();
 
         bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true);
@@ -47,7 +48,6 @@ public class PhysicalCopiesDAOTest {
     @Test
     public void testRemovePhysicalCopies(){
 
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         BookDAO bookDAO = new BookDAO();
 
         int book_code_1 = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
@@ -68,7 +68,6 @@ public class PhysicalCopiesDAOTest {
     @Test
     public void testUpdatePhysicalCopies(){
 
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         BookDAO bookDAO = new BookDAO();
 
         bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
@@ -88,7 +87,6 @@ public class PhysicalCopiesDAOTest {
         pcExpected.put(Library.LIBRARY_2, pc2);
         b1.setPhysicalCopies(pcExpected);
         BookDAO bookDAO = new BookDAO();
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 10, true );
         physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_2.toString(), 12, true);
 

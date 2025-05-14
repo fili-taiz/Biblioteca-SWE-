@@ -82,13 +82,13 @@ public class ReservationDAO {
                 try {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
                     reservations.add(new Reservation(
-                            resultSet.getDate("lending_date").toLocalDate(), hirer, book,
+                            resultSet.getDate("reservation_date").toLocalDate(), hirer, book,
                                     Library.valueOf(resultSet.getString("storage_place"))));
                 }catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-                    reservations.add(new Reservation(resultSet.getDate("lending_date").toLocalDate(), hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
+                    reservations.add(new Reservation(resultSet.getDate("reservation_date").toLocalDate(), hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
                 }catch (IdNotFoundException e) {
                 }
             }

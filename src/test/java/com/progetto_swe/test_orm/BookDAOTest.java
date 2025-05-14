@@ -1,10 +1,8 @@
 package com.progetto_swe.test_orm;
 
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.BookDAO;
-import com.progetto_swe.orm.ConnectionManager;
-import com.progetto_swe.orm.PhysicalCopiesDAO;
-import com.progetto_swe.orm.ThesisDAO;
+import com.progetto_swe.orm.*;
+import com.progetto_swe.orm.database_exception.ConstraintViolationException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BookDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    BookDAO bookDAO = new BookDAO();
 
     @BeforeEach
-    public void setUp() throws Exception {
-        String query = "TRUNCATE TABLE Book, Item RESTART IDENTITY CASCADE;";
+    public void setUp() throws SQLException {
+        String query = "TRUNCATE TABLE Book, Item, Hirer RESTART IDENTITY CASCADE;";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.execute();
     }
@@ -36,8 +35,6 @@ public class BookDAOTest {
     @Test
     public void testGetBook(){
 
-        BookDAO bookDAO = new BookDAO();
-        PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         int book_code = bookDAO.addBook("titolo", LocalDate.of(2023,4,5).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(), 5, true);
         Book book = new Book(book_code, "titolo", LocalDate.of(2023,4,5), Language.LANGUAGE_1, Category.CATEGORY_1, "link", "isbn", "publishing house", 200, "authors");
 
@@ -50,7 +47,6 @@ public class BookDAOTest {
 
     @Test
     public void testAddBook(){
-        BookDAO bookDAO = new BookDAO();
         Book book_1 = new Book(1, "titolo1", LocalDate.of(2023,4,1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1" );
 
         assertEquals(book_1.getCode(), bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true ));
@@ -63,8 +59,6 @@ public class BookDAOTest {
     @Test
     public void testUpdateBook(){
 
-        BookDAO bookDAO = new BookDAO();
-
         Book book_2 = new Book(2, "titolo2", LocalDate.of(2023,4,2), Language.LANGUAGE_2, Category.CATEGORY_2, "link2", "isbn2", "publishing house 2", 200, "authors2" );
         bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
 
@@ -76,16 +70,21 @@ public class BookDAOTest {
     @Test
     public void testRemoveBook(){
 
-        BookDAO bookDAO = new BookDAO();
+        int book_code = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
+        HirerDAO hirerDAO = new HirerDAO();
+        hirerDAO.addHirer("uc1", "name", "surname", "email", "00000");
+        LendingDAO lendingDAO = new LendingDAO();
+        lendingDAO.addLending("uc1", book_code, Library.LIBRARY_1.toString());
+
 
         assertThrows(IdNotFoundException.class, () -> bookDAO.removeBook(3));
+        assertThrows(ConstraintViolationException.class, () -> bookDAO.removeBook(book_code));
 
 
     }
 
     @Test
     public void testGetAllBooks(){
-        BookDAO bookDAO = new BookDAO();
         int code_1 = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 10, false);
         int code_2 = bookDAO.addBook("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", "isbn2", "publishing house 2", 220, "authors2", Library.LIBRARY_1.toString(), 10, false);
 

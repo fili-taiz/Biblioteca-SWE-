@@ -64,7 +64,7 @@ public class PhysicalCopiesDAO {
         } catch (SQLException e) {
             ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
-                throw new ConstraintViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [SEI UN COGLIONE]");
+                throw new ConstraintViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti.");
             }
             throw new DatabaseConnectionException(e.getCause().toString());
         }

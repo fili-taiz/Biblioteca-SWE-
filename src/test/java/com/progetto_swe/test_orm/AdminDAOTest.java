@@ -16,11 +16,11 @@ import com.progetto_swe.orm.database_exception.IdNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.postgresql.util.PSQLException;
 
 
 public class AdminDAOTest {
     Connection connection = ConnectionManager.getConnection();
+    AdminDAO adminDAO = new AdminDAO();
 
 
     @BeforeEach
@@ -50,7 +50,6 @@ public class AdminDAOTest {
         ps.setString(6, Library.LIBRARY_1.toString());
         ps.executeUpdate();
 
-        AdminDAO adminDAO = new AdminDAO();
         Admin admin = adminDAO.getAdmin("123");
 
         assertNotNull(admin);

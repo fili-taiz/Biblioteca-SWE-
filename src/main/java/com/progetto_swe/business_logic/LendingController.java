@@ -42,12 +42,12 @@ public class LendingController {
         }
 
         if (hirer.getUnbannedDate() != null) {
-            throw new ActionDeniedException("Errore: l'Hirer con userCode [" + hirer.getUserCode() +"] è bannato non può eseguire un prestito.");
+            throw new ActionDeniedException("Errore: l'Hirer con userCode [" + hirer.getUserCode() +"] è bannato, non può eseguire un prestito.");
         }
         if (!item.isBorrowable(Library.valueOf(token.getTokenWorkingPlace()))) {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non è noleggiabile.");
         }
-        if (item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) <= 0) {
+        if (item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) <= 1) {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" + token.getTokenWorkingPlace() + "].");
         }
 
