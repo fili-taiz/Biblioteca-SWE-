@@ -41,21 +41,21 @@ public class Thesis extends Item {
 
     @Override
     public String[] getValues() {
-        return new String[]{this.title, this.author, this.category.name(), this.publicationDate.toString()};
+        return new String[]{this.getTitle(), this.author, this.getCategory().name(), this.getPublicationDate().toString()};
     }
 
-    @Override
+
     public ArrayList<String[]> toStringValues() {
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"Codice: ", Integer.toString(this.code)});
-        data.add(new String[]{"Titolo: ", this.title});
+        data.add(new String[]{"Codice: ", Integer.toString(this.getCode())});
+        data.add(new String[]{"Titolo: ", this.getTitle()});
         data.add(new String[]{"Autore: ", this.author});
-        data.add(new String[]{"Data pubblicazione: ", this.publicationDate.toString()});
+        data.add(new String[]{"Data pubblicazione: ", this.getPublicationDate().toString()});
         data.add(new String[]{"Università: ", this.university});
         data.add(new String[]{"Supervisori: ", this.supervisors});
-        data.add(new String[]{"Lingua: ", this.language.toString()});
-        data.add(new String[]{"Categoria: ", this.category.toString()});
-        data.add(new String[]{"Link: ", this.link});
+        data.add(new String[]{"Lingua: ", this.getLanguage().toString()});
+        data.add(new String[]{"Categoria: ", this.getCategory().toString()});
+        data.add(new String[]{"Link: ", this.getLink()});
         return data;
     }
 

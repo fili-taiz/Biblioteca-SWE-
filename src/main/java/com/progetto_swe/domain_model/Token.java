@@ -5,7 +5,7 @@ import com.progetto_swe.business_logic.Hasher;
 import java.util.Objects;
 
 public class Token {
-    private String token;
+    protected String token;
 
     public Token(Hirer hirer) {
         this.token = Hasher.hash("Hirer") + ";";

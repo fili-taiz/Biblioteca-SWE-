@@ -42,22 +42,21 @@ public class Book extends Item {
 
     @Override
     public String[] getValues(){
-        return new String[]{this.title, this.authors, this.category.name(), this.publicationDate.toString()};
+        return new String[]{this.getTitle(), this.authors, this.getCategory().name(), this.getPublicationDate().toString()};
     }
 
-    @Override
     public ArrayList<String[]> toStringValues() {
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"Codice: ", Integer.toString(this.code)});
-        data.add(new String[]{"Titolo: ", this.title});
+        data.add(new String[]{"Codice: ", Integer.toString(this.getCode())});
+        data.add(new String[]{"Titolo: ", this.getTitle()});
         data.add(new String[]{"Autori: ", this.authors});
-        data.add(new String[]{"Data pubblicazione: ", this.publicationDate.toString()});
-        data.add(new String[]{"Categoria: ", this.category.toString()});
-        data.add(new String[]{"Lingua: ", this.language.toString()});
-        data.add(new String[]{"Link: ", this.link});
+        data.add(new String[]{"Data pubblicazione: ", this.getPublicationDate().toString()});
+        data.add(new String[]{"Categoria: ", this.getCategory().toString()});
+        data.add(new String[]{"Lingua: ", this.getLanguage().toString()});
+        data.add(new String[]{"Link: ", this.getLink()});
         data.add(new String[]{"ISBN: ", this.isbn});
         data.add(new String[]{"Casa editrice: ", this.publishingHouse});
-        data.add(new String[]{"Numero pagine: ", Integer.toString(this.numberOfPages)});
+        data.add(new String[]{"Numero pagine: ", Integer.toString(this.getNumberOfPages())});
         return data;
     }
 

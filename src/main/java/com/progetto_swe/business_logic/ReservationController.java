@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class ReservationController {
-    public ArrayList<Reservation> getReservation(String userCode) {
+    public ArrayList<Reservation> getReservations(String userCode) {
         ReservationDAO reservationDAO = new ReservationDAO();
         return reservationDAO.getReservationsByUserCode(userCode);
     }

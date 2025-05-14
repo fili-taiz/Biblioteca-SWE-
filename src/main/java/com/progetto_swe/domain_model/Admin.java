@@ -35,7 +35,7 @@ public class Admin extends User{
 
     @Override
     public int hashCode() {
-        return Objects.hash(userCode, name, surname, email, telephoneNumber, workingPlace);
+        return Objects.hash(this.getUserCode(), this.getName(), this.getSurname(), this.getEmail(), this.getTelephoneNumber(), workingPlace);
     }
 
     public Library getWorkingPlace() {

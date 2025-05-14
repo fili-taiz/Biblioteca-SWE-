@@ -3,12 +3,12 @@ package com.progetto_swe.domain_model;
 import java.util.Objects;
 
 public abstract class User {
-    protected String userCode;
-    protected String name;
-    protected String surname;
-    protected String email;
-    protected String telephoneNumber;
-    protected Token token;
+    private String userCode;
+    private String name;
+    private String surname;
+    private String email;
+    private String telephoneNumber;
+    private Token token;
 
     public User(String userCode, String name, String surname, String email, String telephoneNumber, Token token){
         this.userCode = userCode;

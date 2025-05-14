@@ -108,36 +108,4 @@ public class LendingDAO {
         }
     }
 
-    //public ArrayList<Lending> getLendingsByStoragePlace(String storagePlace) {
-    //    this.connection = ConnectionManager.getConnection();
-    //    try {
-    //        String query = "SELECT * FROM lending L WHERE L.user_code = ?;";
-    //        PreparedStatement ps = connection.prepareStatement(query);
-    //        ps.setString(1, storagePlace);
-    //        ResultSet resultSet = ps.executeQuery();
-    //        ArrayList<Lending> lendings = new ArrayList<>();
-    //        while (resultSet.next()) {
-    //            BookDAO bookDAO = new BookDAO();
-    //            MagazineDAO magazineDAO = new MagazineDAO();
-    //            Book book = bookDAO.getBook(resultSet.getInt("code"));
-    //            Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-//
-    //            HirerDAO hirerDAO = new HirerDAO();
-    //            Hirer hirer = hirerDAO.getHirer(storagePlace);
-    //            Item item;
-    //            if(book != null) {
-    //                item = book;
-    //            } else if (magazine != null) {
-    //                item = magazine;
-    //            } else {
-    //                return null;
-    //            }
-    //            lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(), hirer, item, Library.valueOf(resultSet.getString("storage_place"))));
-    //        }
-    //        return lendings;
-    //    } catch (SQLException e) {
-    //        System.out.println("SQLException: " + e.getMessage());
-    //        return null;
-    //    }
-    //}
 }

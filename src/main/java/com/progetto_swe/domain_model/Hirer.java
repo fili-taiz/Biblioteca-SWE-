@@ -18,19 +18,19 @@ public class Hirer extends User{
     }
 
     public boolean contains(String keyword){
-        if(userCode.toUpperCase().contains(keyword.toUpperCase())){
+        if(this.getUserCode().toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(name.toUpperCase().contains(keyword.toUpperCase())){
+        if(this.getName().toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(surname.toUpperCase().contains(keyword.toUpperCase())){
+        if(this.getSurname().toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(email.toUpperCase().contains(keyword.toUpperCase())){
+        if(this.getEmail().toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        return telephoneNumber.toUpperCase().contains(keyword.toUpperCase());
+        return this.getTelephoneNumber().toUpperCase().contains(keyword.toUpperCase());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class Hirer extends User{
 
     @Override
     public int hashCode() {
-        return Objects.hash(userCode, name, surname, email, telephoneNumber, unbannedDate);
+        return Objects.hash(this.getUserCode(), this.getName(), this.getSurname(), this.getEmail(), this.getTelephoneNumber(), unbannedDate);
     }
 
     public LocalDate getUnbannedDate() {

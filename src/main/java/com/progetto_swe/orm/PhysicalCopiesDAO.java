@@ -96,7 +96,7 @@ public class PhysicalCopiesDAO {
         }
     }
 
-    public HashMap<Library, PhysicalCopies> getPhysicalCopies(int code) throws DatabaseConnectionException {
+    public HashMap<Library, PhysicalCopies> getPhysicalCopies(int itemCode) throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
             String query = """
@@ -105,7 +105,7 @@ public class PhysicalCopiesDAO {
                     WHERE P.code = ?;
                     """;
             PreparedStatement ps = connection.prepareStatement(query);
-            ps.setInt(1, code);
+            ps.setInt(1, itemCode);
             ResultSet copiesSet = ps.executeQuery();
             HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
             while (copiesSet.next()) {
