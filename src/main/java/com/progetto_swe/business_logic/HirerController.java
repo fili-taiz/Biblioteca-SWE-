@@ -65,16 +65,9 @@ public class HirerController {
         waitingListDAO.addToWaitingList(item.getCode(), storagePlace, mail);
     }
 
-    public ArrayList<Hirer> searchHirer(String keyword) {
+    public Hirer searchHirer(String keyword) {
         HirerDAO hirerDAO = new HirerDAO();
-        ArrayList<Hirer> hirers = hirerDAO.getHirers_();
-        ArrayList<Hirer> result = new ArrayList<>();
-        for(Hirer h : hirers){
-            if(!h.contains(keyword)){
-                result.add(h);
-            }
-        }
-        return result;
+        return hirerDAO.getHirer(keyword);
     }
 
     public void registerExternalHirer(String name, String surname, String email, String telephoneNumber, Token token) {
