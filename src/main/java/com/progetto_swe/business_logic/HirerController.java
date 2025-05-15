@@ -65,9 +65,9 @@ public class HirerController {
         waitingListDAO.addToWaitingList(item.getCode(), storagePlace, mail);
     }
 
-    public Hirer searchHirer(String keyword) {
+    public Hirer searchHirer(String userCode) {
         HirerDAO hirerDAO = new HirerDAO();
-        return hirerDAO.getHirer(keyword);
+        return hirerDAO.getHirer(userCode);
     }
 
     public void registerExternalHirer(String name, String surname, String email, String telephoneNumber, Token token) {
