@@ -94,7 +94,7 @@ public class AdminControllerTest {
     public void testLoginAdmin_NotRecognized() throws SQLException{
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
-        assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("E34212", "knvfdkjfndkjdn"));
+        assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("E34212", "wrong_password"));
     }
 
 }

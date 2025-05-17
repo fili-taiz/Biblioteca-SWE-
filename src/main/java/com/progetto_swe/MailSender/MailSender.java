@@ -98,7 +98,7 @@ public class MailSender {
     }
 
     public static void sendWithdrawSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, String expireDate) {
-        String subject = "RESTITUZIONE ARTICOLO CON SUCCESSO";
+        String subject = "ARTICOLO RITIRATO CON SUCCESSO";
         String content = "ha ritirato con successo l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>." +
                 "È pregato di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
         String html = createhtml(subject, userCode, content);
@@ -118,7 +118,7 @@ public class MailSender {
 
     //mandato da postgre
     public static void sendHirerBannedMail(String recepient, String userCode, int itemCode, String title, LocalDate unbannedDate) {
-        String subject = "UTENTE BANNATO";
+        String subject = "UTENTE BLOCCATO";
         String content = "è stato bannato fino a data " + unbannedDate + " perché non ha restituito 'articolo \"" + title + "\" " +
                 "<br>con codice <strong>" + itemCode + "</strong>" + " dopo aver il noleggio 3 volte.";
         String html = createhtml(subject, userCode, content);
@@ -127,7 +127,7 @@ public class MailSender {
 
     //mandato da postgre
     public static void sendHirerUnbannedMail(String recepient, String userCode) {
-        String subject = "UTENTE UNBANNATO";
+        String subject = "UTENTE SBLOCCATO";
         String content = "è stato unbannato, la pregriamo di restituire l'articolo entro le scadenze.";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
