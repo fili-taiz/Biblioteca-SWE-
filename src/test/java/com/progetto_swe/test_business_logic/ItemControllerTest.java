@@ -35,8 +35,12 @@ public class ItemControllerTest {
     @Test
     public void testSearchItem(){
         BookDAO bookDAO = new BookDAO();
-        int book_code_1 = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
-        int book_code_2 = bookDAO.addBook("Anatomia", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", "isbn2", "publishing house 2", 220, "authors2",  Library.LIBRARY_1.toString(), 7, true);
+        int book_code_1 = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1",
+                "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
+        int book_code_2 = bookDAO.addBook("Anatomia", LocalDate.of(2023,4,2).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", "isbn2",
+                "publishing house 2", 220, "authors2",  Library.LIBRARY_1.toString(), 7, true);
 
         ArrayList<Item> expected_items = new ArrayList<>();
 
@@ -63,26 +67,53 @@ public class ItemControllerTest {
         Token token = new Token(hirer);
         hirer.setToken(token);
 
-        assertThrows(ActionDeniedException.class, () -> itemController.addBook("title", LocalDate.of(2004, 2, 13).toString(), Language.LANGUAGE_1.toString(),
-                Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors", 5, true, token));
+        assertThrows(ActionDeniedException.class, () -> itemController.addBook("title", LocalDate.of(2004, 2, 13).toString(),
+                Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200,
+                "authors", 5, true, token));
     }
 
     @Test
-    public void testRemoveBook(){
-        Admin admin = new Admin("uc1", "nome", "cognome", "mail", "00000", Library.LIBRARY_1,null);
-        Token admin_token = new Token(admin);
-        admin.setToken(admin_token);
+    public void testRemoveBook_Fail1(){
         Hirer hirer = new Hirer("usercode", "name", "surname", "email", "00001", null, null);
         Token hirer_token = new Token(hirer);
         hirer.setToken(hirer_token);
         BookDAO bookDAO = new BookDAO();
 
-        int book_code_1 = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
-        int book_code_2 = bookDAO.addBook("Anatomia", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2", "isbn2", "publishing house 2", 220, "authors2",  Library.LIBRARY_2.toString(), 7, true);
+        int book_code_1 = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
+                200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
 
 
         assertThrows(ActionDeniedException.class, () -> itemController.removeBook(book_code_1, hirer_token));
-        assertThrows(ActionDeniedException.class, () -> itemController.removeBook(book_code_2, admin_token));
+
+    }
+
+    @Test
+    public void testRemoveBook_Fail2(){
+        Admin admin = new Admin("uc1", "nome", "cognome", "mail", "00000", Library.LIBRARY_1,null);
+        Token admin_token = new Token(admin);
+        admin.setToken(admin_token);
+        BookDAO bookDAO = new BookDAO();
+
+        int book_code_1 = bookDAO.addBook("Anatomia", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(), "link2", "isbn2", "publishing house 2", 220, "authors2",
+                Library.LIBRARY_2.toString(), 7, true);
+
+        assertThrows(ActionDeniedException.class, () -> itemController.removeBook(book_code_1, admin_token));
+
+    }
+
+    @Test
+    public void testRemoveBook_Fail3(){
+        Admin admin = new Admin("uc1", "nome", "cognome", "mail", "00000", Library.LIBRARY_1,null);
+        Token admin_token = new Token(admin);
+        admin.setToken(admin_token);
+        BookDAO bookDAO = new BookDAO();
+
+        int book_code_1 = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
+                200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
 
         ReservationDAO reservationDAO = new ReservationDAO();
         HirerDAO hirerDAO = new HirerDAO();
@@ -99,7 +130,8 @@ public class ItemControllerTest {
         Token token = new Token(hirer);
         hirer.setToken(token);
 
-        assertThrows(ActionDeniedException.class, () -> itemController.updateBook(1,"title", LocalDate.of(2004, 2, 13).toString(), true, Language.LANGUAGE_1.toString(),
+        assertThrows(ActionDeniedException.class, () -> itemController.updateBook(1,"title", LocalDate.of(2004, 2, 13).toString(),
+                true, Language.LANGUAGE_1.toString(),
                 Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors", 5, token));
 
     }

@@ -38,8 +38,9 @@ public class ReservationControllerTest {
 
     private int setup(){
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
-        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
-        return book_code;
+        return bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
+                200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
     }
 
     @Test
@@ -72,7 +73,8 @@ public class ReservationControllerTest {
         Token token = new Token(admin);
         admin.setToken(token);
 
-        assertThrows(ActionDeniedException.class, () -> reservationController.reserveItem(hirerDAO.getHirer("usercode"), book, Library.LIBRARY_1.toString(), token));
+        assertThrows(ActionDeniedException.class, () -> reservationController.reserveItem(hirerDAO.getHirer("usercode"), book,
+                Library.LIBRARY_1.toString(), token));
     }
 
     @Test
@@ -104,7 +106,8 @@ public class ReservationControllerTest {
         Token token = new Token(admin);
         admin.setToken(token);
 
-        assertThrows(ActionDeniedException.class, () -> reservationController.reserveItem(hirerDAO.getHirer("usercode"), book, Library.LIBRARY_2.toString(), token));
+        assertThrows(ActionDeniedException.class, () -> reservationController.reserveItem(hirerDAO.getHirer("usercode"), book,
+                Library.LIBRARY_2.toString(), token));
     }
 
 

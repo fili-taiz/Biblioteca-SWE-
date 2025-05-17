@@ -59,7 +59,7 @@ public class HirerControllerTest {
 
 
     @Test
-    public void testLoginAdmin_SuccessAndNotFirstLogin() throws SQLException {
+    public void testLoginHirer_SuccessAndNotFirstLogin() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
         setUpLoginRecognized();
@@ -72,7 +72,7 @@ public class HirerControllerTest {
 
 
     @Test
-    public void testLoginAdmin_SuccessAndFirstLogin() throws SQLException {
+    public void testLoginHirer_SuccessAndFirstLogin() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
         setUpLoginRecognized();
 
@@ -82,7 +82,7 @@ public class HirerControllerTest {
     }
 
     @Test
-    public void testLoginAdmin_NotRecognized() throws SQLException{
+    public void testLoginHirer_NotRecognized() throws SQLException{
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
         assertThrows(AccessDeniedException.class, () -> hirerController.loginUniversityHirer("E34212", "knvfdkjfndkjdn"));
@@ -93,8 +93,10 @@ public class HirerControllerTest {
         setUpLoginRecognized();
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
         BookDAO bookDAO = new BookDAO();
-        int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(),
-                "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(), 5, false);
+        int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(),
+                "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(),
+                5, false);
 
         assertThrows(ActionDeniedException.class, () -> hirerController.addToWaitingList(bookDAO.getBook(book_code), "mail", Library.LIBRARY_1.toString()));
     }
@@ -108,7 +110,9 @@ public class HirerControllerTest {
         Token token = new Token(hirer);
         hirer.setToken(token);
 
-        assertThrows(ActionDeniedException.class, () -> hirerController.registerExternalHirer(hirer.getName(), hirer.getSurname(), hirer.getEmail(), hirer.getTelephoneNumber(), hirer.getToken()));
+        assertThrows(ActionDeniedException.class, () -> hirerController.registerExternalHirer(hirer.getName(),
+                hirer.getSurname(), hirer.getEmail(), hirer.getTelephoneNumber(), hirer.getToken()));
 
     }
 }
+

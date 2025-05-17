@@ -36,8 +36,9 @@ public class LendingControllerTest {
 
     private int setup(){
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
-        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
-        return book_code;
+        return bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
+                200, "authors1",  Library.LIBRARY_1.toString(), 5, true);
     }
 
     @Test
@@ -89,7 +90,9 @@ public class LendingControllerTest {
     @Test
     public void registerLending_Fail3(){
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
-        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 5, false);
+        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
+                200, "authors1",  Library.LIBRARY_1.toString(), 5, false);
         Hirer hirer = hirerDAO.getHirer("usercode");
         adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
         Admin admin = adminDAO.getAdmin("usercode1");
@@ -102,7 +105,9 @@ public class LendingControllerTest {
     @Test
     public void registerLending_Fail4(){
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
-        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1",  Library.LIBRARY_1.toString(), 2, true);
+        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
+                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
+                200, "authors1",  Library.LIBRARY_1.toString(), 2, true);
         Hirer hirer = hirerDAO.getHirer("usercode");
         adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
         Admin admin = adminDAO.getAdmin("usercode1");

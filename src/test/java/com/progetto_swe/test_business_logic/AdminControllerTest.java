@@ -71,8 +71,8 @@ public class AdminControllerTest {
     public void testLoginAdmin_SuccessAndNotFirstLogin() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
-        adminDAO.addAdmin("E256743", "Marco", "Verdi", "marco.verdi@unimail.com", "00001", "LIBRARY_1");
         setUpLoginRecognized();
+        adminDAO.addAdmin("E256743", "Marco", "Verdi", "marco.verdi@unimail.com", "00001", "LIBRARY_1");
 
         assertEquals(adminDAO.getAdmin("E256743"), adminController.loginAdmin("E256743", "abcd1234"));
 
