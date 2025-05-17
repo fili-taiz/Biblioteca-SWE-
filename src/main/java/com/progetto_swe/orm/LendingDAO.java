@@ -62,7 +62,6 @@ public class LendingDAO {
         }
     }
 
-    //aggiunto da testare
 
     public ArrayList<Lending> getLendingsByUserCode(String userCode) throws DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
@@ -83,22 +82,14 @@ public class LendingDAO {
                 Hirer hirer = hirerDAO.getHirer(userCode);
                 try {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
-                    lendings.add(new Lending(
-                            resultSet.getDate("lending_date").toLocalDate(),
-                            resultSet.getDate("maturity_date").toLocalDate(),
-                            hirer,
-                            book,
-                            Library.valueOf(resultSet.getString("storage_place"))));
+                    lendings.add(new Lending( resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(),
+                            hirer, book, Library.valueOf(resultSet.getString("storage_place"))));
                 }catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-                    lendings.add(new Lending(
-                            resultSet.getDate("lending_date").toLocalDate(),
-                            resultSet.getDate("maturity_date").toLocalDate(),
-                            hirer,
-                            magazine,
-                            Library.valueOf(resultSet.getString("storage_place"))));
+                    lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(),
+                            hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
                 }catch (IdNotFoundException e) {
                 }
             }
