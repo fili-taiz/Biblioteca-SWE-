@@ -10,19 +10,32 @@ import jakarta.mail.internet.MimeMessage;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
 public class MailSender {
     private static final MailSender mailSender = new MailSender();
     private static Session session;
-    private static String myAccountEmail = "biblioteca.SWE@gmail.com";
-    private static String password = "upun dxcl xqfi rwae";
+    private static String myAccountEmail = "";
+    private static String password = "";
     private static boolean sendMail = false;
 
 
     private MailSender() {
+        try {
+            List<String> righe = Files.readAllLines(Paths.get("./src/main/resources/credenziali"));
+            myAccountEmail = righe.get(0);
+            password = righe.get(1);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.host", "smtp.gmail.com");
