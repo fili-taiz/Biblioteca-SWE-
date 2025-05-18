@@ -40,8 +40,6 @@ public class MagazineDAO {
                     resultSet.getString("link"),
                     resultSet.getInt("number_of_pages"),
                     resultSet.getString("publishing_house"));
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
             return magazine;
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e.getCause().toString());
@@ -54,13 +52,9 @@ public class MagazineDAO {
                            String category,
                            String link,
                            String publishingHouse,
-                           int number_of_pages,
-                           String storagePlace,
-                           int numberOfCopies,
-                           boolean borrowable)
+                           int number_of_pages)
             throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             //Creazione Item e Magazine
             String query = """
@@ -88,13 +82,8 @@ public class MagazineDAO {
             ps.setInt(1, itemCode);
             ps.setString(2, publishingHouse);
             ps.executeUpdate();
-
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
-            ConnectionManager.commit();
             return itemCode;
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -143,13 +132,9 @@ public class MagazineDAO {
                                String category,
                                String link,
                                String publishingHouse,
-                               String storagePlace,
-                               int newNumberOfCopies,
-                               boolean borrowable,
                                int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             String query = """
                     UPDATE Item 
@@ -166,7 +151,6 @@ public class MagazineDAO {
             ps.setInt(7, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Magazine con ItemCode [" + originalItemCode + "] non presente nel DB.");
             }
 
@@ -180,14 +164,9 @@ public class MagazineDAO {
             ps.setInt(2, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] non è un Magazine.");
             }
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -211,11 +190,6 @@ public class MagazineDAO {
                         resultSet.getString("link"),
                         resultSet.getInt("number_of_pages"),
                         resultSet.getString("publishing_house")));
-            }
-
-            for(Magazine magazine : magazines){
-                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-                magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(magazine.getCode()));
             }
             return magazines;
         } catch (SQLException e) {

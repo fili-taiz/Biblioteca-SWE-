@@ -18,7 +18,7 @@ public class PhysicalCopiesDAO {
                                      String storagePlace,
                                      int numberOfCopies,
                                      boolean borrowable)
-            throws DatabaseConnectionException {
+            throws ConstraintViolationException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = """ 
@@ -35,6 +35,9 @@ public class PhysicalCopiesDAO {
         } catch (SQLException e) {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Articolo con userCode [" + itemCode + "] già presente nella sede [" + storagePlace + "].");
+            }
+            if(e.getSQLState().equals("23503")){
+                throw new ConstraintViolationException("Errore: Non puoi avere 0 copie di un Item.");
             }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
@@ -71,9 +74,8 @@ public class PhysicalCopiesDAO {
     }
 
     public void updatePhysicalCopies(int itemCode, String storagePlace, int newNumberOfCopies, boolean borrowable)
-            throws IdNotFoundException, DatabaseConnectionException {
+            throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             String query = """
                      UPDATE physical_copies 
@@ -87,11 +89,12 @@ public class PhysicalCopiesDAO {
             ps.setString(4, storagePlace);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + itemCode + "] non ha copie nella sede [" + storagePlace + "].");
             }
-            ConnectionManager.commit();
         } catch (SQLException e) {
+            if(e.getSQLState().equals("23503")){
+                throw new ConstraintViolationException("Errore: Non puoi avere 0 copie di un Item.");
+            }
             throw new DatabaseConnectionException(e.getCause().toString());
         }
     }
@@ -109,8 +112,10 @@ public class PhysicalCopiesDAO {
             ResultSet copiesSet = ps.executeQuery();
             HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
             while (copiesSet.next()) {
-                physicalCopies.put(Library.valueOf(copiesSet.getString("storage_place")),
-                        new PhysicalCopies(copiesSet.getInt("number_of_copies"),
+                physicalCopies.put(
+                        Library.valueOf(copiesSet.getString("storage_place")),
+                        new PhysicalCopies(
+                                copiesSet.getInt("number_of_copies"),
                                 copiesSet.getInt("number_of_available_copies"),
                                 copiesSet.getBoolean("borrowable")));
             }

@@ -79,17 +79,26 @@ public class ReservationDAO {
             while (resultSet.next()) {
                 HirerDAO hirerDAO = new HirerDAO();
                 Hirer hirer = hirerDAO.getHirer(userCode);
+                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 try {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
+                    book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
                     reservations.add(new Reservation(
-                            resultSet.getDate("reservation_date").toLocalDate(), hirer, book,
-                                    Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                            resultSet.getDate("reservation_date").toLocalDate(),
+                            hirer,
+                            book,
+                            Library.valueOf(resultSet.getString("storage_place"))));
+                } catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-                    reservations.add(new Reservation(resultSet.getDate("reservation_date").toLocalDate(), hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                    magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
+                    reservations.add(new Reservation(
+                            resultSet.getDate("reservation_date").toLocalDate(),
+                            hirer,
+                            magazine,
+                            Library.valueOf(resultSet.getString("storage_place"))));
+                } catch (IdNotFoundException e) {
                 }
             }
             return reservations;

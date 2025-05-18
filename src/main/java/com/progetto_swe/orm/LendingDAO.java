@@ -81,25 +81,28 @@ public class LendingDAO {
             while (resultSet.next()) {
                 HirerDAO hirerDAO = new HirerDAO();
                 Hirer hirer = hirerDAO.getHirer(userCode);
+                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 try {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
+                    book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
                     lendings.add(new Lending(
                             resultSet.getDate("lending_date").toLocalDate(),
                             resultSet.getDate("maturity_date").toLocalDate(),
                             hirer,
                             book,
                             Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                } catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
+                    magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
                     lendings.add(new Lending(
                             resultSet.getDate("lending_date").toLocalDate(),
                             resultSet.getDate("maturity_date").toLocalDate(),
                             hirer,
                             magazine,
                             Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                } catch (IdNotFoundException e) {
                 }
             }
             return lendings;
