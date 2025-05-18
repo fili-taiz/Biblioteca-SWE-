@@ -39,7 +39,7 @@ public class PhysicalCopiesDAO {
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Non puoi avere 0 copie di un Item.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -69,7 +69,7 @@ public class PhysicalCopiesDAO {
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -95,7 +95,7 @@ public class PhysicalCopiesDAO {
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Non puoi avere 0 copie di un Item.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -121,7 +121,7 @@ public class PhysicalCopiesDAO {
             }
             return physicalCopies;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

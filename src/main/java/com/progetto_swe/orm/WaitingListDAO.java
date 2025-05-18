@@ -31,7 +31,7 @@ public class WaitingListDAO {
             }
             return emails;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -52,11 +52,11 @@ public class WaitingListDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer con email [" + email + "] già in lista d'attesa.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
-    public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException, SQLException {
+    public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
         try {
             String query = """
@@ -66,10 +66,9 @@ public class WaitingListDAO {
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, itemCode);
             ps.setString(2, storagePlace);
-
+            ps.executeUpdate();
         } catch (SQLException e) {
-            connection.rollback();
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

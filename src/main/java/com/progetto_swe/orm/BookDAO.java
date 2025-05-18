@@ -14,7 +14,7 @@ public class BookDAO {
     public BookDAO() {
         this.connection = ConnectionManager.getConnection();
     }
-//TODO gestire la divisione di item e physical copies
+
     public Book getBook(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
         try {
@@ -44,7 +44,7 @@ public class BookDAO {
                     resultSet.getString("authors"));
             return book;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -91,7 +91,7 @@ public class BookDAO {
 
             return itemCode;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -129,7 +129,7 @@ public class BookDAO {
                 throw new ConstraintViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato " +
                         "perché sono ancora presenti Copie/Prenotazioni/Prestiti. ");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -179,7 +179,7 @@ public class BookDAO {
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] che cuoi aggiornare non è un Book.");
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -209,7 +209,7 @@ public class BookDAO {
             }
             return books;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 

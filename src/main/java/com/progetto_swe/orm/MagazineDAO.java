@@ -42,7 +42,7 @@ public class MagazineDAO {
                     resultSet.getString("publishing_house"));
             return magazine;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -84,7 +84,7 @@ public class MagazineDAO {
             ps.executeUpdate();
             return itemCode;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -121,7 +121,7 @@ public class MagazineDAO {
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Magazine con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -167,7 +167,7 @@ public class MagazineDAO {
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] non è un Magazine.");
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -193,7 +193,7 @@ public class MagazineDAO {
             }
             return magazines;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

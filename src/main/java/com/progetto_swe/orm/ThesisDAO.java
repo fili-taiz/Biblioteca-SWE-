@@ -44,7 +44,7 @@ public class ThesisDAO {
                     resultSet.getString("university"));
             return thesis;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -93,7 +93,7 @@ public class ThesisDAO {
 
             return itemCode;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -131,7 +131,7 @@ public class ThesisDAO {
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Thesis con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -179,7 +179,7 @@ public class ThesisDAO {
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] non è un Thesis.");
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -207,7 +207,7 @@ public class ThesisDAO {
             }
             return thesis;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }
