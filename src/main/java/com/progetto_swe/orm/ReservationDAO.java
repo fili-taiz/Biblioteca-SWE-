@@ -34,7 +34,10 @@ public class ReservationDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer ha già prenotato un articolo con itemCode [" + userCode + "].");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            if(e.getSQLState().equals("23503")){//TODO
+                throw new IdAlreadyExistsException("Errore: l'Item con itemCode [" + itemCode + "] non ha copie fisiche non puoi effettuare una prenotazione.");
+            }
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -57,7 +60,7 @@ public class ReservationDAO {
             }
             ConnectionManager.commit();
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -79,22 +82,31 @@ public class ReservationDAO {
             while (resultSet.next()) {
                 HirerDAO hirerDAO = new HirerDAO();
                 Hirer hirer = hirerDAO.getHirer(userCode);
+                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 try {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
+                    book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
                     reservations.add(new Reservation(
-                            resultSet.getDate("reservation_date").toLocalDate(), hirer, book,
-                                    Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                            resultSet.getDate("reservation_date").toLocalDate(),
+                            hirer,
+                            book,
+                            Library.valueOf(resultSet.getString("storage_place"))));
+                } catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-                    reservations.add(new Reservation(resultSet.getDate("reservation_date").toLocalDate(), hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                    magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
+                    reservations.add(new Reservation(
+                            resultSet.getDate("reservation_date").toLocalDate(),
+                            hirer,
+                            magazine,
+                            Library.valueOf(resultSet.getString("storage_place"))));
+                } catch (IdNotFoundException e) {
                 }
             }
             return reservations;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

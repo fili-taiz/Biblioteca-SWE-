@@ -1,8 +1,15 @@
 package com.progetto_swe.orm.database_exception;
 
+import java.sql.SQLException;
+
 public class DatabaseConnectionException extends RuntimeException {
-    public DatabaseConnectionException(String message) {
-        super(message);
+    SQLException exception;
+    public DatabaseConnectionException(SQLException e) {
+        exception = e;
+    }
+
+    public Exception getException(){
+        return exception;
     }
 }
 

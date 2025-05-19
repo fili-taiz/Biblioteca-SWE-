@@ -36,7 +36,10 @@ public class LendingDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer ha già preso in prestito articolo con itemCode [" + itemCode + "].");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            if(e.getSQLState().equals("23503")){//TODO
+                throw new IdAlreadyExistsException("Errore: l'Item con itemCode [" + itemCode + "] non ha copie fisiche non puoi effettuare un prestito.");
+            }
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -58,7 +61,7 @@ public class LendingDAO {
                 throw new IdNotFoundException("Errore: Prestito di Hirer con userCode [" + itemCode + "] e Item con itemCode [" + itemCode + "] presso sede [" + storagePlace + "] non presente nel DB.");
             }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -80,22 +83,33 @@ public class LendingDAO {
             while (resultSet.next()) {
                 HirerDAO hirerDAO = new HirerDAO();
                 Hirer hirer = hirerDAO.getHirer(userCode);
+                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 try {
                     Book book = bookDAO.getBook(resultSet.getInt("code"));
-                    lendings.add(new Lending( resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(),
-                            hirer, book, Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                    book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
+                    lendings.add(new Lending(
+                            resultSet.getDate("lending_date").toLocalDate(),
+                            resultSet.getDate("maturity_date").toLocalDate(),
+                            hirer,
+                            book,
+                            Library.valueOf(resultSet.getString("storage_place"))));
+                } catch (IdNotFoundException e) {
                 }
                 try {
                     Magazine magazine = magazineDAO.getMagazine(resultSet.getInt("code"));
-                    lendings.add(new Lending(resultSet.getDate("lending_date").toLocalDate(), resultSet.getDate("maturity_date").toLocalDate(),
-                            hirer, magazine, Library.valueOf(resultSet.getString("storage_place"))));
-                }catch (IdNotFoundException e) {
+                    magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(resultSet.getInt("code")));
+                    lendings.add(new Lending(
+                            resultSet.getDate("lending_date").toLocalDate(),
+                            resultSet.getDate("maturity_date").toLocalDate(),
+                            hirer,
+                            magazine,
+                            Library.valueOf(resultSet.getString("storage_place"))));
+                } catch (IdNotFoundException e) {
                 }
             }
             return lendings;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 

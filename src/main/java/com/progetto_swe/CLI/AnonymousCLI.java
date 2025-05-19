@@ -1,12 +1,15 @@
 package com.progetto_swe.CLI;
 
+import com.progetto_swe.domain_model.Category;
+import com.progetto_swe.domain_model.Item;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class AnonymousCLI {
+public class AnonymousCLI {/*
 
-    /*private AnonymousUserController anonymousUserController = new AnonymousUserController();
     private Scanner scanner = new Scanner(System.in);
-/*
+
     public String start() {
         CommandLineInterface.clearScreen();
         String scelta;
@@ -173,15 +176,5 @@ public class AnonymousCLI {
             data.add(new String[]{library.toString(), Integer.toString(item.getNumberOfAvailableCopiesInLibrary(library)), state(item.getNumberOfAvailableCopiesInLibrary(library), item.isBorrowable(library))});
         }
         CommandLineInterface.printTable(header, data, 0);
-    }
-
-    private String state(int numberOfCopies, boolean borrowable) {
-        if (!borrowable) {
-            return "Non noleggiabile";
-        }
-        if (numberOfCopies == 0) {
-            return "Esaurito";
-        }
-        return "Prenotabile";
     }*/
 }

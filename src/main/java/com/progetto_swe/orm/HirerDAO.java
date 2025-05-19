@@ -46,7 +46,7 @@ public class HirerDAO {
             hirer.setToken(new Token(hirer));
             return hirer;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -68,7 +68,7 @@ public class HirerDAO {
             saltAndHashedPassword.put("hashedPassword", resultSet.getString("hashed_password"));
             return saltAndHashedPassword;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -92,7 +92,7 @@ public class HirerDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer con userCode [" + userCode + "] già presente nel DB.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -110,7 +110,7 @@ public class HirerDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Credenziali per Hirer con userCode [" + userCode + "] già presenti nel DB.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -131,7 +131,7 @@ public class HirerDAO {
             }
             return result;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 

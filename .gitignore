@@ -31,3 +31,4 @@ bin/
 
 ##ignorare file nella cartella target
 target/
+./src/main/resources/credenziali

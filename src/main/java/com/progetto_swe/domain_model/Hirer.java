@@ -18,7 +18,7 @@ public class Hirer extends User{
     }
 
     public boolean contains(String keyword){
-        if(this.getUserCode().toUpperCase().contains(keyword.toUpperCase())){
+        if(this.getUserCode().equals(keyword)){
             return true;
         }
         if(this.getName().toUpperCase().contains(keyword.toUpperCase())){
@@ -27,10 +27,10 @@ public class Hirer extends User{
         if(this.getSurname().toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
-        if(this.getEmail().toUpperCase().contains(keyword.toUpperCase())){
+        if(this.getEmail().toUpperCase().equals(keyword.toUpperCase())){
             return true;
         }
-        return this.getTelephoneNumber().toUpperCase().contains(keyword.toUpperCase());
+        return this.getTelephoneNumber().equals(keyword);
     }
 
     @Override

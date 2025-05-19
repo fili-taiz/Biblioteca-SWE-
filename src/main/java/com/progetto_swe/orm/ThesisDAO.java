@@ -42,11 +42,9 @@ public class ThesisDAO {
                     resultSet.getString("author"),
                     resultSet.getString("supervisors"),
                     resultSet.getString("university"));
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            thesis.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
             return thesis;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -58,13 +56,9 @@ public class ThesisDAO {
                          int number_of_pages,
                          String author,
                          String supervisors,
-                         String university,
-                         String storagePlace,
-                         int numberOfCopies,
-                         boolean borrowable)
+                         String university)
             throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             //Creazione Item e Thesis
             String query = """
@@ -97,13 +91,9 @@ public class ThesisDAO {
             ps.setString(4, university);
             ps.executeUpdate();
 
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
-            ConnectionManager.commit();
             return itemCode;
         } catch (SQLException e) {
-            ConnectionManager.rollback();
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -141,7 +131,7 @@ public class ThesisDAO {
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Thesis con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -154,13 +144,9 @@ public class ThesisDAO {
                              String author,
                              String supervisors,
                              String university,
-                             String storagePlace,
-                             int newNumberOfCopies,
-                             boolean borrowable,
                              int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             String query = """
                         UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? WHERE code = ?;
@@ -175,7 +161,6 @@ public class ThesisDAO {
             ps.setInt(7, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Thesis con ItemCode [" + originalItemCode + "] non presente nel DB.");
             }
 
@@ -191,15 +176,10 @@ public class ThesisDAO {
             ps.setInt(4, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] non è un Thesis.");
             }
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -225,14 +205,9 @@ public class ThesisDAO {
                         resultSet.getString("supervisors"),
                         resultSet.getString("university")));
             }
-
-            for(Thesis t : thesis){
-                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-                t.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(t.getCode()));
-            }
             return thesis;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

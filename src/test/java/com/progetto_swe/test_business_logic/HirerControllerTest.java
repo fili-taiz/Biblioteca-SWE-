@@ -15,18 +15,22 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerControllerTest {
    Connection connection_library_db = ConnectionManager.getConnection();
     Connection connection_university_db;
+    AdminDAO adminDAO = new AdminDAO();
     HirerDAO hirerDAO = new HirerDAO();
     BookDAO bookDAO = new BookDAO();
+    LendingDAO lendingDAO = new LendingDAO();
     WaitingListDAO waitingListDAO = new WaitingListDAO();
     PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
     HirerController hirerController = new HirerController();
+    ReservationDAO reservationDAO = new ReservationDAO();
 
 
     @BeforeEach
@@ -34,7 +38,7 @@ public class HirerControllerTest {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
         PreparedStatement preparedStatement = connection_university_db.prepareStatement("TRUNCATE TABLE university_people RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
-        preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE hirer, book, item RESTART IDENTITY CASCADE;");
+        preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE hirer, book, item, reservation, lending, admin, physical_copies RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
     }
 
@@ -95,10 +99,15 @@ public class HirerControllerTest {
         int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
                 Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors");
 
-        physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 0, true);
+        physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 2, true);
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
+        reservationDAO.addReservation("usercode", book_code, Library.LIBRARY_1.toString());
 
-        hirerController.addToWaitingList(bookDAO.getBook(book_code), hirerDAO.getHirer("usercode").getEmail(), Library.LIBRARY_1.toString());
+        Book book = bookDAO.getBook(book_code);
+        HashMap<Library, PhysicalCopies> pcs = physicalCopiesDAO.getPhysicalCopies(book_code);
+        book.setPhysicalCopies(pcs);
+
+        hirerController.addToWaitingList(book, hirerDAO.getHirer("usercode").getEmail(), Library.LIBRARY_1.toString());
 
         ArrayList<String> emails = waitingListDAO.getWaitingList(book_code, Library.LIBRARY_1.toString());
 
@@ -118,6 +127,17 @@ public class HirerControllerTest {
     }
 
     @Test
+    public void testRegisterExternalHirer_Success(){
+        adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString());
+        Admin admin = adminDAO.getAdmin("uc1");
+        Token admin_token = new Token(admin);
+        admin.setToken(admin_token);
+        String expected_usercode = hirerController.registerExternalHirer("nome", "cognome", "email", "01234", admin_token);
+
+        assertEquals(expected_usercode, hirerDAO.getHirer(expected_usercode).getUserCode());
+    }
+
+    @Test
     public void testRegisterExternalHirer_Fail(){
         hirerDAO.addHirer("E256743", "Marco", "Verdi", "marco.verdi@studuni.com", "00001");
         Hirer hirer = hirerDAO.getHirer("E256743");
@@ -128,5 +148,85 @@ public class HirerControllerTest {
                 hirer.getSurname(), hirer.getEmail(), hirer.getTelephoneNumber(), hirer.getToken()));
 
     }
+
+    @Test
+    public void testSearchHirer(){
+        hirerDAO.addHirer("uc1", "Marco", "Bianchi", "marco.bianchi@unimail.com", "02121");
+        hirerDAO.addHirer("uc2", "Luca", "Bianchi", "luca.bianchi@unimail.com", "09876");
+        hirerDAO.addHirer("uc3", "Mario", "Rossi", "mario.rossi@unimail.com", "34563");
+
+        ArrayList <Hirer> expected_hirers = new ArrayList<>();
+        expected_hirers.add(hirerDAO.getHirer("uc1"));
+        expected_hirers.add(hirerDAO.getHirer("uc2"));
+
+        ArrayList <Hirer> notExpected_hirers = new ArrayList<>();
+        notExpected_hirers.add(hirerDAO.getHirer("uc1"));
+        notExpected_hirers.add(hirerDAO.getHirer("uc2"));
+        notExpected_hirers.add(hirerDAO.getHirer("uc3"));
+
+        assertEquals(expected_hirers, hirerController.searchHirer("Bianchi"));
+        assertNotEquals(notExpected_hirers, hirerController.searchHirer("Bianchi"));
+    }
+
+    @Test
+    public void testLoginExternalHirer_Success() throws SQLException {
+        setUpLoginRecognized();
+        hirerDAO.addHirer("E256743", "Marco", "Bianchi", "marco.bianchi@studuni.com", "00001");
+        hirerDAO.addHirerPassword("E256743", "1722c3266324344fa1dbf0c156d299a26ce14fd5d16b1f38e447da831fcaf7e9", "345234");
+
+        assertEquals(hirerDAO.getHirer("E256743"), hirerController.loginExternalHirer("E256743", "abcd1234"));
+    }
+
+    @Test
+    public void testLoginExternalHirer_Fail() throws SQLException {
+        setUpLoginRecognized();
+        hirerDAO.addHirer("E256743", "Marco", "Bianchi", "marco.bianchi@studuni.com", "00001");
+        hirerDAO.addHirerPassword("E256743", "1722c3266324344fa1dbf0c156d299a26ce14fd5d16b1f38e447da831fcaf7e9", "345234");
+
+        assertThrows(AccessDeniedException.class, () -> hirerController.loginExternalHirer("E256743", "abcd12345"));
+    }
+
+    @Test
+    public void FunctionalTestHirer() throws SQLException {
+        setUpLoginRecognized();
+
+        hirerController.loginUniversityHirer("E256743", "abcd1234");
+
+        Hirer hirer = hirerDAO.getHirer("E256743");
+        Token hirer_token = new Token(hirer);
+        hirer.setToken(hirer_token);
+
+        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2015, 3, 2).toString(), Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(), "link", "isbn", "Mondadori", 300, "autori");
+
+        physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 5, true);
+
+
+        reservationDAO.addReservation("E256743", book_code, Library.LIBRARY_1.toString());
+
+        Reservation reservation = new Reservation(LocalDate.now(), hirer, bookDAO.getBook(book_code), Library.LIBRARY_1);
+
+        assertEquals(reservation, reservationDAO.getReservationsByUserCode("E256743").get(0));
+
+        ReservationController rc = new ReservationController();
+
+        adminDAO.addAdmin("M23234", "Filippo", "Taiti", "ft0011ft@gmail.com", "034567", Library.LIBRARY_1.toString());
+        Admin admin = adminDAO.getAdmin("M23234");
+        Token admin_token = new Token(admin);
+        HashMap<Library, PhysicalCopies> pcs = physicalCopiesDAO.getPhysicalCopies(book_code);
+        Book book = bookDAO.getBook(book_code);
+        book.setPhysicalCopies(pcs);
+
+        rc.confirmReservationWithdraw(hirer, book, Library.LIBRARY_1.toString(), admin_token);
+
+        Lending lending = new Lending(LocalDate.now(), LocalDate.now().plusMonths(1), hirer, bookDAO.getBook(book_code), Library.LIBRARY_1);
+
+        assertEquals(Collections.emptyMap(), reservationDAO.getReservationsByUserCode("E256743").get(0));
+        assertEquals(lending, lendingDAO.getLendingsByUserCode("E256743").get(0));
+
+
+    }
+
+
 }
 

@@ -25,16 +25,22 @@ public class AdminController {
         Admin admin;
         try{
             admin = adminDAO.getAdmin(userCode);
-        }catch(IdNotFoundException e){
-            admin = null;
-        }
-
-        //riconosciuto dall'università ma è la prima volta che esegue login
-        if (admin == null){
-            adminDAO.addAdmin(userCode, adminInfo.get("name"), adminInfo.get("surname"), adminInfo.get("email"),
-                    adminInfo.get("telephoneNumber"), adminInfo.get("workingPlace"));
-
-            admin = adminDAO.getAdmin(userCode);
+        }catch(IdNotFoundException e){ //riconosciuto dall'università ma è la prima volta che esegue login
+            adminDAO.addAdmin(
+                    userCode,
+                    adminInfo.get("name"),
+                    adminInfo.get("surname"),
+                    adminInfo.get("email"),
+                    adminInfo.get("telephoneNumber"),
+                    adminInfo.get("workingPlace"));
+            admin = new Admin(
+                    userCode,
+                    adminInfo.get("name"),
+                    adminInfo.get("surname"),
+                    adminInfo.get("email"),
+                    adminInfo.get("telephoneNumber"),
+                    Library.valueOf(adminInfo.get("workingPlace")),
+                    null);
         }
 
         //aggiunta credenziali

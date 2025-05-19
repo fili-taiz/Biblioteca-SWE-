@@ -1,5 +1,6 @@
 package com.progetto_swe.business_logic;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,7 +15,7 @@ public class HirerController {
     public Hirer loginUniversityHirer(String userCode, String password){
         UniversityAuthenticationSystem authenticationSystem = new UniversityAuthenticationSystem();
 
-        //ottengo informazioni di questo UniversityHirer se la password combacia con quella nel database universitario
+        //ottengo informazioni da database universitario se password corretta
         HashMap<String, String> hirerInfo = authenticationSystem.getUniversityPeople(userCode, password);
 
 
@@ -23,17 +24,26 @@ public class HirerController {
             throw new AccessDeniedException("Errore: accesso come ruolo Hirer rifiutato, controlla userCode e password.");
         }
 
-        //ottengo informazioni di questo UniversityHirer nel database bibliotecario
+        //controllo se presente nel database bibliotecario
         HirerDAO hirerDAO = new HirerDAO();
         Hirer hirer;
         try{
             hirer = hirerDAO.getHirer(userCode);
-        }catch (IdNotFoundException e) { //riconosciuto dall'università ma è la prima volta che esegue login
-            hirerDAO.addHirer( userCode, hirerInfo.get("name"), hirerInfo.get("surname"), hirerInfo.get("email"),
+        }catch (IdNotFoundException e) { //riconosciuto dall'università ma non presente nel database bibliotecario
+            hirerDAO.addHirer(
+                    userCode,
+                    hirerInfo.get("name"),
+                    hirerInfo.get("surname"),
+                    hirerInfo.get("email"),
                     hirerInfo.get("telephoneNumber"));
-            hirer = new Hirer(userCode, hirerInfo.get("name"), hirerInfo.get("surname"), hirerInfo.get("email"),
+            hirer = new Hirer(
+                    userCode,
+                    hirerInfo.get("name"),
+                    hirerInfo.get("surname"),
+                    hirerInfo.get("email"),
                     hirerInfo.get("telephoneNumber"),
-                    null, null);
+                    null,
+                    null);
         }
         //aggiunta credenziali
         hirer.setToken(new Token(hirer));
@@ -51,7 +61,6 @@ public class HirerController {
             throw new AccessDeniedException("Errore: accesso come ruolo Hirer rifiutato, controlla userCode e password.");
         }
 
-        //istanziazione Hirer
         Hirer hirer = hirerDAO.getHirer(userCode);
         hirer.setToken(new Token(hirer));
         return hirer;
@@ -65,19 +74,22 @@ public class HirerController {
         waitingListDAO.addToWaitingList(item.getCode(), storagePlace, mail);
     }
 
-    public ArrayList<Hirer> searchHirer(String keyword) {
+    public ArrayList<Hirer> searchHirer(String keywords) {
         HirerDAO hirerDAO = new HirerDAO();
         ArrayList<Hirer> hirers = hirerDAO.getHirers_();
+        String[] splittedKeywords = keywords.split(" ");
         ArrayList<Hirer> result = new ArrayList<>();
         for(Hirer h : hirers){
-            if(h.getUserCode().equals(keyword)){
-                result.add(h);
+            for (String keyword : splittedKeywords){
+                if (h.contains(keyword)) {
+                    result.add(h);
+                }
             }
         }
         return result;
     }
 
-    public void registerExternalHirer(String name, String surname, String email, String telephoneNumber, Token token) {
+    public String registerExternalHirer(String name, String surname, String email, String telephoneNumber, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
@@ -104,6 +116,7 @@ public class HirerController {
             ConnectionManager.rollback();
             throw e;
         }
+        return userCode;
     }
 
 }

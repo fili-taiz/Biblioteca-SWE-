@@ -43,7 +43,7 @@ public class AdminDAO {
             admin.setToken(new Token(admin));
             return admin;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -72,7 +72,7 @@ public class AdminDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Admin con userCode [" + userCode + "] già presente nel DB.");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

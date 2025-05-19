@@ -6,17 +6,29 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionManager {
+import java.nio.file.*;
+import java.io.IOException;
+import java.util.List;
+
+public class ConnectionManager {//TODO implementare in modo più appropriato il singleton
+    private static ConnectionManager connectionManager;
     private static Connection connection;
-    private static final String url = "jdbc:postgresql://localhost:5432/Library";
+    private static String url = "";
     private static final String username = "postgres";
-    private static final String password = "filipposwe";
+    private static String password = "";
 
     private ConnectionManager() {
         try {
+            List<String> righe = Files.readAllLines(Paths.get("./src/main/resources/credenziali"));
+            url = righe.get(2);
+            password = righe.get(3);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
             connection = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -27,11 +39,12 @@ public class ConnectionManager {
     public static Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
+                connectionManager = new ConnectionManager();
                 connection = DriverManager.getConnection(url, username, password);
             }
             return connection;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -39,7 +52,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -47,7 +60,7 @@ public class ConnectionManager {
         try {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -56,7 +69,7 @@ public class ConnectionManager {
             connection.commit();
             openAutoCommit();
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -65,7 +78,7 @@ public class ConnectionManager {
             connection.rollback();
             openAutoCommit();
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 }

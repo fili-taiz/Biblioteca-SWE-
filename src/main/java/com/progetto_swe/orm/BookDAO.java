@@ -42,11 +42,9 @@ public class BookDAO {
                     resultSet.getString("publishing_house"),
                     resultSet.getInt("number_of_pages"),
                     resultSet.getString("authors"));
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
             return book;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -58,13 +56,9 @@ public class BookDAO {
                        String isbn,
                        String publishingHouse,
                        int numberOfPages,
-                       String authors,
-                       String storagePlace,
-                       int numberOfCopies,
-                       boolean borrowable)
+                       String authors)
             throws DatabaseConnectionException {
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             //Creazione Item e Book
             String query = """
@@ -95,13 +89,9 @@ public class BookDAO {
             ps2.setString(4, authors);
             ps2.executeUpdate();
 
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace, numberOfCopies, borrowable);
-            ConnectionManager.commit();
             return itemCode;
         } catch (SQLException e) {
-            ConnectionManager.rollback();
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -139,7 +129,7 @@ public class BookDAO {
                 throw new ConstraintViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato " +
                         "perché sono ancora presenti Copie/Prenotazioni/Prestiti. ");
             }
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -152,13 +142,9 @@ public class BookDAO {
                            String isbn,
                            String publishingHouse,
                            String authors,
-                           String storagePlace,
-                           int newNumberOfCopies,
-                           boolean borrowable,
                            int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException{
         connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
         try {
             String query = """
                     UPDATE Item 
@@ -175,7 +161,6 @@ public class BookDAO {
             ps.setInt(7, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Book con ItemCode [" + originalItemCode + "] non presente nel DB.");
             }
 
@@ -191,15 +176,10 @@ public class BookDAO {
             ps.setInt(4, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] che cuoi aggiornare non è un Book.");
             }
-            PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-            physicalCopiesDAO.updatePhysicalCopies(originalItemCode, storagePlace, newNumberOfCopies, borrowable);
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
@@ -227,14 +207,9 @@ public class BookDAO {
                         resultSet.getInt("number_of_pages"),
                         resultSet.getString("authors")));
             }
-
-            for(Book book : books){
-                PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-                book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(book.getCode()));
-            }
             return books;
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getCause().toString());
+            throw new DatabaseConnectionException(e);
         }
     }
 
