@@ -7,6 +7,7 @@ import com.progetto_swe.business_logic.*;
 import com.progetto_swe.orm.BookDAO;
 import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.ConnectionManager;
+import com.progetto_swe.orm.WaitingListDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,8 @@ public class HirerControllerTest {
    Connection connection_library_db = ConnectionManager.getConnection();
     Connection connection_university_db;
     HirerDAO hirerDAO = new HirerDAO();
+    BookDAO bookDAO = new BookDAO();
+    WaitingListDAO waitingListDAO = new WaitingListDAO();
     HirerController hirerController = new HirerController();
 
 
@@ -89,10 +92,17 @@ public class HirerControllerTest {
     }
 
     @Test
-    public void testAddToWaitingList_Fail() throws SQLException {
-        setUpLoginRecognized();
+    public void testAddToWaitingList_Success(){
+        int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(),
+                0, true);
+
+
+    }
+
+    @Test
+    public void testAddToWaitingList_Fail(){
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
-        BookDAO bookDAO = new BookDAO();
         int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
                 Category.CATEGORY_1.toString(),
                 "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(),
@@ -102,9 +112,7 @@ public class HirerControllerTest {
     }
 
     @Test
-    public void testRegisterExternalHirer_Fail() throws SQLException {
-        setUpLoginRecognized();
-
+    public void testRegisterExternalHirer_Fail(){
         hirerDAO.addHirer("E256743", "Marco", "Verdi", "marco.verdi@studuni.com", "00001");
         Hirer hirer = hirerDAO.getHirer("E256743");
         Token token = new Token(hirer);

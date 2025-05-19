@@ -43,17 +43,8 @@ public class AdminControllerTest {
 
     private void setUpLoginRecognized() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
-        PreparedStatement ps = connection_university_db.prepareStatement("INSERT INTO university_people VALUES (?, ?, ?, ?, ?, ?, ?)");
-        ps.setString(1, "E256743");
-        ps.setString(2, "Marco");
-        ps.setString(3, "Verdi");
-        ps.setString(4, "marco.verdi@unimail.com");
-        ps.setString(5, "00001");
-        ps.setString(6, "345234");
-        ps.setString(7, "1722c3266324344fa1dbf0c156d299a26ce14fd5d16b1f38e447da831fcaf7e9");
-        ps.executeUpdate();
 
-        ps = connection_university_db.prepareStatement("INSERT INTO library_admin VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement ps = connection_university_db.prepareStatement("INSERT INTO library_admin VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         ps.setString(1, "E256743");
         ps.setString(2, "Marco");
         ps.setString(3, "Verdi");
@@ -71,15 +62,18 @@ public class AdminControllerTest {
     public void testLoginAdmin_SuccessAndNotFirstLogin() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
+        //inserisco l'admin nel database dell'università
         setUpLoginRecognized();
+        //inserisco l'admin nel database della biblioteca
         adminDAO.addAdmin("E256743", "Marco", "Verdi", "marco.verdi@unimail.com", "00001", "LIBRARY_1");
-
+        //controllo che il metodo loginAdmin ritorni effettivamente l'admin corretto
         assertEquals(adminDAO.getAdmin("E256743"), adminController.loginAdmin("E256743", "abcd1234"));
 
     }
 
 
 
+    //simile al test precedente, solo che ora prima dell'esecuzione di loginAdmin, l'admin non è presente nel database della biblioteca
     @Test
     public void testLoginAdmin_SuccessAndFirstLogin() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
@@ -90,6 +84,7 @@ public class AdminControllerTest {
         assertEquals(admin, adminDAO.getAdmin("E256743"));
     }
 
+    //admin non riconosciuto dall'università
     @Test
     public void testLoginAdmin_NotRecognized() throws SQLException{
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
