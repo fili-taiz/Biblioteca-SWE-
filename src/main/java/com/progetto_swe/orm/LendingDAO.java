@@ -36,7 +36,7 @@ public class LendingDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer ha già preso in prestito articolo con itemCode [" + itemCode + "].");
             }
-            if(e.getSQLState().equals("23503")){//TODO
+            if(e.getSQLState().equals("23503")){
                 throw new IdAlreadyExistsException("Errore: l'Item con itemCode [" + itemCode + "] non ha copie fisiche non puoi effettuare un prestito.");
             }
             throw new DatabaseConnectionException(e);

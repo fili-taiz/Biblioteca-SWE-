@@ -21,8 +21,8 @@ import java.util.Scanner;
 public class MailSender {
     private static final MailSender mailSender = new MailSender();
     private static Session session;
-    private static String myAccountEmail = "qualcosa";
-    private static String password = "boh";
+    private static String myAccountEmail = "biblioteca.SWE@gmail.com";
+    private static String password = "tvxm kyjn otpt meju";
     private static boolean sendMail = true;
 
 
@@ -38,9 +38,10 @@ public class MailSender {
 
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");
+
 
         this.session = Session.getInstance(properties, new Authenticator() {
             @Override
@@ -167,17 +168,25 @@ public class MailSender {
     }
 
     private static void sendMail(String recipient, String subject, String content) {
+        if (!sendMail) return;
+
         try {
-            if (sendMail) {
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(myAccountEmail));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
-                message.setSubject(subject);
-                message.setContent(content, "text/html");
-                Transport.send(message);
+            if (recipient == null || recipient.isBlank()) {
+                throw new IllegalArgumentException("Recipient email is null or empty");
             }
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(myAccountEmail));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
+            message.setSubject(subject);
+            message.setContent(content, "text/html");
+
+            Transport.send(message);
+            System.out.println("✅ Email inviata a: " + recipient);
         } catch (Exception e) {
+            System.err.println("❌ Errore nell'invio della mail: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 }

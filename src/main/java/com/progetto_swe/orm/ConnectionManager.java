@@ -67,7 +67,6 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
     public static void commit() {
         try {
             connection.commit();
-            openAutoCommit();
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e);
         }
@@ -76,7 +75,6 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
     public static void rollback() {
         try {
             connection.rollback();
-            openAutoCommit();
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e);
         }

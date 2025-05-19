@@ -15,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -221,7 +220,7 @@ public class HirerControllerTest {
 
         Lending lending = new Lending(LocalDate.now(), LocalDate.now().plusMonths(1), hirer, bookDAO.getBook(book_code), Library.LIBRARY_1);
 
-        assertEquals(Collections.emptyMap(), reservationDAO.getReservationsByUserCode("E256743").get(0));
+        assertTrue(reservationDAO.getReservationsByUserCode("E256743").isEmpty());
         assertEquals(lending, lendingDAO.getLendingsByUserCode("E256743").get(0));
 
 

@@ -243,8 +243,8 @@ public class ItemController {
         if(book.getNumberOfLibraries() == 0){
             if(book.getLink().isEmpty()){
                 bookDAO.removeBook(itemCode);
-                return;
             }
+            return;
         }
         if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
             throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");

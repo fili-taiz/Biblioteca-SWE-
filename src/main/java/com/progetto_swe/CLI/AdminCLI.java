@@ -1,7 +1,7 @@
 package com.progetto_swe.CLI;
 
 import com.progetto_swe.business_logic.AdminController;
-import com.progetto_swe.business_logic.HirerController;
+import com.progetto_swe.business_logic.*;
 import com.progetto_swe.domain_model.*;
 
 import java.time.LocalDate;
