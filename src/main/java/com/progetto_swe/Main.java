@@ -22,7 +22,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        ConnectionManager.getConnection();
+        MailSender.sendWithdrawSuccessMail("biblioteca.SWE@gmail.com", "pinco pallino", 1, "titolo", "Library_1", LocalDate.now().toString());
 
 
 

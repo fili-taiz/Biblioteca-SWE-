@@ -22,7 +22,7 @@ public class MailSender {
     private static final MailSender mailSender = new MailSender();
     private static Session session;
     private static String myAccountEmail = "biblioteca.SWE@gmail.com";
-    private static String password = "tvxm kyjn otpt meju";
+    private static String password = "tvxmkyjnotptmeju";
     private static boolean sendMail = true;
 
 
@@ -38,10 +38,9 @@ public class MailSender {
 
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.port", "587");
-
 
         this.session = Session.getInstance(properties, new Authenticator() {
             @Override
@@ -77,9 +76,9 @@ public class MailSender {
     public static void sendReservationSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "PRENOTAZIONE EFFETTUATA CON SUCCESSO";
         String content = "la sua prenotazione dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
-                        " presso " + storagePlace + "  è stata effettuata con successo. <br>" +
-                        "È pregata di venire nella sede \"" + storagePlace + "\" a ritirare l'articolo entro la data " + expireDate + " " +
-                        "<br> per concludere l'operazione di noleggio.";
+                " presso " + storagePlace + "  è stata effettuata con successo. <br>" +
+                "È pregata di venire nella sede \"" + storagePlace + "\" a ritirare l'articolo entro la data " + expireDate + " " +
+                "<br> per concludere l'operazione di noleggio.";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
     }
@@ -88,8 +87,8 @@ public class MailSender {
     public static void sendReservationExpired(String recepient, String userCode, int itemCode, String title, String storagePlace) {
         String subject = "CANCELLAZIONE PRENOTAZIONE";
         String content = "la sua prenotazione dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
-                        " presso " + storagePlace + "  è stata cancellata perché non è venuta a ritirare " +
-                        "<br>l'articolo entro la scadenza comunicata.";
+                " presso " + storagePlace + "  è stata cancellata perché non è venuta a ritirare " +
+                "<br>l'articolo entro la scadenza comunicata.";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
     }
@@ -97,8 +96,8 @@ public class MailSender {
     public static void sendLendingSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "NOLEGGIO EFFETTUATO CON SUCCESSO";
         String content = "il suo noleggio dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
-                        " presso " + storagePlace + "  è stata effettuato con successo. <br>" +
-                        "È pregata di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
+                " presso " + storagePlace + "  è stata effettuato con successo. <br>" +
+                "È pregata di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
     }
@@ -113,7 +112,7 @@ public class MailSender {
 
     public static void sendWithdrawSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, String expireDate) {
         String subject = "ARTICOLO RITIRATO CON SUCCESSO";
-        String content = "ha ritirato con successo l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>." +
+        String content = "ha ritirato con successo l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>. " +
                 "È pregato di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
@@ -123,9 +122,9 @@ public class MailSender {
     public static void sendUpdateLendingDateMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
         String subject = "RINNOVATO NOLEGGIO";
         String content = "il suo noleggio dell'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
-                        " presso " + storagePlace + "  è stato rinnovato perché non ha restituito il libro" +
-                        "<br> entro la scadenza comunicata. <br>" +
-                        "È pregata di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
+                " presso " + storagePlace + "  è stato rinnovato perché non ha restituito il libro" +
+                "<br> entro la scadenza comunicata. <br>" +
+                "È pregata di restituire l'articolo alla sede \"" + storagePlace + "\" entro la data " + expireDate + ".";
         String html = createhtml(subject, userCode, content);
         sendMail(recepient, subject, html);
     }
@@ -160,33 +159,25 @@ public class MailSender {
     public static void sendNotifyWaitingListMail(String recepient, int itemCode, String title, String storagePlace) {
         String subject = "ARTICOLO DISPONIBILE";
         String content = "l'articolo \"" + title + "\" con codice <strong>" + itemCode + "</strong>" +
-                        " presso " + storagePlace + " è disponibile.<br> " +
-                        "Le è stata mandata questa mail perché si era aggiunta alla lista d'attesa per questo articolo" +
-                        "<br> alla sede \"" + storagePlace + "\".";
+                " presso " + storagePlace + " è disponibile.<br> " +
+                "Le è stata mandata questa mail perché si era aggiunta alla lista d'attesa per questo articolo" +
+                "<br> alla sede \"" + storagePlace + "\".";
         String html = createhtml(subject, "", content);
         sendMail(recepient, subject, html);
     }
 
     private static void sendMail(String recipient, String subject, String content) {
-        if (!sendMail) return;
-
         try {
-            if (recipient == null || recipient.isBlank()) {
-                throw new IllegalArgumentException("Recipient email is null or empty");
+            if (sendMail) {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(myAccountEmail));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
+                message.setSubject(subject);
+                message.setContent(content, "text/html");
+                Transport.send(message);
             }
-
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(myAccountEmail));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
-            message.setSubject(subject);
-            message.setContent(content, "text/html");
-
-            Transport.send(message);
-            System.out.println("✅ Email inviata a: " + recipient);
         } catch (Exception e) {
-            System.err.println("❌ Errore nell'invio della mail: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
 }
