@@ -2,6 +2,7 @@ package com.progetto_swe.test_orm;
 
 import com.progetto_swe.domain_model.Admin;
 import com.progetto_swe.domain_model.Library;
+import com.progetto_swe.domain_model.Token;
 import com.progetto_swe.orm.AdminDAO;
 import com.progetto_swe.orm.ConnectionManager;
 
@@ -70,6 +71,13 @@ public class AdminDAOTest {
         adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString());
 
         assertThrows(IdAlreadyExistsException.class, () -> adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString()));
+
+        Admin new_Admin = new Admin("uc2", "nome", "surname", "email", "1234567890", Library.LIBRARY_2, null);
+        new_Admin.setToken(new Token(new_Admin));
+        adminDAO.addAdmin("uc2", "nome", "surname", "email", "1234567890", Library.LIBRARY_2.toString());
+        Admin inserted_Admin = adminDAO.getAdmin("uc2");
+        assertEquals(new_Admin, inserted_Admin);
+
     }
 
 

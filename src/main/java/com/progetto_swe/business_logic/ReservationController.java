@@ -32,6 +32,7 @@ public class ReservationController {
         for (String email : emails) {
             MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);
         }
+        waitingListDAO.removeWaitingList(item.getCode(), storagePlace);
         return true;
     }
 

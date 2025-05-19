@@ -10,8 +10,8 @@ import java.nio.file.*;
 import java.io.IOException;
 import java.util.List;
 
-public class ConnectionManager {
-    private static final ConnectionManager connectionManager = new ConnectionManager();
+public class ConnectionManager {//TODO implementare in modo più appropriato il singleton
+    private static ConnectionManager connectionManager;
     private static Connection connection;
     private static String url = "";
     private static final String username = "postgres";
@@ -39,6 +39,7 @@ public class ConnectionManager {
     public static Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
+                connectionManager = new ConnectionManager();
                 connection = DriverManager.getConnection(url, username, password);
             }
             return connection;

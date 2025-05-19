@@ -8,16 +8,14 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class HirerCLI {
-
-    private HirerController hirerController;
+public class HirerCLI {/*
+    private Hirer hirer;
     private Scanner scanner = new Scanner(System.in);
-    private String operazione;
 
-    public HirerCLI(HirerController hirerController) {
-        this.hirerController = hirerController;
+    public HirerCLI(Hirer hirer) {
+        this.hirer = hirer;
     }
-/*
+
     public String start() {
         String scelta;
         do {

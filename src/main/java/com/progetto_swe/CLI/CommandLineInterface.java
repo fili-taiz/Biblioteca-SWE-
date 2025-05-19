@@ -2,18 +2,19 @@ package com.progetto_swe.CLI;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import com.progetto_swe.business_logic.*;
-import com.progetto_swe.domain_model.Hirer;
-import com.progetto_swe.domain_model.Admin;
+import com.progetto_swe.domain_model.*;
 
-public class CommandLineInterface {
+public class CommandLineInterface {/*
     static int screenWidth = 90;
     String role = "UTENTE ANONIMO";
-/*
+    static Scanner scanner = new Scanner(System.in);
+
     public void start() {
-        Scanner scanner = new Scanner(System.in);
+
         do {
             switch (role) {
                 case "UTENTE ANONIMO": {
@@ -24,7 +25,7 @@ public class CommandLineInterface {
 
                 case "NOLEGGIATORE ESTERNO": {
                     clearScreen();
-                    LoginExternalHirerController loginExternalHirerController = new LoginExternalHirerController();
+                    HirerController hirerController = new HirerController();
 
                     //ottiene le credenziali
                     System.out.println("Inserisci il tuo codice utente: ");
@@ -32,11 +33,10 @@ public class CommandLineInterface {
                     System.out.println("Inserisci la tua password: ");
                     String password = scanner.nextLine();
 
-                    Hirer hirer = loginExternalHirerController.loginExternalHirer(userCode, password);
+                    Hirer hirer = hirerController.loginExternalHirer(userCode, password);
                     if (hirer == null) {
                         System.out.println("Errore: nome utente o password errati.");
                     } else {
-                        HirerController hirerController = new HirerController(hirer);
                         HirerCLI hirerCLI = new HirerCLI(hirerController);
                         role = hirerCLI.start();
                     }
@@ -98,6 +98,69 @@ public class CommandLineInterface {
         } while (!role.equals("ESCI"));
     }
 
+    //evitare codice duplicato
+    public static HashMap<String, String> getRicercaParam() {
+        HashMap<String, String> ricercaParam = new HashMap<>();
+        System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
+        for (Category c : Category.values()) {
+            System.out.print(c + ", ");
+        }
+        System.out.print("\b;");
+        ricercaParam.put("Category", scanner.nextLine());
+
+        System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
+        ricercaParam.put("Keywords", scanner.nextLine());
+
+        return ricercaParam;
+    }
+
+
+    private ArrayList<Item> getRicercaAvanzataParam() {
+        CommandLineInterface.clearScreen();
+        HashMap<String, String> ricercaParam = new HashMap<>();
+        System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
+        for (Category c : Category.values()) {
+            System.out.print(c + ", ");
+        }
+        System.out.println("\b;");
+        ricercaParam.put("Category", scanner.nextLine());
+
+        System.out.println("Inserisci in quale lingua è scritto l'articolo che stai cercando tra quelli elencati: ");
+        for (Language l : Language.values()) {
+            System.out.print(l + ", ");
+        }
+        System.out.println("\b;");
+        ricercaParam.put("Language", scanner.nextLine());
+
+        System.out.println("Inserisci [Si] se l'articolo deve essere noleggiabile in una nostra biblioteca: ");
+        ricercaParam.put("Borrowable", scanner.nextLine());
+
+        System.out.println("Inserisci l'intervallo in cui è stato pubblicato l'articolo che stai cercando: \n" +
+                "Data inizio: [formato GG/MM/AAAA]");
+        ricercaParam.put("StartDate", scanner.nextLine());
+        System.out.println("Data fine: [formato GG/MM/AAAA]");
+        ricercaParam.put("EndDate", scanner.nextLine());
+
+        System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
+        ricercaParam.put("Keywords", scanner.nextLine());
+        ItemController itemController = new ItemController();
+        itemController.advanceSearchItem();
+    }
+
+
+    public static String state(int numberOfCopies, boolean borrowable) {
+        if (!borrowable) {
+            return "Non noleggiabile";
+        }
+        if (numberOfCopies == 0) {
+            return "Esaurito";
+        }
+        return "Prenotabile";
+    }
+
+
+
+    //funzioni d stampa
 
     public static void printBiblioteca() {
         String biblioteca = "Un uomo entra in una Biblioteca, SPLASH!";

@@ -1,6 +1,9 @@
 package com.progetto_swe;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import com.progetto_swe.MailSender.MailSender;
@@ -14,16 +17,12 @@ import com.progetto_swe.orm.HirerDAO;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 
 public class Main {
     public static void main(String[] args) {
-        try{
-
-        } catch (Exception e) {//TODO SQLexception
-            System.out.println("Eccezione di connessione al server, problemi nell'applicazione");
-        }
-
+        ConnectionManager.getConnection();
 
 
 

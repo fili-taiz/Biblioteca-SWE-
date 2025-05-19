@@ -35,6 +35,7 @@ public class LendingController {
         for (String email : emails) {
             MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);//notifica libro disponibile per prenotazione e noleggio
         }
+        waitingListDAO.removeWaitingList(item.getCode(), storagePlace);
     }
 
     public void registerLending(Hirer hirer, Item item, Token token) {

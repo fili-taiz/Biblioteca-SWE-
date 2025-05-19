@@ -34,7 +34,7 @@ public class ReservationDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Hirer ha già prenotato un articolo con itemCode [" + userCode + "].");
             }
-            if(e.getSQLState().equals("23503")){
+            if(e.getSQLState().equals("23503")){//TODO
                 throw new IdAlreadyExistsException("Errore: l'Item con itemCode [" + itemCode + "] non ha copie fisiche non puoi effettuare una prenotazione.");
             }
             throw new DatabaseConnectionException(e);
