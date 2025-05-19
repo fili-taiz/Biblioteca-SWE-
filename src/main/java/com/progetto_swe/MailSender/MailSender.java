@@ -22,7 +22,7 @@ public class MailSender {
     private static final MailSender mailSender = new MailSender();
     private static Session session;
     private static String myAccountEmail = "biblioteca.SWE@gmail.com";
-    private static String password = "tvxm kyjn otpt meju";
+    private static String password = "tvxmkyjnotptmeju";
     private static boolean sendMail = true;
 
 
@@ -38,8 +38,8 @@ public class MailSender {
 
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.port", "587");
 
 
