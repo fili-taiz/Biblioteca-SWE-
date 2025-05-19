@@ -4,10 +4,7 @@ import com.progetto_swe.business_logic.business_logic_exception.AccessDeniedExce
 import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.business_logic.*;
-import com.progetto_swe.orm.BookDAO;
-import com.progetto_swe.orm.HirerDAO;
-import com.progetto_swe.orm.ConnectionManager;
-import com.progetto_swe.orm.WaitingListDAO;
+import com.progetto_swe.orm.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +14,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,6 +25,7 @@ public class HirerControllerTest {
     HirerDAO hirerDAO = new HirerDAO();
     BookDAO bookDAO = new BookDAO();
     WaitingListDAO waitingListDAO = new WaitingListDAO();
+    PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
     HirerController hirerController = new HirerController();
 
 
@@ -94,9 +93,17 @@ public class HirerControllerTest {
     @Test
     public void testAddToWaitingList_Success(){
         int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
-                Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(),
-                0, true);
+                Category.CATEGORY_1.toString(), "link", "isbn", "publishing house", 200, "authors");
 
+        physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 0, true);
+        hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
+
+        hirerController.addToWaitingList(bookDAO.getBook(book_code), hirerDAO.getHirer("usercode").getEmail(), Library.LIBRARY_1.toString());
+
+        ArrayList<String> emails = waitingListDAO.getWaitingList(book_code, Library.LIBRARY_1.toString());
+
+        assertEquals(emails.size(), 1);
+        assertEquals(emails.get(0), hirerDAO.getHirer("usercode").getEmail());
 
     }
 
@@ -105,8 +112,7 @@ public class HirerControllerTest {
         hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
         int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
                 Category.CATEGORY_1.toString(),
-                "link", "isbn", "publishing house", 200, "authors", Library.LIBRARY_1.toString(),
-                5, false);
+                "link", "isbn", "publishing house", 200, "authors");
 
         assertThrows(ActionDeniedException.class, () -> hirerController.addToWaitingList(bookDAO.getBook(book_code), "mail", Library.LIBRARY_1.toString()));
     }
