@@ -65,7 +65,6 @@ public class LendingDAO {
         }
     }
 
-    //aggiunto da testare
 
     public ArrayList<Lending> getLendingsByUserCode(String userCode) throws DatabaseConnectionException {
         this.connection = ConnectionManager.getConnection();
