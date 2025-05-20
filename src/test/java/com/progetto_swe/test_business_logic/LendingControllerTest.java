@@ -84,8 +84,6 @@ public class LendingControllerTest {
        Token token = new Token(admin);
        admin.setToken(token);
        Hirer hirer = hirerDAO.getHirer("usercode");
-
-
        assertThrows(ActionDeniedException.class, () -> lendingController.registerReturnOfItem(hirer, book, Library.LIBRARY_2.toString(), token));
    }
 
