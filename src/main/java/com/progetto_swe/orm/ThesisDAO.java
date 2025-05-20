@@ -12,11 +12,11 @@ public class ThesisDAO {
     private Connection connection;
 
     public ThesisDAO() {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
     }
 
     public Thesis getThesis(int itemCode) throws IdNotFoundException, DatabaseConnectionException{
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 
@@ -58,7 +58,7 @@ public class ThesisDAO {
                          String supervisors,
                          String university)
             throws DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             //Creazione Item e Thesis
             String query = """
@@ -98,8 +98,7 @@ public class ThesisDAO {
     }
 
     public void removeThesis(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
+        connection = ConnectionManager.getInstance().getConnection();
 
         try {
             String query = """
@@ -110,7 +109,6 @@ public class ThesisDAO {
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Il Thesis con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
@@ -122,12 +120,9 @@ public class ThesisDAO {
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: L'Item che vuoi rimuovere non è un Thesis. [problema su chiamata del metodo]");
             }
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Thesis con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
@@ -146,7 +141,7 @@ public class ThesisDAO {
                              String university,
                              int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                         UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? WHERE code = ?;
@@ -185,7 +180,7 @@ public class ThesisDAO {
 
     public ArrayList<Thesis> getAllThesis() throws DatabaseConnectionException {
         ArrayList<Thesis> thesis = new ArrayList<>();
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

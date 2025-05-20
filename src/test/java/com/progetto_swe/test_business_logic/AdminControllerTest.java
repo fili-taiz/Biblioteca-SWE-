@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AdminControllerTest {
-    Connection connection_library_db = ConnectionManager.getConnection();
+    Connection connection_library_db = ConnectionManager.getInstance().getConnection();
     Connection connection_university_db;
     AdminDAO adminDAO = new AdminDAO();
     AdminController adminController = new AdminController();

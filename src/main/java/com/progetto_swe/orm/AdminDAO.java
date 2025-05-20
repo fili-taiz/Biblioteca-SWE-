@@ -13,11 +13,11 @@ public class AdminDAO {
     private Connection connection;
 
     public AdminDAO(){
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getInstance().getConnection();
     }
 
     public Admin getAdmin(String userCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                         SELECT * 
@@ -54,7 +54,7 @@ public class AdminDAO {
                          String telephoneNumber,
                          String workingPlace)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     INSERT INTO Admin (user_code, name, surname, email, telephone_number, working_place) 

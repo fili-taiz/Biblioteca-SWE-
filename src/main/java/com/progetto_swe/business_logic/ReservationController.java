@@ -60,23 +60,27 @@ public class ReservationController {
         }
         Library.valueOf(storagePlace);
 
-        ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        connectionManager.closeAutoCommit();
         ReservationDAO reservationDAO = new ReservationDAO();
         LendingController lendingController = new LendingController();
         try {
             reservationDAO.removeReservation(hirer.getUserCode(), item.getCode(), storagePlace);
         } catch (Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
 
         try {
             lendingController.registerLending(hirer, item, token);
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
             MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(),
                     storagePlace, LocalDate.now().plusMonths(1).toString());
         }catch (Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }

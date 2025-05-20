@@ -12,11 +12,11 @@ public class MagazineDAO {
     private Connection connection;
 
     public MagazineDAO() {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
     }
 
     public Magazine getMagazine(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 
@@ -54,7 +54,7 @@ public class MagazineDAO {
                            String publishingHouse,
                            int number_of_pages)
             throws DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             //Creazione Item e Magazine
             String query = """
@@ -89,8 +89,7 @@ public class MagazineDAO {
     }
 
     public void removeMagazine(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM Magazine 
@@ -100,7 +99,6 @@ public class MagazineDAO {
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Il Magazine con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
@@ -112,12 +110,9 @@ public class MagazineDAO {
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: L'Item che vuoi rimuovere non è un Magazine. [problema su chiamata del metodo]");
             }
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Magazine con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti. [problema del programma controllare logica di cancellazione elemento]");
             }
@@ -134,7 +129,7 @@ public class MagazineDAO {
                                String publishingHouse,
                                int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     UPDATE Item 
@@ -173,7 +168,7 @@ public class MagazineDAO {
 
     public ArrayList<Magazine> getAllMagazines() throws DatabaseConnectionException {
         ArrayList<Magazine> magazines = new ArrayList<>();
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

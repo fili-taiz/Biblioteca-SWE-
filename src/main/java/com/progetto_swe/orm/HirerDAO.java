@@ -15,7 +15,7 @@ public class HirerDAO {
 
     //creazione Hirer con solo i dati inerenti Hirer
     public Hirer getHirer(String userCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query
                     = "SELECT * "
@@ -51,7 +51,7 @@ public class HirerDAO {
     }
 
     public HashMap<String, String> getSaltAndHashedPassword(String userCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = "SELECT UC.salt, UC.hashed_password FROM user_credentials UC WHERE UC.user_code = ?;";
 
@@ -78,7 +78,7 @@ public class HirerDAO {
                          String email,
                          String telephoneNumber)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = "INSERT INTO Hirer (user_code, name, surname, email, telephone_number) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
@@ -98,7 +98,7 @@ public class HirerDAO {
 
     public void addHirerPassword(String userCode, String hashedPassword, String salt)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = "INSERT INTO user_credentials (user_code, hashed_password, salt) VALUES (?, ?, ?);";
             PreparedStatement ps = connection.prepareStatement(query);
@@ -116,7 +116,7 @@ public class HirerDAO {
 
     public ArrayList<Hirer> getHirers_() throws DatabaseConnectionException {
         ArrayList<Hirer> result = new ArrayList<>();
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = "SELECT * FROM hirer H LEFT JOIN banned_hirers BH ON H.user_code = BH.user_code;";
             PreparedStatement ps = connection.prepareStatement(query);

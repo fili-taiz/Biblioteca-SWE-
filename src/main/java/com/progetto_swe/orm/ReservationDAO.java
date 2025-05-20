@@ -13,12 +13,12 @@ public class ReservationDAO {
     private Connection connection;
 
     public ReservationDAO(){
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
     }
 
     public void addReservation(String userCode, int itemCode, String storagePlace)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """ 
                     INSERT INTO Reservation (user_code, code, storage_place, reservation_date)
@@ -43,8 +43,7 @@ public class ReservationDAO {
 
     public void removeReservation(String userCode, int itemCode, String storagePlace)
             throws IdNotFoundException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
+        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """ 
                     DELETE FROM Reservation R 
@@ -55,10 +54,8 @@ public class ReservationDAO {
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Prestito di Hirer con userCode [" + itemCode + "] e Item con itemCode [" + itemCode + "] presso sede [" + storagePlace + "] non presente nel DB.");
             }
-            ConnectionManager.commit();
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e);
         }
@@ -66,7 +63,7 @@ public class ReservationDAO {
 
     public ArrayList<Reservation> getReservationsByUserCode(String userCode)
             throws IdNotFoundException, DatabaseConnectionException{
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
         try {

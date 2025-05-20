@@ -21,7 +21,7 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerDAOTest {
-    Connection connection = ConnectionManager.getConnection();
+    Connection connection = ConnectionManager.getInstance().getConnection();
     HirerDAO hirerDAO = new HirerDAO();
 
 

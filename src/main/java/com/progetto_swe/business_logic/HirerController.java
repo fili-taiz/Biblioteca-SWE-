@@ -106,14 +106,16 @@ public class HirerController {
         String salt = String.valueOf(Math.round(Math.random()*100000));
         String hashedPassword = Hasher.hashPassword(password, salt);
 
-
-        ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        connectionManager.closeAutoCommit();
         try{
             hirerDAO.addHirer(userCode, name, surname, email, telephoneNumber);
             hirerDAO.addHirerPassword(userCode, hashedPassword, salt);
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch (Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
         return userCode;

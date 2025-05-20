@@ -20,7 +20,7 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerControllerTest {
-   Connection connection_library_db = ConnectionManager.getConnection();
+   Connection connection_library_db = ConnectionManager.getInstance().getInstance().getConnection();
     Connection connection_university_db;
     AdminDAO adminDAO = new AdminDAO();
     HirerDAO hirerDAO = new HirerDAO();

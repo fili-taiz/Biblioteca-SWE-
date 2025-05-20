@@ -17,7 +17,7 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WaitingListDAOTest {
-    Connection connection = ConnectionManager.getConnection();
+    Connection connection = ConnectionManager.getInstance().getConnection();
     WaitingListDAO waitingListDAO = new WaitingListDAO();
 
     @BeforeEach

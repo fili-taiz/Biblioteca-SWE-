@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ReservationDAOTest {
- //   Connection connection = ConnectionManager.getConnection();
+ //   Connection connection = ConnectionManager.getInstance().getConnection();
  //   ReservationDAO reservationDAO = new ReservationDAO();
 //
  //   @BeforeEach

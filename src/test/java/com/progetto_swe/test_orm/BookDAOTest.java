@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookDAOTest {
-    Connection connection = ConnectionManager.getConnection();
+    Connection connection = ConnectionManager.getInstance().getConnection();
     BookDAO bookDAO = new BookDAO();
 
     @BeforeEach

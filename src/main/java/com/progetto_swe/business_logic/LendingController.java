@@ -3,6 +3,7 @@ package com.progetto_swe.business_logic;
 import com.progetto_swe.MailSender.MailSender;
 import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.LendingDAO;
 import com.progetto_swe.orm.WaitingListDAO;
 
@@ -28,14 +29,24 @@ public class LendingController {
         Library.valueOf(storagePlace);
 
         LendingDAO lendingDAO = new LendingDAO();
-        lendingDAO.removeLending(hirer.getUserCode(), item.getCode(), token.getTokenWorkingPlace());
-        MailSender.sendReturnSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());
-        WaitingListDAO waitingListDAO = new WaitingListDAO();
-        ArrayList<String> emails = waitingListDAO.getWaitingList(item.getCode(), storagePlace);
-        for (String email : emails) {
-            MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);//notifica libro disponibile per prenotazione e noleggio
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        connectionManager.closeAutoCommit();
+        try {
+            lendingDAO.removeLending(hirer.getUserCode(), item.getCode(), token.getTokenWorkingPlace());
+            MailSender.sendReturnSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle());
+            WaitingListDAO waitingListDAO = new WaitingListDAO();
+            ArrayList<String> emails = waitingListDAO.getWaitingList(item.getCode(), storagePlace);
+            for (String email : emails) {
+                MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);//notifica libro disponibile per prenotazione e noleggio
+            }
+            waitingListDAO.removeWaitingList(item.getCode(), storagePlace);
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
+        } catch (Exception e){
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
+            throw e;
         }
-        waitingListDAO.removeWaitingList(item.getCode(), storagePlace);
     }
 
     public void registerLending(Hirer hirer, Item item, Token token) {

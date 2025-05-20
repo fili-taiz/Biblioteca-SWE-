@@ -81,8 +81,9 @@ public class ItemController {
             }
         }
 
-        try{
-            ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
             int itemCode = bookDAO.addBook(
                     title,
                     publicationDate,
@@ -97,9 +98,11 @@ public class ItemController {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.addPhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch(Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }
@@ -137,8 +140,9 @@ public class ItemController {
             }
         }
 
-        try{
-            ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
             int itemCode = magazineDAO.addMagazine(
                     title,
                     publicationDate,
@@ -151,9 +155,11 @@ public class ItemController {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.addPhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch(Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }
@@ -196,8 +202,9 @@ public class ItemController {
         }
 
         //gestione transazione
-        try{
-            ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
             int itemCode = thesisDAO.addThesis(
                     title,
                     publicationDate,
@@ -212,9 +219,11 @@ public class ItemController {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.addPhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch(Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }
@@ -240,21 +249,31 @@ public class ItemController {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         book.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
 
-        if(book.getNumberOfLibraries() == 0){
-            if(book.getLink().isEmpty()){
-                bookDAO.removeBook(itemCode);
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
+            if (book.getNumberOfLibraries() == 0) {
+                if (book.getLink().isEmpty()) {
+                    bookDAO.removeBook(itemCode);
+                }
+                return;
             }
-            return;
+            if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
+                throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+            }
+            if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) !=
+                    book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
+                throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" +
+                        token.getTokenWorkingPlace() + "]");
+            }
+            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
+        } catch (Exception e){
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
+            throw e;
         }
-        if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
-            throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
-        }
-        if(book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) !=
-                book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
-            throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" +
-                    token.getTokenWorkingPlace() + "]");
-        }
-        physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
     }
 
 
@@ -267,19 +286,29 @@ public class ItemController {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         magazine.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
 
-        if(magazine.getNumberOfLibraries() == 0){
-            if(magazine.getLink().isEmpty()){
-                magazineDAO.removeMagazine(itemCode);
-                return;
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
+            if (magazine.getNumberOfLibraries() == 0) {
+                if (magazine.getLink().isEmpty()) {
+                    magazineDAO.removeMagazine(itemCode);
+                    return;
+                }
             }
+            if (magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
+                throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+            }
+            if (magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != magazine.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
+                throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+            }
+            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
+        } catch (Exception e){
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
+            throw e;
         }
-        if(magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
-            throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
-        }
-        if(magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != magazine.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
-            throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
-        }
-        physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
     }
 
 
@@ -292,19 +321,29 @@ public class ItemController {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         thesis.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(itemCode));
 
-        if(thesis.getNumberOfLibraries() == 0){
-            if(thesis.getLink().isEmpty()){
-                thesisDAO.removeThesis(itemCode);
-                return;
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
+            if (thesis.getNumberOfLibraries() == 0) {
+                if (thesis.getLink().isEmpty()) {
+                    thesisDAO.removeThesis(itemCode);
+                    return;
+                }
             }
+            if (thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
+                throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+            }
+            if (thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != thesis.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
+                throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+            }
+            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
+        } catch (Exception e){
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
+            throw e;
         }
-        if(thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0){
-            throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
-        }
-        if(thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != thesis.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))){
-            throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
-        }
-        physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
     }
 
 
@@ -330,8 +369,9 @@ public class ItemController {
         Language.valueOf(language);
         Category.valueOf(category);
 
-        try{
-            ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
 
             BookDAO bookDAO = new BookDAO();
             bookDAO.updateBook(
@@ -351,9 +391,11 @@ public class ItemController {
                 physicalCopiesDAO.updatePhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
 
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch (Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }
@@ -378,8 +420,9 @@ public class ItemController {
         Category.valueOf(category);
 
 
-        try{
-            ConnectionManager.closeAutoCommit();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        try {
+            connectionManager.closeAutoCommit();
 
             MagazineDAO magazineDAO = new MagazineDAO();
             magazineDAO.updateMagazine(
@@ -397,9 +440,11 @@ public class ItemController {
                 physicalCopiesDAO.updatePhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
 
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch (Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }
@@ -424,8 +469,9 @@ public class ItemController {
         Language.valueOf(language);
         Category.valueOf(category);
 
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
         try{
-            ConnectionManager.closeAutoCommit();
+
 
             ThesisDAO thesisDAO = new ThesisDAO();
             thesisDAO.updateThesis(
@@ -445,9 +491,11 @@ public class ItemController {
                 physicalCopiesDAO.updatePhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
 
-            ConnectionManager.commit();
+            connectionManager.commit();
+            connectionManager.openAutoCommit();
         } catch (Exception e){
-            ConnectionManager.rollback();
+            connectionManager.rollback();
+            connectionManager.openAutoCommit();
             throw e;
         }
     }

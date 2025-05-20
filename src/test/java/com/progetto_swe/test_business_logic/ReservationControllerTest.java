@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReservationControllerTest {
   ReservationController reservationController = new ReservationController();
-  Connection connection = ConnectionManager.getConnection();
+  Connection connection = ConnectionManager.getInstance().getConnection();
   HirerDAO hirerDAO = new HirerDAO();
   BookDAO bookDAO = new BookDAO();
   AdminDAO adminDAO = new AdminDAO();

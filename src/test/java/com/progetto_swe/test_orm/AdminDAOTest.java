@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 
 public class AdminDAOTest {
-    Connection connection = ConnectionManager.getConnection();
+    Connection connection = ConnectionManager.getInstance().getConnection();
     AdminDAO adminDAO = new AdminDAO();
 
 

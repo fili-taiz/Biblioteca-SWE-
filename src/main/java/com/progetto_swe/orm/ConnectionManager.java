@@ -12,16 +12,17 @@ import java.util.List;
 
 public class ConnectionManager {//TODO implementare in modo più appropriato il singleton
     private static ConnectionManager connectionManager;
-    private static Connection connection;
-    private static String url = "";
-    private static final String username = "postgres";
-    private static String password = "";
+    private Connection connection;
+    private String url = "";
+    private String username = "";
+    private String password = "";
 
     private ConnectionManager() {
         try {
             List<String> righe = Files.readAllLines(Paths.get("./src/main/resources/credenziali"));
             url = righe.get(2);
-            password = righe.get(3);
+            username = righe.get(3);
+            password = righe.get(4);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,14 +33,20 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
         }
     }
 
-    public static void setConnection(Connection newConnection) {
+    public static ConnectionManager getInstance() {
+        if (connectionManager == null) {
+            connectionManager = new ConnectionManager();
+        }
+        return connectionManager;
+    }
+
+    public void setConnection(Connection newConnection) {
         connection = newConnection;
     }
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
-                connectionManager = new ConnectionManager();
                 connection = DriverManager.getConnection(url, username, password);
             }
             return connection;
@@ -48,7 +55,7 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
         }
     }
 
-    public static void closeAutoCommit() {
+    public void closeAutoCommit() {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
@@ -56,7 +63,7 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
         }
     }
 
-    public static void openAutoCommit() {
+    public void openAutoCommit() {
         try {
             connection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -64,7 +71,7 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
         }
     }
 
-    public static void commit() {
+    public void commit() {
         try {
             connection.commit();
         } catch (SQLException e) {
@@ -72,7 +79,7 @@ public class ConnectionManager {//TODO implementare in modo più appropriato il 
         }
     }
 
-    public static void rollback() {
+    public void rollback() {
         try {
             connection.rollback();
         } catch (SQLException e) {

@@ -12,11 +12,11 @@ public class BookDAO {
     private Connection connection;
 
     public BookDAO() {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
     }
 
     public Book getBook(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 
@@ -58,7 +58,7 @@ public class BookDAO {
                        int numberOfPages,
                        String authors)
             throws DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             //Creazione Item e Book
             String query = """
@@ -96,8 +96,7 @@ public class BookDAO {
     }
 
     public void removeBook(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM Book 
@@ -107,7 +106,6 @@ public class BookDAO {
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Il Book con itemCode [" + itemCode + "] non è presente nel DB.");
             }
 
@@ -119,12 +117,9 @@ public class BookDAO {
             ps.setInt(1, itemCode);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: L'Item con ItemCode [" + itemCode + "] che vuoi rimuovere non è un Book. ");
             }
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: Book con itemCode [" + itemCode + "] non può essere eliminato " +
                         "perché sono ancora presenti Copie/Prenotazioni/Prestiti. ");
@@ -144,7 +139,7 @@ public class BookDAO {
                            String authors,
                            int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException{
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     UPDATE Item 
@@ -186,7 +181,7 @@ public class BookDAO {
 
     public ArrayList<Book> getAllBooks() throws DatabaseConnectionException {
         ArrayList<Book> books = new ArrayList<>();
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

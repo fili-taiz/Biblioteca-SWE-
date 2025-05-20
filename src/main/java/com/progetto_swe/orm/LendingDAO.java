@@ -14,12 +14,12 @@ public class LendingDAO {
     private Connection connection;
 
     public LendingDAO() {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
     }
 
     public void addLending(String userCode, int itemCode, String storagePlace)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     INSERT INTO lending (user_code, code, storage_place, lending_date, maturity_date) 
@@ -45,8 +45,7 @@ public class LendingDAO {
 
     public void removeLending(String userCode, int itemCode, String storagePlace)
             throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM lending L 
@@ -57,7 +56,6 @@ public class LendingDAO {
             ps.setInt(2, itemCode);
             ps.setString(3, storagePlace);
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: Prestito di Hirer con userCode [" + itemCode + "] e Item con itemCode [" + itemCode + "] presso sede [" + storagePlace + "] non presente nel DB.");
             }
         } catch (SQLException e) {
@@ -67,7 +65,7 @@ public class LendingDAO {
 
 
     public ArrayList<Lending> getLendingsByUserCode(String userCode) throws DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
         try {

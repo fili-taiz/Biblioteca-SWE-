@@ -11,7 +11,7 @@ public class PhysicalCopiesDAO {
     private Connection connection;
 
     public PhysicalCopiesDAO(){
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
     }
 
     public void addPhysicalCopies(int itemCode,
@@ -19,7 +19,7 @@ public class PhysicalCopiesDAO {
                                      int numberOfCopies,
                                      boolean borrowable)
             throws ConstraintViolationException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """ 
                     INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable, number_of_available_copies) 
@@ -45,8 +45,7 @@ public class PhysicalCopiesDAO {
 
     public void removePhysicalCopies(int itemCode, String storagePlace)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
-        ConnectionManager.closeAutoCommit();
+        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM physical_copies P 
@@ -57,15 +56,12 @@ public class PhysicalCopiesDAO {
             ps.setString(2, storagePlace);
 
             if(ps.executeUpdate() != 1) {
-                ConnectionManager.rollback();
                 throw new IdNotFoundException("Errore: L'Item con itemCode [" + itemCode + "] non ha copie presso la sede [" + storagePlace + "].");
             }
 
             WaitingListDAO waitingListDAO = new WaitingListDAO();
             waitingListDAO.removeWaitingList(itemCode, storagePlace);
-            ConnectionManager.commit();
         } catch (SQLException e) {
-            ConnectionManager.rollback();
             if(e.getSQLState().equals("23503")){
                 throw new ConstraintViolationException("Errore: L'Item con itemCode [" + itemCode + "] non può essere eliminato perché sono ancora presenti Copie/Prenotazioni/Prestiti.");
             }
@@ -75,7 +71,7 @@ public class PhysicalCopiesDAO {
 
     public void updatePhysicalCopies(int itemCode, String storagePlace, int newNumberOfCopies, boolean borrowable)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getConnection();
+        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                      UPDATE physical_copies 
@@ -100,7 +96,7 @@ public class PhysicalCopiesDAO {
     }
 
     public HashMap<Library, PhysicalCopies> getPhysicalCopies(int itemCode) throws DatabaseConnectionException {
-        connection = ConnectionManager.getConnection();
+        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

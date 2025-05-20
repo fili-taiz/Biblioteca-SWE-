@@ -22,7 +22,7 @@ public class MailSender {
     private static final MailSender mailSender = new MailSender();
     private static Session session;
     private static String myAccountEmail = "biblioteca.SWE@gmail.com";
-    private static String password = "tvxmkyjnotptmeju";
+    private static String password = "tvxm kyjn otpt meju";
     private static boolean sendMail = true;
 
 

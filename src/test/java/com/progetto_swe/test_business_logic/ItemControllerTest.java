@@ -18,7 +18,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ItemControllerTest {
-   Connection connection = ConnectionManager.getConnection();
+   Connection connection = ConnectionManager.getInstance().getConnection();
    ItemController itemController = new ItemController();
    AdminDAO adminDAO = new AdminDAO();
    BookDAO bookDAO = new BookDAO();

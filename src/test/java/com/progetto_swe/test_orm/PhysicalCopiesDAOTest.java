@@ -22,7 +22,7 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalCopiesDAOTest {
- //  Connection connection = ConnectionManager.getConnection();
+ //  Connection connection = ConnectionManager.getInstance().getConnection();
  //  PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
 
  //  @BeforeEach

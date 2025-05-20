@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LendingControllerTest {
     LendingController lendingController = new LendingController();
-    Connection connection = ConnectionManager.getConnection();
+    Connection connection = ConnectionManager.getInstance().getConnection();
     HirerDAO hirerDAO = new HirerDAO();
     BookDAO bookDAO = new BookDAO();
     AdminDAO adminDAO = new AdminDAO();

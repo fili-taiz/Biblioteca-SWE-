@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ThesisDAOTest {
-    Connection connection = ConnectionManager.getConnection();
+    Connection connection = ConnectionManager.getInstance().getConnection();
     ThesisDAO thesisDAO = new ThesisDAO();
 
 
