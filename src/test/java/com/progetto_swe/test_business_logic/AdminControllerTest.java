@@ -1,11 +1,13 @@
 package com.progetto_swe.test_business_logic;
 
 
-import com.progetto_swe.business_logic.AdminController;
+import com.progetto_swe.business_logic.*;
 import com.progetto_swe.business_logic.business_logic_exception.AccessDeniedException;
-import com.progetto_swe.domain_model.Admin;
+import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.AdminDAO;
+import com.progetto_swe.orm.BookDAO;
 import com.progetto_swe.orm.ConnectionManager;
+import com.progetto_swe.orm.PhysicalCopiesDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,15 +26,19 @@ public class AdminControllerTest {
     Connection connection_library_db = ConnectionManager.getInstance().getConnection();
     Connection connection_university_db;
     AdminDAO adminDAO = new AdminDAO();
+    BookDAO bookDAO = new BookDAO();
+    PhysicalCopiesDAO pcDAO = new PhysicalCopiesDAO();
     AdminController adminController = new AdminController();
+    ItemController itemController = new ItemController();
+    HirerController hirerController = new HirerController();
 
 
     @BeforeEach
     public void setUp() throws SQLException {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
-        PreparedStatement preparedStatement = connection_university_db.prepareStatement("TRUNCATE TABLE library_admin, university_people RESTART IDENTITY CASCADE;");
+        PreparedStatement preparedStatement = connection_university_db.prepareStatement("TRUNCATE TABLE library_admin RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
-        preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE admin RESTART IDENTITY CASCADE;");
+        preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE admin, book, physical_copies, item RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
     }
 
@@ -90,6 +98,38 @@ public class AdminControllerTest {
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
         assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("E34212", "wrong_password"));
+    }
+
+    @Test
+    public void FunctionalTestAdmin() throws SQLException {
+        setUpLoginRecognized();
+
+        Admin admin = adminController.loginAdmin("E256743", "abcd1234");
+        Token admin_token = new Token(admin);
+
+        itemController.addBook("Programmazione", LocalDate.of(2020, 3,4).toString(), Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(), "link", "isbn", "Mondadori", 500,
+                "autori", 8, true, admin_token);
+
+        Book expected_book = new Book(1, "Programmazione", LocalDate.of(2020, 3,4), Language.LANGUAGE_1,
+                Category.CATEGORY_1, "link", "isbn", "Mondadori", 500,
+                "autori");
+
+        HashMap<Library, PhysicalCopies> expected_pcs = new HashMap<>();
+        PhysicalCopies pc = new PhysicalCopies(8, 8, true);
+        expected_pcs.put(Library.LIBRARY_1, pc);
+
+        assertEquals(expected_book, bookDAO.getBook(1));
+        assertEquals(expected_pcs, pcDAO.getPhysicalCopies(1));
+
+
+        itemController.updateBook(1, "Fondamenti di informatica", LocalDate.of(2020, 3,4).toString(), true, Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(), "link", "isbn", "Mondadori", 500,
+                "autori", 8, admin_token );
+
+        hirerController.registerExternalHirer("Filippo", "Taiti", "filippotaiti@studuni.com", "00000", admin_token);
+
+
     }
 
 }

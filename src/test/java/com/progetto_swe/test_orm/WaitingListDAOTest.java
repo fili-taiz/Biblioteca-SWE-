@@ -50,6 +50,10 @@ public class WaitingListDAOTest {
 
         waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1");
 
+        ArrayList<String> emails_expected = new ArrayList<>();
+        emails_expected.add("email1");
+
+        assertEquals(emails_expected, waitingListDAO.getWaitingList(1, Library.LIBRARY_1.toString()));
         assertThrows(IdAlreadyExistsException.class, () -> waitingListDAO.addToWaitingList(1, Library.LIBRARY_1.toString(), "email1"));
 
     }

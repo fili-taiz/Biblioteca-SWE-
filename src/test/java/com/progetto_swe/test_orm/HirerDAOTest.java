@@ -77,6 +77,13 @@ public class HirerDAOTest {
 
         hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
 
+        Hirer hirer = hirerDAO.getHirer("uc1");
+        assertEquals("uc1", hirer.getUserCode());
+        assertEquals("name1", hirer.getName());
+        assertEquals("surname1", hirer.getSurname());
+        assertEquals("email1", hirer.getEmail());
+        assertEquals("telephonenumber1", hirer.getTelephoneNumber());
+
         assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1"));
 
     }
@@ -86,6 +93,12 @@ public class HirerDAOTest {
 
         hirerDAO.addHirer("uc1", "name1", "surname1", "email1", "telephonenumber1");
         hirerDAO.addHirerPassword("uc1", "hashed_password_1", "salt_1");
+
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("salt", "salt_1");
+        expected.put("hashedPassword", "hashed_password_1");
+
+        assertEquals(expected, hirerDAO.getSaltAndHashedPassword("uc1"));
 
         assertThrows(IdAlreadyExistsException.class, () -> hirerDAO.addHirerPassword("uc1", "hp1", "salt"));
 

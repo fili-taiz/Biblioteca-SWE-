@@ -10,7 +10,7 @@ import java.nio.file.*;
 import java.io.IOException;
 import java.util.List;
 
-public class ConnectionManager {//TODO implementare in modo più appropriato il singleton
+public class ConnectionManager {
     private static ConnectionManager connectionManager;
     private Connection connection;
     private String url = "";

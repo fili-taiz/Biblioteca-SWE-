@@ -22,77 +22,95 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalCopiesDAOTest {
- //  Connection connection = ConnectionManager.getInstance().getConnection();
- //  PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
+  Connection connection = ConnectionManager.getInstance().getConnection();
+  BookDAO bookDAO = new BookDAO();
+  PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
 
- //  @BeforeEach
- //  public void setUp() throws SQLException {
- //      PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE physical_copies, book, magazine, thesis, item RESTART IDENTITY CASCADE;");
- //      ps.execute();
- //  }
+  @BeforeEach
+  public void setUp() throws SQLException {
+      PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE physical_copies, book, magazine, thesis, item RESTART IDENTITY CASCADE;");
+      ps.execute();
+  }
 
- //  @AfterEach
- //  public void tearDown() throws SQLException{
- //      connection.close();
- //  }
+  @AfterEach
+  public void tearDown() throws SQLException{
+      connection.close();
+  }
 
- //  @Test
- //  public void testAddPhysicalCopies(){
+  @Test
+  public void testAddPhysicalCopies(){
 
- //      BookDAO bookDAO = new BookDAO();
+      BookDAO bookDAO = new BookDAO();
 
- //      bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true);
+      bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1");
+      physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true);
 
- //  }
+      PhysicalCopies pc = new PhysicalCopies(5,5, true);
+      HashMap<Library, PhysicalCopies> expected_pcs = new HashMap<>();
+      expected_pcs.put(Library.LIBRARY_1, pc);
 
- //  @Test
- //  public void testRemovePhysicalCopies(){
+      assertEquals(expected_pcs, physicalCopiesDAO.getPhysicalCopies(1));
+      assertThrows(IdAlreadyExistsException.class, () -> physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 5, true));
 
- //      BookDAO bookDAO = new BookDAO();
+      bookDAO.addBook("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "isbn2", "publishing house 2", 300, "authors2");
 
- //      int book_code_1 = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
+      //assertThrows(ConstraintViolationException.class, () -> physicalCopiesDAO.addPhysicalCopies(2, Library.LIBRARY_1.toString(), 0, true));
+  }
 
- //      Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
- //      Token token = new Token(hirer);
- //      hirer.setToken(token);
+  @Test
+  public void testRemovePhysicalCopies(){
 
- //      assertThrows(IdNotFoundException.class, () -> physicalCopiesDAO.removePhysicalCopies(3, Library.LIBRARY_1.toString()));
+      BookDAO bookDAO = new BookDAO();
 
- //      LendingDAO lendingDAO = new LendingDAO();
- //      lendingDAO.addLending("uc1", book_code_1, Library.LIBRARY_1.toString());
- //      assertThrows(ConstraintViolationException.class, () -> physicalCopiesDAO.removePhysicalCopies(1, Library.LIBRARY_1.toString()));
-
-
- //  }
-
- //  @Test
- //  public void testUpdatePhysicalCopies(){
-
- //      BookDAO bookDAO = new BookDAO();
-
- //      bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 5, true );
-
- //      assertThrows(IdNotFoundException.class, () -> physicalCopiesDAO.updatePhysicalCopies(3, Library.LIBRARY_1.toString(), 14, true));
-
- //  }
-
- //  @Test
- //  public void testGetPhysicalCopies(){
-
- //      Book b1 = new Book(1, "titolo1", LocalDate.of(2023, 4, 1), Language.LANGUAGE_1, Category.CATEGORY_1, "link1", "isbn1", "publishing house 1", 200, "authors1");
- //      PhysicalCopies pc1 = new PhysicalCopies(10, 10, true);
- //      PhysicalCopies pc2 = new PhysicalCopies(12, 12, true);
- //      HashMap<Library, PhysicalCopies> pcExpected = new HashMap<>();
- //      pcExpected.put(Library.LIBRARY_1, pc1);
- //      pcExpected.put(Library.LIBRARY_2, pc2);
- //      b1.setPhysicalCopies(pcExpected);
- //      BookDAO bookDAO = new BookDAO();
- //      bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1", Library.LIBRARY_1.toString(), 10, true );
- //      physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_2.toString(), 12, true);
-
- //      assertEquals(pcExpected, physicalCopiesDAO.getPhysicalCopies(1));
- //      assertEquals(Collections.emptyMap(),physicalCopiesDAO.getPhysicalCopies(2));
+      int book_code_1 = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1", 200, "authors1");
+      physicalCopiesDAO.addPhysicalCopies(book_code_1, Library.LIBRARY_1.toString(), 5, true);
 
 
- //  }
+      Hirer hirer = new Hirer("uc1", "name1", "surname1", "email1", "telephonenumber1", null, null);
+      Token token = new Token(hirer);
+      hirer.setToken(token);
+
+      physicalCopiesDAO.removePhysicalCopies(1, Library.LIBRARY_1.toString());
+      assertEquals(0, physicalCopiesDAO.getPhysicalCopies(1).size());
+
+      assertThrows(IdNotFoundException.class, () -> physicalCopiesDAO.removePhysicalCopies(3, Library.LIBRARY_1.toString()));
+
+      physicalCopiesDAO.addPhysicalCopies(book_code_1, Library.LIBRARY_1.toString(), 5, true);
+
+      LendingDAO lendingDAO = new LendingDAO();
+      lendingDAO.addLending("uc1", book_code_1, Library.LIBRARY_1.toString());
+      assertThrows(ConstraintViolationException.class, () -> physicalCopiesDAO.removePhysicalCopies(1, Library.LIBRARY_1.toString()));
+
+
+  }
+
+  @Test
+  public void testUpdatePhysicalCopies(){
+
+      BookDAO bookDAO = new BookDAO();
+
+      int book_code_1 = bookDAO.addBook("titolo1", LocalDate.of(2023,4,1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1");
+      physicalCopiesDAO.addPhysicalCopies(book_code_1, Library.LIBRARY_1.toString(), 5, true);
+
+      physicalCopiesDAO.updatePhysicalCopies(book_code_1, Library.LIBRARY_1.toString(), 10, false);
+      HashMap<Library, PhysicalCopies> expected_pcs = physicalCopiesDAO.getPhysicalCopies(book_code_1);
+      PhysicalCopies pc = expected_pcs.get(Library.LIBRARY_1);
+
+      assertEquals(10, pc.getNumberOfPhysicalCopies());
+      assertFalse(pc.isBorrowable());
+
+      assertThrows(IdNotFoundException.class, () -> physicalCopiesDAO.updatePhysicalCopies(3, Library.LIBRARY_1.toString(), 14, true));
+
+  }
+
+  @Test
+  public void testGetPhysicalCopies(){
+
+      bookDAO.addBook("titolo1", LocalDate.of(2023, 4, 1).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1",  "isbn1", "publishing house 1", 200, "authors1");
+      physicalCopiesDAO.addPhysicalCopies(1, Library.LIBRARY_1.toString(), 12, true);
+      PhysicalCopies pc = new PhysicalCopies(12, 12, true);
+
+
+      assertEquals(pc, physicalCopiesDAO.getPhysicalCopies(1).get(Library.LIBRARY_1));
+  }
 }
