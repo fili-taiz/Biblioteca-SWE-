@@ -187,19 +187,19 @@ public class HirerControllerTest {
 
     @Test
     public void FunctionalTestHirer() throws SQLException {
-        setUpLoginRecognized();
-
-        hirerController.loginUniversityHirer("E256743", "abcd1234");
-
-        Hirer hirer = hirerDAO.getHirer("E256743");
-        Token hirer_token = new Token(hirer);
-        hirer.setToken(hirer_token);
-
+        //inizio pre-set
         int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2015, 3, 2).toString(), Language.LANGUAGE_1.toString(),
                 Category.CATEGORY_1.toString(), "link", "isbn", "Mondadori", 300, "autori");
 
         physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 5, true);
 
+        //fine pre-set
+        setUpLoginRecognized();
+
+        Hirer hirer = hirerController.loginUniversityHirer("E256743", "abcd1234");
+
+        Token hirer_token = new Token(hirer);
+        hirer.setToken(hirer_token);
 
         reservationDAO.addReservation("E256743", book_code, Library.LIBRARY_1.toString());
 
