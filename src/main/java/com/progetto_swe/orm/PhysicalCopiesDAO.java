@@ -36,7 +36,7 @@ public class PhysicalCopiesDAO {
             if(e.getSQLState().equals("23505")){
                 throw new IdAlreadyExistsException("Errore: Articolo con userCode [" + itemCode + "] già presente nella sede [" + storagePlace + "].");
             }
-            if(e.getSQLState().equals("23503")){
+            if(e.getSQLState().equals("23514")){
                 throw new ConstraintViolationException("Errore: Non puoi avere 0 copie di un Item.");
             }
             throw new DatabaseConnectionException(e);

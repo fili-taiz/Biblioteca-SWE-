@@ -168,7 +168,7 @@ public class ReservationControllerTest {
   }
 
 
-/*
+
   @Test
   public void testConfirmReservationWithdraw_Fail1(){
       Book book = bookDAO.getBook(setup());
@@ -176,8 +176,8 @@ public class ReservationControllerTest {
       Token hirer_token = new Token(hirer);
       hirer.setToken(hirer_token);
 
-      assertThrows(ActionDeniedException.class, () -> reservationController.removeReservation(hirer, book, Library.LIBRARY_2.toString(), hirer_token));
-  }*/
+      assertThrows(ActionDeniedException.class, () -> reservationController.confirmReservationWithdraw(hirer, book, Library.LIBRARY_2.toString(), hirer_token));
+  }
 
   @Test
   public void testConfirmReservationWithdraw_Fail2(){
@@ -187,7 +187,7 @@ public class ReservationControllerTest {
       Token token = new Token(admin);
       admin.setToken(token);
 
-      assertThrows(ActionDeniedException.class, () -> reservationController.reserveItem(hirerDAO.getHirer("usercode"), book,
+      assertThrows(ActionDeniedException.class, () -> reservationController.confirmReservationWithdraw(hirerDAO.getHirer("usercode"), book,
               Library.LIBRARY_2.toString(), token));
   }
 

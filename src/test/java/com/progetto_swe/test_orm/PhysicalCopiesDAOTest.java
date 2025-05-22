@@ -54,7 +54,7 @@ public class PhysicalCopiesDAOTest {
 
       bookDAO.addBook("titolo2", LocalDate.of(2023,4,2).toString(), Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link2",  "isbn2", "publishing house 2", 300, "authors2");
 
-      //assertThrows(ConstraintViolationException.class, () -> physicalCopiesDAO.addPhysicalCopies(2, Library.LIBRARY_1.toString(), 0, true));
+      assertThrows(ConstraintViolationException.class, () -> physicalCopiesDAO.addPhysicalCopies(2, Library.LIBRARY_1.toString(), 0, true));
   }
 
   @Test
