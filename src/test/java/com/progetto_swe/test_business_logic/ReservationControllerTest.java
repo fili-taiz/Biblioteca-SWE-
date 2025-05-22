@@ -47,7 +47,7 @@ public class ReservationControllerTest {
   }
 
   @Test
-  public void removeReservation_Success(){
+  public void testRemoveReservation_Success(){
       Book book = bookDAO.getBook(setup());
       pcDAO.addPhysicalCopies(book.getCode(), Library.LIBRARY_1.toString(), 5, true);
       Hirer hirer = hirerDAO.getHirer("usercode");
@@ -62,8 +62,6 @@ public class ReservationControllerTest {
 
       assertTrue(reservationDAO.getReservationsByUserCode("usercode").isEmpty());
       assertTrue(waitingListDAO.getWaitingList(book.getCode(), Library.LIBRARY_1.toString()).isEmpty());
-
-
 
   }
 
@@ -80,7 +78,7 @@ public class ReservationControllerTest {
   }*/
 
   @Test
-  public void removeReservation_Fail2(){
+  public void testRemoveReservation_Fail1(){
       Book book = bookDAO.getBook(setup());
       Hirer hirer = hirerDAO.getHirer("usercode");
       adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
@@ -92,7 +90,7 @@ public class ReservationControllerTest {
   }
 
   @Test
-  public void reserveItem_Success(){
+  public void testReserveItem_Success(){
       Book book = bookDAO.getBook(setup());
       pcDAO.addPhysicalCopies(book.getCode(), Library.LIBRARY_1.toString(), 5, true);
       Hirer hirer = hirerDAO.getHirer("usercode");
@@ -114,7 +112,7 @@ public class ReservationControllerTest {
 
 
   @Test
-  public void reserveItem_Fail1(){
+  public void testReserveItem_Fail1(){
       Book book = bookDAO.getBook(setup());
       adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
       Admin admin = adminDAO.getAdmin("usercode1");
@@ -126,7 +124,7 @@ public class ReservationControllerTest {
   }
 
   @Test
-  public void reserveItem_Fail2(){
+  public void testReserveItem_Fail2(){
       Book book = bookDAO.getBook(setup());
       Hirer hirer = hirerDAO.getHirer("usercode");
       Token hirer_token = new Token(hirer);
@@ -176,20 +174,20 @@ public class ReservationControllerTest {
       Token hirer_token = new Token(hirer);
       hirer.setToken(hirer_token);
 
-      assertThrows(ActionDeniedException.class, () -> reservationController.confirmReservationWithdraw(hirer, book, Library.LIBRARY_2.toString(), hirer_token));
+      assertThrows(ActionDeniedException.class, () -> reservationController.confirmReservationWithdraw(hirer, book, Library.LIBRARY_1.toString(), hirer_token));
   }
 
-  @Test
-  public void testConfirmReservationWithdraw_Fail2(){
-      Book book = bookDAO.getBook(setup());
-      adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
-      Admin admin = adminDAO.getAdmin("usercode1");
-      Token token = new Token(admin);
-      admin.setToken(token);
+    @Test
+    public void testConfirmReservationWithdraw_Fail2(){
+        Book book = bookDAO.getBook(setup());
+        adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
+        Admin admin = adminDAO.getAdmin("usercode1");
+        Token token = new Token(admin);
+        admin.setToken(token);
 
-      assertThrows(ActionDeniedException.class, () -> reservationController.confirmReservationWithdraw(hirerDAO.getHirer("usercode"), book,
-              Library.LIBRARY_2.toString(), token));
-  }
+        assertThrows(ActionDeniedException.class, () -> reservationController.confirmReservationWithdraw(hirerDAO.getHirer("usercode"), book,
+                Library.LIBRARY_2.toString(), token));
+    }
 
 
 
