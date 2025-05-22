@@ -171,7 +171,7 @@ public class BookDAO {
             ps.setInt(4, originalItemCode);
 
             if(ps.executeUpdate() != 1) {
-                throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] che cuoi aggiornare non è un Book.");
+                throw new IdNotFoundException("Errore: Item con ItemCode [" + originalItemCode + "] che vuoi aggiornare non è un Book.");
             }
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e);

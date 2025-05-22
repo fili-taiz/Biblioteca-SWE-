@@ -16,11 +16,8 @@ public class ReservationController {
     }
 
 
-    public boolean removeReservation(Hirer hirer, Item item, String storagePlace, Token token) {
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
-            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
-        }
-        if(!token.getTokenWorkingPlace().equals(storagePlace)){
+    public void removeReservation(Hirer hirer, Item item, String storagePlace, Token token) {
+        if(!token.getTokenWorkingPlace().equals("None") && !token.getTokenWorkingPlace().equals(storagePlace)){
             throw new ActionDeniedException("Errore: Non puoi registrare questa operazione, il libro non è stato prenotato nella sede in cui lavori.");
         }
         Library.valueOf(storagePlace);
@@ -33,7 +30,6 @@ public class ReservationController {
             MailSender.sendNotifyWaitingListMail(email, item.getCode(), item.getTitle(), storagePlace);
         }
         waitingListDAO.removeWaitingList(item.getCode(), storagePlace);
-        return true;
     }
 
 

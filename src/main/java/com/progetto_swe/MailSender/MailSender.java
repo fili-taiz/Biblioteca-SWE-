@@ -1,10 +1,6 @@
 package com.progetto_swe.MailSender;
 
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
+import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
@@ -19,19 +15,18 @@ import java.util.Properties;
 import java.util.Scanner;
 
 public class MailSender {
-    private static final MailSender mailSender = new MailSender();
     private static Session session;
-    private static String myAccountEmail = "biblioteca.SWE@gmail.com";
-    private static String password = "tvxm kyjn otpt meju";
+    private static Transport transport;
+    private static String myAccountEmail = "";
+    private static String password = "";
     private static boolean sendMail = true;
 
 
-    private MailSender() {
+    static {
         try {
             List<String> righe = Files.readAllLines(Paths.get("./src/main/resources/credenziali"));
             myAccountEmail = righe.get(0);
             password = righe.get(1);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,13 +38,19 @@ public class MailSender {
         properties.put("mail.smtp.port", "587");
         properties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
-        this.session = Session.getInstance(properties, new Authenticator() {
+        session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(myAccountEmail, password);
             }
         });
-        session.setDebug(true);
+        try {
+            transport = session.getTransport("smtp");
+            transport.connect();
+        } catch (MessagingException e) {
+            throw new RuntimeException("Errore di connessione SMTP", e);
+        }
+        session.setDebug(false);
     }
 
     private static String getHTMLmodel() {
@@ -72,6 +73,16 @@ public class MailSender {
         html = html.replace("$[UTENTE]", userCode);
         html = html.replace("$[CONTENUTO]", content);
         return html;
+    }
+
+    public static int sendMailVerification(String recepient) {
+        int verificationCode = (int) (Math.random()*1000000);
+        String subject = "VERIFICA EMAIL";
+        String content = "questo è il suo codice di verifica da fornire all'Admin che la sta aiutando a registrarsi alla nostra biblioteca: </p> <p style = \"text-align: center; font-size: 2em;\">" +
+                + verificationCode;
+        String html = createhtml(subject, "", content);
+        sendMail(recepient, subject, html);
+        return verificationCode;
     }
 
     public static void sendReservationSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
@@ -170,12 +181,15 @@ public class MailSender {
     private static void sendMail(String recipient, String subject, String content) {
         try {
             if (sendMail) {
+                if (!transport.isConnected()) {
+                    transport.connect();
+                }
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(myAccountEmail));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
                 message.setSubject(subject);
                 message.setContent(content, "text/html");
-                Transport.send(message);
+                transport.sendMessage(message, message.getAllRecipients());
             }
         } catch (Exception e) {
             e.printStackTrace();

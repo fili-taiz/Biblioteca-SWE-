@@ -8,7 +8,7 @@ public class Token {
     protected String token;
 
     public Token(Hirer hirer) {
-        this.token = Hasher.hash("Hirer") + ";";
+        this.token = Hasher.hash("Hirer") + ";" + "None;";
     }
 
     public Token(Admin admin) {
