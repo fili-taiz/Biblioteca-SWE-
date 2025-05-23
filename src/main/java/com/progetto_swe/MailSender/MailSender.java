@@ -19,7 +19,7 @@ public class MailSender {
     private static Transport transport;
     private static String myAccountEmail = "";
     private static String password = "";
-    private static boolean sendMail = false;
+    private static boolean sendMail = true;
 
 
     static {
@@ -80,6 +80,16 @@ public class MailSender {
         String subject = "VERIFICA EMAIL";
         String content = "questo è il suo codice di verifica da fornire all'Admin che la sta aiutando a registrarsi alla nostra biblioteca: </p> <p style = \"text-align: center; font-size: 2em;\">" +
                 + verificationCode;
+        String html = createhtml(subject, "", content);
+        sendMail(recepient, subject, html);
+        return verificationCode;
+    }
+
+    public static int sendRegisterCredentials(String recepient, String userCode, String password) {
+        int verificationCode = (int) (Math.random()*1000000);
+        String subject = "CREDENZIALI BIBLIOTECA";
+        String content = "la sua registrazione è stata effettuata con successo il suo userCode è: </p> <p style = \"text-align: center; font-size: 2em;\">"
+                + userCode + "<br> <p> la sua passoword è: </p> <p style = \"text-align: center; font-size: 2em;\">" + password;
         String html = createhtml(subject, "", content);
         sendMail(recepient, subject, html);
         return verificationCode;

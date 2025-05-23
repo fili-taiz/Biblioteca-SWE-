@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.progetto_swe.MailSender.MailSender;
 import com.progetto_swe.business_logic.business_logic_exception.AccessDeniedException;
 import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
@@ -118,6 +119,7 @@ public class HirerController {
             connectionManager.openAutoCommit();
             throw e;
         }
+        MailSender.sendRegisterCredentials(email, userCode, password);
         return userCode;
     }
 
