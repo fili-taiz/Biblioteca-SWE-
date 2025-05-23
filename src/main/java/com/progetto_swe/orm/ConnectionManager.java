@@ -86,4 +86,12 @@ public class ConnectionManager {
             throw new DatabaseConnectionException(e);
         }
     }
+
+    public void closeConnection() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException(e);
+        }
+    }
 }

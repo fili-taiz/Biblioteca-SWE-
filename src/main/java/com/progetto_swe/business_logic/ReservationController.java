@@ -72,8 +72,6 @@ public class ReservationController {
             lendingController.registerLending(hirer, item, token);
             connectionManager.commit();
             connectionManager.openAutoCommit();
-            MailSender.sendWithdrawSuccessMail(hirer.getEmail(), hirer.getUserCode(), item.getCode(), item.getTitle(),
-                    storagePlace, LocalDate.now().plusMonths(1).toString());
         }catch (Exception e){
             connectionManager.rollback();
             connectionManager.openAutoCommit();
