@@ -32,10 +32,10 @@ public class HirerTest {
         Token token = new Token(hirer);
         hirer.setToken(token);
 
-        assertTrue(hirer.contains("user"));
+        assertTrue(hirer.contains("usercode"));
         assertTrue(hirer.contains("nam"));
         assertTrue(hirer.contains("surn"));
-        assertTrue(hirer.contains("mai"));
+        assertTrue(hirer.contains("email"));
         assertTrue(hirer.contains("12345"));
         assertFalse(hirer.contains("universita"));
     }

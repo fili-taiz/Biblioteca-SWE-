@@ -4,9 +4,7 @@ import com.progetto_swe.domain_model.Library;
 import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.WaitingListDAO;
 import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,18 +15,23 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WaitingListDAOTest {
-    Connection connection = ConnectionManager.getInstance().getConnection();
+    static Connection connection;
     WaitingListDAO waitingListDAO = new WaitingListDAO();
+
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException {
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE waiting_list RESTART IDENTITY CASCADE;");
         ps.execute();
-    }
-
-    @AfterEach
-    public void tearDown() throws SQLException{
-        connection.close();
     }
 
     @Test

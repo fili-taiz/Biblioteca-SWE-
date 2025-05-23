@@ -5,10 +5,10 @@ import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedExce
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.business_logic.*;
 import com.progetto_swe.orm.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,12 +16,13 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerControllerTest {
-   Connection connection_library_db = ConnectionManager.getInstance().getConnection();
-   Connection connection_university_db = ConnectionManagerUniversity.getInstance().getConnection();
+   static Connection connection_library_db;
+   static Connection connection_university_db;
    AdminDAO adminDAO = new AdminDAO();
    HirerDAO hirerDAO = new HirerDAO();
    BookDAO bookDAO = new BookDAO();
@@ -31,6 +32,27 @@ public class HirerControllerTest {
    HirerController hirerController = new HirerController();
    ReservationDAO reservationDAO = new ReservationDAO();
 
+   @BeforeAll
+   public static void setUpBeforeClass() throws Exception {
+       connection_library_db = ConnectionManager.getInstance().getConnection();
+       List<String> righe = Files.readAllLines(Paths.get("./src/main/resources/credenziali"));
+       String url = righe.get(5);
+       String username = righe.get(6);
+       String password = righe.get(7);
+       try {
+           connection_university_db = DriverManager.getConnection(url, username, password);
+       } catch(SQLException e){
+           e.printStackTrace();
+       }
+   }
+
+    @AfterAll
+    public static void tearDown() throws SQLException {
+        connection_library_db.close();
+        connection_university_db.close();
+
+    }
+
 
    @BeforeEach
    public void setUp() throws SQLException {
@@ -38,13 +60,6 @@ public class HirerControllerTest {
        preparedStatement.execute();
        preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE hirer, book, item, reservation, lending, admin, physical_copies RESTART IDENTITY CASCADE;");
        preparedStatement.execute();
-   }
-
-   @AfterEach
-   public void tearDown() throws SQLException {
-       connection_library_db.close();
-       connection_university_db.close();
-
    }
 
    private void setUpLoginRecognized() throws SQLException {

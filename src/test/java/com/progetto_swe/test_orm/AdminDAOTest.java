@@ -14,14 +14,22 @@ import java.sql.*;
 
 import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 
 public class AdminDAOTest {
-    Connection connection = ConnectionManager.getInstance().getConnection();
+    static Connection connection;
     AdminDAO adminDAO = new AdminDAO();
+
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
 
 
     @BeforeEach
@@ -29,12 +37,6 @@ public class AdminDAOTest {
         PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE admin RESTART IDENTITY CASCADE;");
         ps.execute();
     }
-
-    @AfterEach
-    public void tearDown() throws SQLException{
-        connection.close();
-    }
-
 
     @Test
     public void testGetAdmin() throws SQLException {

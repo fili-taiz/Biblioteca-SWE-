@@ -4,9 +4,7 @@ import com.progetto_swe.business_logic.ReservationController;
 import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReservationControllerTest {
   ReservationController reservationController = new ReservationController();
-  Connection connection = ConnectionManager.getInstance().getConnection();
+  static Connection connection = ConnectionManager.getInstance().getConnection();
   HirerDAO hirerDAO = new HirerDAO();
   BookDAO bookDAO = new BookDAO();
   AdminDAO adminDAO = new AdminDAO();
@@ -28,15 +26,20 @@ public class ReservationControllerTest {
   ReservationDAO reservationDAO = new ReservationDAO();
   LendingDAO lendingDAO = new LendingDAO();
 
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
+
   @BeforeEach
   public void setUp() throws Exception {
       PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE book, item, hirer, reservation, admin, physical_copies, lending RESTART IDENTITY CASCADE;");
       ps.execute();
-  }
-
-  @AfterEach
-  public void tearDown() throws SQLException {
-      connection.close();
   }
 
   private int setup(){
@@ -64,18 +67,6 @@ public class ReservationControllerTest {
       assertTrue(waitingListDAO.getWaitingList(book.getCode(), Library.LIBRARY_1.toString()).isEmpty());
 
   }
-
-/*
-
-  @Test
-  public void removeReservation_Fail1(){
-      Book book = bookDAO.getBook(setup());
-      Hirer hirer = hirerDAO.getHirer("usercode");
-      Token hirer_token = new Token(hirer);
-      hirer.setToken(hirer_token);
-
-      assertThrows(ActionDeniedException.class, () -> reservationController.removeReservation(hirer, book, Library.LIBRARY_1.toString(), hirer_token));
-  }*/
 
   @Test
   public void testRemoveReservation_Fail1(){
