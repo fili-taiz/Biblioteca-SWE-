@@ -6,9 +6,7 @@ import com.progetto_swe.orm.ConnectionManager;
 import com.progetto_swe.orm.HirerDAO;
 import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -21,8 +19,18 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HirerDAOTest {
-    Connection connection = ConnectionManager.getInstance().getConnection();
+    static Connection connection = ConnectionManager.getInstance().getConnection();
     HirerDAO hirerDAO = new HirerDAO();
+
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
 
 
     @BeforeEach
@@ -30,11 +38,6 @@ public class HirerDAOTest {
         String query = "TRUNCATE TABLE banned_hirers, hirer, user_credentials RESTART IDENTITY CASCADE";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.execute();
-    }
-
-    @AfterEach
-    public void tearDown() throws SQLException{
-        connection.close();
     }
 
     @Test

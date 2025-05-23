@@ -5,22 +5,23 @@ import com.progetto_swe.business_logic.*;
 import com.progetto_swe.business_logic.business_logic_exception.AccessDeniedException;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AdminControllerTest {
-    Connection connection_library_db = ConnectionManager.getInstance().getConnection();
-    Connection connection_university_db;
+    static Connection connection_library_db;
+    static Connection connection_university_db;
     AdminDAO adminDAO = new AdminDAO();
     HirerDAO hirerDAO = new HirerDAO();
     BookDAO bookDAO = new BookDAO();
@@ -29,21 +30,34 @@ public class AdminControllerTest {
     ItemController itemController = new ItemController();
     HirerController hirerController = new HirerController();
 
+    @BeforeAll
+    public static void setUpBeforeClass() throws Exception {
+        connection_library_db = ConnectionManager.getInstance().getConnection();
+        List<String> righe = Files.readAllLines(Paths.get("./src/main/resources/credenziali"));
+        String url = righe.get(5);
+        String username = righe.get(6);
+        String password = righe.get(7);
+        try {
+            connection_university_db = DriverManager.getConnection(url, username, password);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException {
+        connection_library_db.close();
+        connection_university_db.close();
+
+    }
+
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
         PreparedStatement preparedStatement = connection_university_db.prepareStatement("TRUNCATE TABLE library_admin RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
         preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE admin, book, physical_copies, item, hirer RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
-    }
-
-    @AfterEach
-    public void tearDown() throws SQLException {
-        connection_library_db.close();
-        connection_university_db.close();
-
     }
 
     private void setUpLoginRecognized() throws SQLException {
@@ -94,7 +108,7 @@ public class AdminControllerTest {
     public void testLoginAdmin_NotRecognized() throws SQLException{
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
-        assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("E34212", "wrong_password"));
+        assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("wrong_usercode", "wrong_password"));
     }
 
     @Test

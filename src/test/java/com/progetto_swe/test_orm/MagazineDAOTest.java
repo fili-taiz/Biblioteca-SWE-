@@ -4,9 +4,7 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 import com.progetto_swe.orm.database_exception.ConstraintViolationException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 
 import java.sql.*;
@@ -17,19 +15,24 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MagazineDAOTest {
-    Connection connection = ConnectionManager.getInstance().getConnection();
+    static Connection connection;
     MagazineDAO magazineDAO = new MagazineDAO();
+
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException {
         String query = "TRUNCATE TABLE Magazine, Item, Physical_copies, Lending, Hirer RESTART IDENTITY CASCADE;";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.execute();
-    }
-
-    @AfterEach
-    public void tearDown() throws SQLException{
-        connection.close();
     }
 
     @Test

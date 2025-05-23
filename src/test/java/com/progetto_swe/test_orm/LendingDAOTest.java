@@ -4,9 +4,7 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,20 +15,25 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LendingDAOTest {
-  Connection connection = ConnectionManager.getInstance().getConnection();
+  static Connection connection;
   BookDAO bookDAO = new BookDAO();
   LendingDAO lendingDAO = new LendingDAO();
   PhysicalCopiesDAO pcDAO = new PhysicalCopiesDAO();
+
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
 
   @BeforeEach
   public void setUp() throws SQLException {
       PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE lending, hirer, physical_copies, book, magazine, thesis, item RESTART IDENTITY CASCADE;");
       ps.execute();
-  }
-
-  @AfterEach
-  public void tearDown() throws SQLException{
-      connection.close();
   }
 
 

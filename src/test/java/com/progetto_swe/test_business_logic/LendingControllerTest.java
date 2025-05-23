@@ -4,9 +4,7 @@ import com.progetto_swe.business_logic.LendingController;
 import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.PreparedStatement;
 
@@ -20,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LendingControllerTest {
     LendingController lendingController = new LendingController();
-    Connection connection = ConnectionManager.getInstance().getConnection();
+    static Connection connection;
     HirerDAO hirerDAO = new HirerDAO();
     BookDAO bookDAO = new BookDAO();
     AdminDAO adminDAO = new AdminDAO();
@@ -28,15 +26,20 @@ public class LendingControllerTest {
     PhysicalCopiesDAO pcDAO = new PhysicalCopiesDAO();
     WaitingListDAO waitingListDAO = new WaitingListDAO();
 
+    @BeforeAll
+    public static void setUpBeforeClass(){
+        connection = ConnectionManager.getInstance().getConnection();
+    }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
+
    @BeforeEach
    public void setUp() throws SQLException {
        PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE book, item, hirer, lending, admin, physical_copies RESTART IDENTITY CASCADE;");
        ps.execute();
-   }
-
-   @AfterEach
-   public void tearDown() throws SQLException {
-       connection.close();
    }
 
    private int setup(){

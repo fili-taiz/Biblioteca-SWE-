@@ -19,7 +19,7 @@ public class MailSender {
     private static Transport transport;
     private static String myAccountEmail = "";
     private static String password = "";
-    private static boolean sendMail = true;
+    private static boolean sendMail = false;
 
 
     static {

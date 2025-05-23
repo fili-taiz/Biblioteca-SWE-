@@ -5,9 +5,7 @@ import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedExce
 import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.*;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +16,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ItemControllerTest {
-   Connection connection = ConnectionManager.getInstance().getConnection();
+   static Connection connection;
    ItemController itemController = new ItemController();
    AdminDAO adminDAO = new AdminDAO();
    BookDAO bookDAO = new BookDAO();
@@ -26,17 +24,23 @@ public class ItemControllerTest {
    HirerDAO hirerDAO = new HirerDAO();
    PhysicalCopiesDAO pcDAO = new PhysicalCopiesDAO();
 
-   @BeforeEach
+   @BeforeAll
+   public static void setUpBeforeClass(){
+       connection = ConnectionManager.getInstance().getConnection();
+   }
+
+    @AfterAll
+    public static void tearDown() throws SQLException{
+        connection.close();
+    }
+
+
+
+    @BeforeEach
    public void setUp() throws SQLException{
        PreparedStatement ps = connection.prepareStatement("TRUNCATE TABLE book, item, hirer, reservation, admin, physical_copies RESTART IDENTITY CASCADE;");
        ps.execute();
    }
-
-   @AfterEach
-   public void tearDown() throws SQLException{
-       connection.close();
-   }
-
 
    @Test
    public void testSearchItem(){
