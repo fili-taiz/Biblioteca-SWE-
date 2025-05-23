@@ -1,27 +1,20 @@
-CREATE OR REPLACE FUNCTION public.check_reservation_date(
-	)
-    RETURNS void
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
+CREATE OR REPLACE FUNCTION increment_number_of_available_copies()
+RETURNS TRIGGER AS $$
 BEGIN
-DELETE FROM reservations WHERE CURRENT_DATE > reservation_date + INTERVAL '7 days'; END;
-$BODY$;
+UPDATE physical_copies
+SET number_of_available_copies = number_of_available_copies + 1
+WHERE itemCode = OLD.itemCode AND storage_place = OLD.storage_place;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION public.close_to_expiration(
-	)
-    RETURNS void
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
+CREATE OR REPLACE FUNCTION decrement_number_of_available_copies()
+RETURNS TRIGGER AS $$
 BEGIN
-IF EXISTS(SELECT * FROM lending WHERE lending_date = CURRENT_DATE + INTERVAL '10 days')
-THEN PERFORM pg_notify('reservation_expiration', 'Reservation expired!' );
-ELSE PERFORM pg_notify('reservation_expiration', 'No expired reservations!' );
-END IF; END;
-$BODY$;
+UPDATE physical_copies
+SET number_of_available_copies = number_of_available_copies - 1
+WHERE itemCode = NEW.itemCode AND storage_place = NEW.storage_place;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER update_available_copies_on_delete
     AFTER DELETE
