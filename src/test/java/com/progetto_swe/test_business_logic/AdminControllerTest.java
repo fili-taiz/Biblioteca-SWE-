@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AdminControllerTest {
     Connection connection_library_db = ConnectionManager.getInstance().getConnection();
-    Connection connection_university_db;
+    Connection connection_university_db = ConnectionManagerUniversity.getInstance().getConnection();
     AdminDAO adminDAO = new AdminDAO();
     HirerDAO hirerDAO = new HirerDAO();
     BookDAO bookDAO = new BookDAO();
@@ -32,7 +32,6 @@ public class AdminControllerTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
         PreparedStatement preparedStatement = connection_university_db.prepareStatement("TRUNCATE TABLE library_admin RESTART IDENTITY CASCADE;");
         preparedStatement.execute();
         preparedStatement = connection_library_db.prepareStatement("TRUNCATE TABLE admin, book, physical_copies, item, hirer RESTART IDENTITY CASCADE;");
@@ -94,7 +93,7 @@ public class AdminControllerTest {
     public void testLoginAdmin_NotRecognized() throws SQLException{
         connection_university_db = DriverManager.getConnection("jdbc:postgresql://localhost:5432/University", "postgres", "filipposwe");
 
-        assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("E34212", "wrong_password"));
+        assertThrows(AccessDeniedException.class, () -> adminController.loginAdmin("wrong_usercode", "wrong_password"));
     }
 
     @Test
