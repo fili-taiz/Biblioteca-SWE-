@@ -158,7 +158,7 @@ public class LendingControllerTest {
        int book_code = bookDAO.addBook("Fondamenti di informatica", LocalDate.of(2023,4,1).toString(),
                Language.LANGUAGE_1.toString(), Category.CATEGORY_1.toString(), "link1", "isbn1", "publishing house 1",
                200, "authors1");
-       pcDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 5, true);
+       pcDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 2, true);
        Hirer hirer = hirerDAO.getHirer("usercode");
        adminDAO.addAdmin("usercode1", "name", "surname", "mail", "00000", Library.LIBRARY_1.toString());
        Admin admin = adminDAO.getAdmin("usercode1");
