@@ -18,7 +18,6 @@ public class ReservationDAO {
 
     public void addReservation(String userCode, int itemCode, String storagePlace)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """ 
                     INSERT INTO Reservation (user_code, code, storage_place, reservation_date)
@@ -43,7 +42,6 @@ public class ReservationDAO {
 
     public void removeReservation(String userCode, int itemCode, String storagePlace)
             throws IdNotFoundException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """ 
                     DELETE FROM Reservation R 
@@ -63,7 +61,6 @@ public class ReservationDAO {
 
     public ArrayList<Reservation> getReservationsByUserCode(String userCode)
             throws IdNotFoundException, DatabaseConnectionException{
-        this.connection = ConnectionManager.getInstance().getConnection();
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
         try {
