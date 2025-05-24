@@ -141,7 +141,6 @@ public class ThesisDAO {
                              String university,
                              int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                         UPDATE Item SET title = ?, publication_date = ?, language = ?, category = ?, link = ?, number_of_pages = ? WHERE code = ?;
@@ -180,7 +179,6 @@ public class ThesisDAO {
 
     public ArrayList<Thesis> getAllThesis() throws DatabaseConnectionException {
         ArrayList<Thesis> thesis = new ArrayList<>();
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

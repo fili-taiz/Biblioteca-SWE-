@@ -16,7 +16,6 @@ public class BookDAO {
     }
 
     public Book getBook(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 
@@ -58,7 +57,6 @@ public class BookDAO {
                        int numberOfPages,
                        String authors)
             throws DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             //Creazione Item e Book
             String query = """
@@ -96,7 +94,6 @@ public class BookDAO {
     }
 
     public void removeBook(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM Book 
@@ -139,7 +136,6 @@ public class BookDAO {
                            String authors,
                            int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException{
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     UPDATE Item 
@@ -181,7 +177,6 @@ public class BookDAO {
 
     public ArrayList<Book> getAllBooks() throws DatabaseConnectionException {
         ArrayList<Book> books = new ArrayList<>();
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

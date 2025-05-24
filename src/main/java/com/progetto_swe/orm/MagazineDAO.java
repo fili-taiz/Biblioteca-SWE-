@@ -16,7 +16,6 @@ public class MagazineDAO {
     }
 
     public Magazine getMagazine(int itemCode) throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 
@@ -54,7 +53,6 @@ public class MagazineDAO {
                            String publishingHouse,
                            int number_of_pages)
             throws DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             //Creazione Item e Magazine
             String query = """
@@ -89,7 +87,6 @@ public class MagazineDAO {
     }
 
     public void removeMagazine(int itemCode) throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM Magazine 
@@ -129,7 +126,6 @@ public class MagazineDAO {
                                String publishingHouse,
                                int numberOfPages)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     UPDATE Item 
@@ -168,7 +164,6 @@ public class MagazineDAO {
 
     public ArrayList<Magazine> getAllMagazines() throws DatabaseConnectionException {
         ArrayList<Magazine> magazines = new ArrayList<>();
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 

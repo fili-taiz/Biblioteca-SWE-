@@ -19,7 +19,6 @@ public class PhysicalCopiesDAO {
                                      int numberOfCopies,
                                      boolean borrowable)
             throws ConstraintViolationException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """ 
                     INSERT INTO physical_copies (code, storage_place, number_of_copies, borrowable, number_of_available_copies) 
@@ -45,7 +44,6 @@ public class PhysicalCopiesDAO {
 
     public void removePhysicalCopies(int itemCode, String storagePlace)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM physical_copies P 
@@ -71,7 +69,6 @@ public class PhysicalCopiesDAO {
 
     public void updatePhysicalCopies(int itemCode, String storagePlace, int newNumberOfCopies, boolean borrowable)
             throws IdNotFoundException, ConstraintViolationException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                      UPDATE physical_copies 
@@ -96,7 +93,6 @@ public class PhysicalCopiesDAO {
     }
 
     public HashMap<Library, PhysicalCopies> getPhysicalCopies(int itemCode) throws DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     SELECT * 
