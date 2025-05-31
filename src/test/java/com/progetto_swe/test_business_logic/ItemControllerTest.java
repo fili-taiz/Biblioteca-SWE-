@@ -58,8 +58,8 @@ public class ItemControllerTest {
        ArrayList<Item> notExpected_items = new ArrayList<>();
        notExpected_items.add(bookDAO.getBook(book_code_2));
 
-       assertEquals(expected_items, itemController.searchItem("Fond", Category.CATEGORY_1.toString()));
-       assertNotEquals(notExpected_items, itemController.searchItem("Fond", Category.CATEGORY_1.toString()));
+       assertEquals(expected_items, itemController.searchItem("Fond"));//TODO Category.CATEGORY_1.toString()
+       assertNotEquals(notExpected_items, itemController.searchItem("Fond"));//TODO Category.CATEGORY_1.toString()
 
 
   }

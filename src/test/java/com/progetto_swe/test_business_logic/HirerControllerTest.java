@@ -162,8 +162,12 @@ public class HirerControllerTest {
 
    }
 
-   @Test
-   public void testSearchHirer() {
+   @Test//TODO da aggiornare su relazione
+   public void testSearchHirer_Success() { //TODO prima testSearchHirer()
+       adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString());
+       Admin admin = adminDAO.getAdmin("uc1");
+       Token admin_token = new Token(admin);
+       admin.setToken(admin_token);
        hirerDAO.addHirer("uc1", "Marco", "Bianchi", "marco.bianchi@unimail.com", "02121");
        hirerDAO.addHirer("uc2", "Luca", "Bianchi", "luca.bianchi@unimail.com", "09876");
        hirerDAO.addHirer("uc3", "Mario", "Rossi", "mario.rossi@unimail.com", "34563");
@@ -177,9 +181,19 @@ public class HirerControllerTest {
        notExpected_hirers.add(hirerDAO.getHirer("uc2"));
        notExpected_hirers.add(hirerDAO.getHirer("uc3"));
 
-       assertEquals(expected_hirers, hirerController.searchHirer("Bianchi"));
-       assertNotEquals(notExpected_hirers, hirerController.searchHirer("Bianchi"));
+       assertEquals(expected_hirers, hirerController.searchHirer("Bianchi", admin_token));//TODO aggiorna
+       assertNotEquals(notExpected_hirers, hirerController.searchHirer("Bianchi", admin_token));//TODO aggiorna
    }
+
+    @Test//TODO da aggiungere su relazione
+    public void testSearchHirer_Fail() {
+        hirerDAO.addHirer("E256743", "Marco", "Verdi", "marco.verdi@studuni.com", "00001");
+        Hirer hirer = hirerDAO.getHirer("E256743");
+        Token token = new Token(hirer);
+        hirer.setToken(token);
+
+        assertThrows(ActionDeniedException.class, () -> hirerController.searchHirer("Bianchi", token));
+    }
 
    @Test
    public void testLoginExternalHirer_Success() throws SQLException {

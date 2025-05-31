@@ -1,5 +1,6 @@
 package com.progetto_swe.MailSender;
 
+import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -19,7 +20,7 @@ public class MailSender {
     private static Transport transport;
     private static String myAccountEmail = "";
     private static String password = "";
-    private static boolean sendMail = true;
+    private static boolean sendMail = false;
 
 
     static {
@@ -54,7 +55,7 @@ public class MailSender {
     }
 
     private static String getHTMLmodel() {
-        Scanner in = null;
+        Scanner in;
         try {
             in = new Scanner(new FileReader("src/main/resources/Mail/ModelloHTML.html"));
         } catch (FileNotFoundException e) {
@@ -75,24 +76,21 @@ public class MailSender {
         return html;
     }
 
-    public static int sendMailVerification(String recepient) {
-        int verificationCode = (int) (Math.random()*1000000);
+    public static void sendMailVerification(String recepient, int verificationCode) {
         String subject = "VERIFICA EMAIL";
         String content = "questo è il suo codice di verifica da fornire all'Admin che la sta aiutando a registrarsi alla nostra biblioteca: </p> <p style = \"text-align: center; font-size: 2em;\">" +
                 + verificationCode;
         String html = createhtml(subject, "", content);
         sendMail(recepient, subject, html);
-        return verificationCode;
+        System.out.println(verificationCode);//TODO to delete
     }
 
-    public static int sendRegisterCredentials(String recepient, String userCode, String password) {
-        int verificationCode = (int) (Math.random()*1000000);
+    public static void sendRegisterCredentials(String recepient, String userCode, String password) {
         String subject = "CREDENZIALI BIBLIOTECA";
         String content = "la sua registrazione è stata effettuata con successo il suo userCode è: </p> <p style = \"text-align: center; font-size: 2em;\">"
                 + userCode + "<br> <p> la sua passoword è: </p> <p style = \"text-align: center; font-size: 2em;\">" + password;
         String html = createhtml(subject, "", content);
         sendMail(recepient, subject, html);
-        return verificationCode;
     }
 
     public static void sendReservationSuccessMail(String recepient, String userCode, int itemCode, String title, String storagePlace, LocalDate expireDate) {
@@ -201,8 +199,10 @@ public class MailSender {
                 message.setContent(content, "text/html");
                 transport.sendMessage(message, message.getAllRecipients());
             }
+        } catch (SendFailedException e) {
+            throw new ActionDeniedException("Errore: invio dell'email fallita: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("\u001B[31m" + "Errore nell'invio dell'email: " + e.getMessage() + "\u001B[0m");
         }
     }
 }

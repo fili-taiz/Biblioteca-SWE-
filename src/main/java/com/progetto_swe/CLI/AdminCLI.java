@@ -1,696 +1,672 @@
 package com.progetto_swe.CLI;
 
+import com.progetto_swe.MailSender.MailSender;
 import com.progetto_swe.business_logic.AdminController;
 import com.progetto_swe.business_logic.*;
+import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.BookDAO;
+import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
-//TODO decidere se admin deve leggere tutte le prenotazioni o solametne quelle dello storagePlace in cui lavora
-public class AdminCLI {/*
-    private AdminController adminController;
-    Library workingPlace;
-    private Scanner scanner = new Scanner(System.in);
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-    public AdminCLI(AdminController adminController, Library workingPlace) {
-        this.adminController = adminController;
-        this.workingPlace = workingPlace;
+public class AdminCLI extends BaseCLI {
+    protected Admin admin;
+    protected String telNumberRegex = "^\\+?[0-9]{1,4}?[-.\\s]?\\(?[0-9]{2,4}?\\)?[-.\\s]?[0-9]{3,4}[-.\\s]?[0-9]{3,4}$";
+    protected String searchHirerKeyWords = "";
+    protected ArrayList<Hirer> hirers;
+    protected String userCode = "";
+    protected Hirer hirer;
+
+
+    public AdminCLI(Admin admin) {
+        this.admin = admin;
     }
 
-    public String start() {
-        String scelta;
-        do {
-            CommandLineInterface.clearScreen();
-            //leggere input user
-            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                    "Registrazione utente: registrazione di un utente esterno per prendere in prestito libri;" +
-                    "Ricerca utente: ricercare un utente all'interno della biblioteca; \n" +
-                    "Ricerca avanzata: ricercare un'articolo con filtri; \n" +
-                    "Aggiungi: aggiungi un articolo; \n" +
-                    "Registra prestito: registra il prestito di un libro da un utente; \n" +
-                    "Logout: uscire dal proprio profilo; \n" +
-                    "Esci: se vuoi uscire dall'applicazione");
-            scelta = scanner.nextLine().toUpperCase();
-
-            switch (scelta) {
-                case "REGISTRAZIONE UTENTE": {
-                    try{//TODO ipotetica mail per autenticazione mail ed invio di email e password
-                        registrazioneUtenteEsterno();
-                    } catch (Exception e){//problema connessione server,
-
-                    }
-                    break;
-                }
-
-                case "RICERCA UTENTE": {
-                        try {
-                            CommandLineInterface.clearScreen();
-                            ArrayList<Hirer> hirers = ricercaUtente();
-                            String usercode;
-                            stampaUtenti(hirers);
-
-                            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                                    "[Un codice di un utente]: visualizzare i dettagli di un certo utente" +
-                                    "Indietro: tornare alla pagina precedente");
-                            usercode = scanner.nextLine().toUpperCase();
-                            stampaUtente(getHirer(hirers, usercode));
-                        } catch (NumberFormatException e) {
-                            CommandLineInterface.clearScreen();
-                            System.out.println("Errore: non hai inserito un codice corretto.");
-                        } catch (Exception e) { // TODO ipotetico eccezione oggetto inesistente
-                            CommandLineInterface.clearScreen();
-                            System.out.println("Errore: non hai inserito una categoria corretta.");
-                        }
-                    break;
-                }
-
-                case "RICERCA": {
-                    try {
-                        ArrayList<Item> items = ricerca();
-                        paginaArticoli(items);
-                    } catch (Exception e) { //TODO eccezione Categoria inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito una categoria corretta.");
-                    }
-                    break;
-                }
-
-                case "RICERCA AVANZATA": {
-                    try {
-                        ArrayList<Item> items = ricercaAvanzata();
-                        paginaArticoli(items); //TODO controllare contenuto eccezione per gestire messaggio di lingua o categoria errata
-                    } catch (NumberFormatException e) { //TODO eccezione Categoria inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito una categoria corretta.");
-                        break;
-                    } catch (Exception e) { //TODO eccezione Lingua inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito una lingua corretta.");
-                    }
-                    break;
-                }
-
-                case "AGGIUNGI": {
-                    System.out.println("Inserisci che tipo di articolo vuoi aggiungere: \n" +
-                            "Libro, Rivista, Tesi");
-                    String operazione = scanner.nextLine().toUpperCase();
-                    ArrayList<Item> param;
-                    switch (operazione) {
-                        case "LIBRO": {
-                            ArrayList<String> params = getItemParameters();
-                            params.addAll(getBookParameters());
-                            params.addAll(getPhysicalCopiesParameters());
-                            adminController.addBook( //TODO riordinare ordine di tutti i parametri
-                                    params.get(0),
-                                    params.get(1),
-                                    params.get(3),
-                                    params.get(4),
-                                    params.get(5),
-                                    params.get(6),
-                                    params.get(7),
-                                    Integer.parseInt(params.get(8)),
-                                    params.get(9),
-                                    Integer.parseInt(params.get(10)),
-                                    params.get(2).equals("SI")
-                            );
-                        }
-
-                        case "RIVISTA": {
-                            ArrayList<String> params = getItemParameters();
-                            params.addAll(getMagazineParameters());
-                            params.addAll(getPhysicalCopiesParameters());
-                            adminController.addMagazine( //TODO riordinare ordine di tutti i parametri
-                                    params.get(0),
-                                    params.get(1),
-                                    params.get(3),
-                                    params.get(4),
-                                    params.get(5),
-                                    Integer.parseInt(params.get(8)),
-                                    params.get(7),
-                                    Integer.parseInt(params.get(8)),
-                                    params.get(2).equals("SI")
-                            );
-                            break;
-                        }
-
-                        case "TESI": {
-                            ArrayList<String> params = getItemParameters();
-                            params.addAll(getThesisParameters());
-                            params.addAll(getPhysicalCopiesParameters());
-                            adminController.addThesis( //TODO riordinare ordine di tutti i parametri
-                                    params.get(0),
-                                    params.get(1),
-                                    params.get(3),
-                                    params.get(4),
-                                    params.get(5),
-                                    Integer.parseInt(params.get(9)),
-                                    params.get(7),
-                                    params.get(8),
-                                    params.get(8),
-                                    Integer.parseInt(params.get(9)),
-                                    params.get(2).equals("SI")
-                            );
-                            break;
-                        }
-                    }
-                    break;
-                }
-
-
-                //TODO modificare MockUPS registrazione prestito
-                case "REGISTRA PRESTITI" : {
-                    CommandLineInterface.clearScreen();
-                    System.out.println("Inserisci lo userCode dell'utente che vuole effettuare il prestito: ");
-                    String usercode = scanner.nextLine().toUpperCase();
-
-                    System.out.println("Inserisci l'itemCode dell'articolo che l'utente vuole prendere in prestito: ");
-                    String itemCode = scanner.nextLine().toUpperCase();
-
-                    adminController.registerLending(usercode, itemCode);
-                }
-
-                case "logout": {
-                    return "utente anonimo";
-                }
-            }
-        } while (!scelta.equals("esci"));
-        return "esci";
-    }
-
-    private Item getItem(ArrayList<Item> items, int code){
-        for(Item i : items){
-            if(i.getCode() == code){
-                return i;
-            }
-        }
-        return null; //TODO eccezione ID errato
-    }
-
-    private Hirer getHirer(ArrayList<Hirer> hirers, String userCode){
-        for(Hirer h : hirers){
-            if(h.getUserCode().equals(userCode)){
-                return h;
-            }
-        }
-        return null; //TODO eccezione ID errato
-    }
-
-    private Reservation getReservation(ArrayList<Reservation> reservations, int itemCode, String storagePlace) {
-        for (Reservation r : reservations) {
-            if (r.getItem().getCode() == itemCode && r.getStoragePlace().equals(Library.valueOf(storagePlace))) {
-                return r;
-            }
-        }
-        return null; //TODO eccezione ID errato
-    }
-
-    private Lending getLending(ArrayList<Lending> lendings, int itemCode, String StoragePlace) {
-        for(Lending l : lendings){
-            if(l.getItem().getCode() == itemCode && l.getStoragePlace().equals(Library.valueOf(StoragePlace))) {
-                return l;
-            }
-        }
-        return null; //TODO eccezione ID errato
-    }
-
-    private void registrazioneUtenteEsterno(){
-        CommandLineInterface.clearScreen();
-        System.out.println("Inserisci il nome dell'utente: ");
-        String name = scanner.nextLine().toUpperCase();
-
-        System.out.println("Inserisci il cognome dell'utente: ");
-        String surname = scanner.nextLine().toUpperCase();
-
-        System.out.println("Inserisci il numero di telefono dell'utente: ");
-        String telNumber = scanner.nextLine().toUpperCase();
-
-        String email;
-        do {
-            System.out.println("Inserisci email dell'utente: ");
-            email = scanner.nextLine().toUpperCase();
-
-            //mando email verifica codice
-            int checkNumber = (int) Math.floor(Math.random()*100000);
-            int input;
-            do {
-                System.out.println("Inserisci il codice di verifica: ");
-                try {
-                    input = Integer.parseInt(scanner.nextLine());
-                    break;
-                } catch (NumberFormatException e) {
-                    System.out.println("Errore: non hai inserito un codice corretto (valori solo numerici).");
-                }
-            } while(true);
-            if(input == checkNumber){
-                System.out.println("Codice di verifica corretto.");
+    @Override
+    protected ArrayList<String[]> getMenu() {
+        switch (page) {
+            case "HIRERSEARCHRESULT": {
+                hirers = searchHirer();
+                hirerSearchResultMenu(hirers);
+                stampaUtenti(hirers);
                 break;
             }
-            System.out.println("Errore: codice di verifica errato.");
-        }while(true);
-        System.out.println("Inserisci la password dell'utente: "); //TODO modifica registrazione utente esterno, password generata random
-        String password = scanner.nextLine();
-        adminController.registerExternalHirer(password, name, surname, email, telNumber);
+
+            case "HIRERPAGE": {
+                hirer = getHirer(userCode, searchHirer());
+                ReservationController reservationController = new ReservationController();
+                LendingController lendingController = new LendingController();
+                reservations = reservationController.getReservations(userCode);
+                lendings = lendingController.getLendings(userCode);
+                hirerMenu(reservations, lendings);
+                stampaUtente(hirer, reservations, lendings);
+                break;
+            }
+
+            default: {
+                super.getMenu();
+                break;
+            }
+        }
+        return menuOption;
     }
 
-    private ArrayList<Hirer> ricercaUtente() {
-        System.out.println("Inserisci informazioni dell'utente (dividi con spazio le parole chiavi): ");
-        String keywords = scanner.nextLine().toUpperCase();
-
-        return adminController.searchHirer(keywords);
+    @Override
+    protected void homePageMenu() {
+        super.homePageMenu();
+        removeOption("Login");
+        menuOption.add(new String[]{"Registrazione utente", "registrazione di un utente esterno per prendere in prestito libri"});
+        menuOption.add(new String[]{"Ricerca utente", "ricercare un utente all'interno della biblioteca"});
+        menuOption.add(new String[]{"Aggiungi", "aggiungi un articolo"});
+        menuOption.add(new String[]{"Registra prestito", "registra il prestito di un libro da un utente"});
+        menuOption.add(new String[]{"Logout", "uscire dall'account"});
     }
 
-    private void stampaUtenti(ArrayList<Hirer> hirers) {
+    protected void hirerSearchResultMenu(ArrayList<Hirer> hirers) {
+        menuOption = new ArrayList<>();
+        if (!hirers.isEmpty()) {
+            menuOption.add(new String[]{"Dettagli", "visualizzare i dettagli di un certo utente"});
+        }
+        menuOption.add(new String[]{"Indietro", "tornare alla pagina precedente"});
+    }
+
+    protected void hirerMenu(ArrayList<Reservation> reservations, ArrayList<Lending> lendings) {
+        menuOption = new ArrayList<>();
+        if (!reservations.isEmpty()) {
+            menuOption.add(new String[]{"Ritira", "registrare il ritiro di un articolo prenotato ed il relativo prestito"});
+        }
+        if (!lendings.isEmpty()) {
+            menuOption.add(new String[]{"Restituisci", "registrare la restituzione dell'articolo noleggiato"});
+        }
+        menuOption.add(new String[]{"Indietro", "tornare alla pagina precedente"});
+    }
+
+    @Override
+    protected void itemMenu() {
+        super.itemMenu();
+        if (item != null) {
+            menuOption.add(0, new String[]{"Modifica", "modifica i dati di un articolo"});
+            menuOption.add(0, new String[]{"Elimina", "per eliminare un articolo dalla sede in cui lavori"});
+        }
+    }
+
+    @Override
+    protected void execute(String scelta) {
+        super.execute(scelta);
+        switch (page) {
+            case "HIRERSEARCHRESULT": {
+                executeHirerSearchResultOption(scelta);
+                break;
+            }
+
+            case "HIRERPAGE": {
+                executeHirerPageOption(scelta);
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void executeHomePageOption(String scelta) {
+        super.executeHomePageOption(scelta);
+        switch (scelta) {
+            case "REGISTRAZIONE UTENTE": {
+                registerHirer();
+                CommandLineInterface.clearScreen();
+                break;
+            }
+
+            case "RICERCA UTENTE": {
+                if (searchHirerKeyWords.isEmpty()) {
+                    getSearchHirerParameters();
+                }
+                page = "HIRERSEARCHRESULT";
+                CommandLineInterface.clearScreen();
+                break;
+            }
+
+            case "AGGIUNGI": {
+                CommandLineInterface.clearScreen();
+                addItem();
+                break;
+            }
+
+            case "REGISTRA PRESTITO": {
+                CommandLineInterface.clearScreen();
+                registerLending();
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void executeItemPageOption(String scelta) {
+        super.executeItemPageOption(scelta);
+        switch (scelta) {
+            case "MODIFICA": {
+                modifyItem();
+                break;
+            }
+
+            case "ELIMINA": {
+                deleteItem();
+                page = "ITEMSEARCHRESULT";
+                break;
+            }
+        }
+    }
+
+    protected void registerHirer() {
+        CommandLineInterface.printMessage("Inserisci il nome dell'utente: ");
+        String name = scanner.nextLine().toUpperCase();
+
+        CommandLineInterface.printMessage("Inserisci il cognome dell'utente: ");
+        String surname = scanner.nextLine().toUpperCase();
+
+        CommandLineInterface.printMessage("Inserisci il numero di telefono dell'utente: ");
+        Pattern pattern = Pattern.compile(telNumberRegex);
+        Matcher matcher;
+        String telNumber;
+        do {
+            CommandLineInterface.printMessage("Utilizza i seguenti formati: ");
+            CommandLineInterface.printMessage("Numeri internazionali con prefisso: +39 123-456-7890, 0039 1234567890;");
+            CommandLineInterface.printMessage("Numeri nazionali italiani con prefisso: 123-456-7890, (123) 456-7890, 1234567890;");
+            CommandLineInterface.printMessage("È valido come separatore anche il punto.");
+            telNumber = scanner.nextLine().toUpperCase();
+            matcher = pattern.matcher(telNumber);
+            if (matcher.matches()) {
+                break;
+            }
+            CommandLineInterface.printError("Errore: formato del numero di telefono incorretto");
+        } while (true);
+
+        int verificationCode = 0;
+        String email = "";
+        do {
+            if (email.isEmpty()) {
+                CommandLineInterface.printMessage("Inserisci email dell'utente: ");
+                email = scanner.nextLine().toUpperCase();
+                verificationCode = (int) (Math.random() * 1000000);
+            }
+            //mando email verifica codice
+            try {
+                MailSender.sendMailVerification(email, verificationCode);
+                CommandLineInterface.printMessage("Inserisci il codice di verifica: ");
+                String input = scanner.nextLine();
+                if (input.equals(String.valueOf(verificationCode))) {
+                    break;
+                } else {
+                    CommandLineInterface.printError("Errore: codice di verifica non corretto");
+                    CommandLineInterface.printMessage("Inserisci [Si] se vuoi inserire una nuova mail");
+                    if (scanner.nextLine().toUpperCase().equals("SI")) {
+                        email = "";
+                    }
+                }
+            } catch (ActionDeniedException e) {
+                CommandLineInterface.printError(e.getMessage());
+                email = "";
+            }
+        } while (true);
+        HirerController hirerController = new HirerController();
+        hirerController.registerExternalHirer(name, surname, email, telNumber, admin.getToken());
+    }
+
+    protected void getSearchHirerParameters() {
         CommandLineInterface.clearScreen();
-        String[] header = {"Codice utente", "Nome", "Cognome", "Numero di telefono", "Email"};
+        CommandLineInterface.printMessage("Inserisci informazioni dell'utente (dividi con spazio le parole chiavi): ");
+        searchHirerKeyWords = scanner.nextLine().toUpperCase();
+    }
+
+    protected ArrayList<Hirer> searchHirer() {
+        HirerController hirerController = new HirerController();
+        return hirerController.searchHirer(searchHirerKeyWords, admin.getToken());
+    }
+
+    protected void executeHirerSearchResultOption(String scelta) {
+        switch (scelta) {
+            case "DETTAGLI": {
+                CommandLineInterface.printMessage("Inserisci lo userCode dell'utente di cui vuoi visualizzare i dettagli:");
+                userCode = scanner.nextLine();
+                page = "HIRERPAGE";
+                CommandLineInterface.clearScreen();
+                break;
+            }
+
+            case "INDIETRO": {
+                page = "HOMEPAGE";
+                CommandLineInterface.clearScreen();
+                searchHirerKeyWords = "";
+                break;
+            }
+        }
+    }
+
+    protected void executeHirerPageOption(String scelta) {
+        switch (scelta) {
+            case "RITIRA": {
+                CommandLineInterface.printMessage("Inserisci il codice dell'articolo di cui si vuole effettuare il ritiro: ");
+                String code = scanner.nextLine();
+                ReservationController reservationController = new ReservationController();
+                Reservation reservation = getReservationByItemCode(code, reservations);
+                if (reservation == null) {
+                    CommandLineInterface.printError("Errore: non hai inserito un ItemCode valido.");
+                    return;
+                }
+                CommandLineInterface.clearScreen();
+                try {
+                    reservationController.confirmReservationWithdraw(hirer, reservation.getItem(), reservation.getStoragePlace().toString(), admin.getToken());
+                } catch (IdAlreadyExistsException | ActionDeniedException e) {
+                    CommandLineInterface.printError(e.getMessage());
+                }
+                break;
+            }
+
+            case "RESTITUISCI": {
+                CommandLineInterface.printMessage("Inserisci il codice dell'articolo di cui si vuole registrare la restituzione: ");
+                String code = scanner.nextLine();
+                LendingController lendingController = new LendingController();
+                Lending lending = getLendingByItemCode(code, lendings);
+                CommandLineInterface.clearScreen();
+                if (lending == null) {
+                    CommandLineInterface.printError("Errore: non hai inserito un ItemCode valido.");
+                    return;
+                }
+                lendingController.registerReturnOfItem(hirer, lending.getItem(), lending.getStoragePlace().toString(), admin.getToken());
+                break;
+            }
+
+            case "INDIETRO": {
+                page = "HIRERSEARCHRESULT";
+                CommandLineInterface.clearScreen();
+                userCode = "";
+            }
+        }
+    }
+
+    private Hirer getHirer(String code, ArrayList<Hirer> Hirer) {
+        for (Hirer hirer : Hirer) {
+            if (hirer.getUserCode().equals(code)) {
+                return hirer;
+            }
+        }
+        return null;
+    }
+
+
+    protected HashMap<String, String> getItemParameters() {
+        CommandLineInterface.clearScreen();
+        HashMap<String, String> parameters = new HashMap<>();
+        CommandLineInterface.printMessage("Inserisci il titolo: ");
+        parameters.put("TITLE", scanner.nextLine());
+
+        CommandLineInterface.printMessage("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
+        for (Category c : Category.values()) {
+            System.out.print(c + ", ");
+        }
+        System.out.println("\b\b;");
+        parameters.put("CATEGORY", scanner.nextLine().toUpperCase());
+        //validazione
+        do {
+            try {
+                Category.valueOf(parameters.get("CATEGORY"));
+                break;
+            } catch (IllegalArgumentException e) {
+                CommandLineInterface.printError("Errore: non hai inserito una categoria corretta, riprova per favore:");
+                parameters.put("CATEGORY", scanner.nextLine().toUpperCase());
+            }
+        } while (true);
+
+        CommandLineInterface.printMessage("Inserisci in quale lingua è scritto l'articolo che stai cercando tra quelli elencati: ");
+        for (Language l : Language.values()) {
+            System.out.print(l + ", ");
+        }
+        System.out.println("\b\b;");
+        parameters.put("LANGUAGE", scanner.nextLine().toUpperCase());
+        //validazione
+        do {
+            try {
+                Language.valueOf(parameters.get("LANGUAGE"));
+                break;
+            } catch (IllegalArgumentException e) {
+                CommandLineInterface.printError("Errore: non hai inserito una lingua corretta, riprova per favore:");
+                parameters.put("LANGUAGE", scanner.nextLine().toUpperCase());
+            }
+        } while (true);
+
+        CommandLineInterface.printMessage("Inserisci il numero di pagine: ");
+        parameters.put("NUMBEROFPAGES", scanner.nextLine());
+        do {
+            try {
+                Integer.parseInt(parameters.get("NUMBEROFPAGES"));
+                break;
+            } catch (NumberFormatException e) {
+                CommandLineInterface.printError("Errore: non hai inserito una numero, riprova per favore:");
+                parameters.put("NUMBEROFPAGES", scanner.nextLine());
+            }
+        } while (true);
+
+        CommandLineInterface.printMessage("Inserisci il link dell'articolo: ");
+        parameters.put("LINK", scanner.nextLine());
+
+        CommandLineInterface.printMessage("Inserisci la data in cui è stato pubblicato l'articolo [formato AAAA-MM-GG]: ");
+        parameters.put("PUBLICATIONDATE", scanner.nextLine().toUpperCase());
+        do {
+            try {
+                LocalDate.parse(parameters.get("PUBLICATIONDATE"));
+                break;
+            } catch (DateTimeParseException e) {
+                CommandLineInterface.printError("Errore: non hai inserito una data corretta, riprova per favore:");
+                parameters.put("PUBLICATIONDATE", scanner.nextLine().toUpperCase());
+            }
+        } while (true);
+        return parameters;
+    }
+
+    private HashMap<String, String> getPhysicalCopiesParameters() {
+        HashMap<String, String> parameters = new HashMap<>();
+
+        CommandLineInterface.printMessage("Inserisci il numero di copie di quest'articolo nella sede in cui lavori: ");
+        parameters.put("NUMBEROFCOPIES", scanner.nextLine());
+        do {
+            try {
+                Integer.parseInt(parameters.get("NUMBEROFCOPIES"));
+                break;
+            } catch (NumberFormatException e) {
+                CommandLineInterface.printError("Errore: non hai inserito una numero, riprova per favore:");
+                parameters.put("NUMBEROFCOPIES", scanner.nextLine());
+            }
+        } while (true);
+
+        System.out.println("Inserisci [Si] se è noleggiabile nella sede in cui lavori: ");
+        parameters.put("BORROWABLE", Boolean.toString(scanner.nextLine().toUpperCase().equals("SI")));
+        return parameters;
+    }
+
+    protected HashMap<String, String> getBookParameters() {
+        HashMap<String, String> parameters = new HashMap<>();
+        System.out.println("Inserisci l'ISBN del libro: ");
+        parameters.put("ISBN", scanner.nextLine());
+
+        System.out.println("Inserisci la casa editrice del libro: ");
+        parameters.put("PUBLISHINGHOUSE", scanner.nextLine());
+
+        System.out.println("Inserisci gli autori del libro [suddivisi con spazi]: ");
+        parameters.put("AUTHORS", scanner.nextLine().toUpperCase());
+        return parameters;
+    }
+
+    protected HashMap<String, String> getMagazineParameters() {
+        HashMap<String, String> parameters = new HashMap<>();
+        System.out.println("Inserisci la casa editrice della rivista: ");
+        parameters.put("PUBLISHINGHOUSE", scanner.nextLine().toUpperCase());
+        return parameters;
+    }
+
+    protected HashMap<String, String> getThesisParameters() {
+        HashMap<String, String> parameters = new HashMap<>();
+        System.out.println("Inserisci l'autore della tesi: ");
+        parameters.put("AUTHOR", scanner.nextLine().toUpperCase());
+
+        System.out.println("Inserisci i supervisori della tesi [divisi con spazi]: ");
+        parameters.put("SUPERVISORS", scanner.nextLine().toUpperCase());
+
+        System.out.println("Inserisci l'università della tesi: ");
+        parameters.put("UNIVERSITY", scanner.nextLine().toUpperCase());
+        return parameters;
+    }
+
+    protected void addItem() {
+        CommandLineInterface.printMessage("Inserisci il tipo dell'articolo che vuoi aggiungere: ");
+        CommandLineInterface.printMessage("[BOOK], [MAGAZINE], [THESIS];");
+        String type = scanner.nextLine().toUpperCase();
+        switch (type) {
+            case "BOOK": {
+                addBook();
+                break;
+            }
+
+            case "MAGAZINE": {
+                addMagazine();
+                break;
+            }
+
+            case "THESIS": {
+                addThesis();
+                break;
+            }
+
+            default: {
+                CommandLineInterface.clearScreen();
+                CommandLineInterface.printError("Errore: tipologia di articolo non valido.");
+                return;
+            }
+        }
+        CommandLineInterface.clearScreen();
+    }
+
+    protected void addBook() {
+        HashMap<String, String> itemParams = getItemParameters();
+        HashMap<String, String> bookParams = getBookParameters();
+        HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+
+        ItemController itemController = new ItemController();
+        itemController.addBook(
+                itemParams.get("TITLE"),
+                itemParams.get("PUBLICATIONDATE"),
+                itemParams.get("LANGUAGE"),
+                itemParams.get("CATEGORY"),
+                itemParams.get("LINK"),
+                bookParams.get("ISBN"),
+                bookParams.get("PUBLISHINGHOUSE"),
+                Integer.parseInt(itemParams.get("NUMBEROFPAGES")),
+                bookParams.get("AUTHORS"),
+                Integer.parseInt(pCopiesParams.get("NUMBEROFCOPIES")),
+                Boolean.parseBoolean(pCopiesParams.get("BORROWABLE")),
+                admin.getToken());
+    }
+
+    protected void addMagazine() {
+        HashMap<String, String> itemParams = getItemParameters();
+        HashMap<String, String> magazineParams = getMagazineParameters();
+        HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+
+        ItemController itemController = new ItemController();
+        itemController.addMagazine(
+                itemParams.get("TITLE"),
+                itemParams.get("PUBLICATIONDATE"),
+                itemParams.get("LANGUAGE"),
+                itemParams.get("CATEGORY"),
+                itemParams.get("LINK"),
+                Integer.parseInt(itemParams.get("NUMBEROFPAGES")),
+                magazineParams.get("PUBLISHINGHOUSE"),
+                Integer.parseInt(pCopiesParams.get("NUMBEROFCOPIES")),
+                Boolean.parseBoolean(pCopiesParams.get("BORROWABLE")),
+                admin.getToken());
+    }
+
+    protected void addThesis() {
+        HashMap<String, String> itemParams = getItemParameters();
+        HashMap<String, String> thesisParams = getThesisParameters();
+        HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+
+        ItemController itemController = new ItemController();
+        itemController.addThesis(
+                itemParams.get("TITLE"),
+                itemParams.get("PUBLICATIONDATE"),
+                itemParams.get("LANGUAGE"),
+                itemParams.get("CATEGORY"),
+                itemParams.get("LINK"),
+                Integer.parseInt(itemParams.get("NUMBEROFPAGES")),
+                thesisParams.get("AUTHOR"),
+                thesisParams.get("SUPERVISORS"),
+                thesisParams.get("UNIVERSITY"),
+                Integer.parseInt(pCopiesParams.get("NUMBEROFCOPIES")),
+                Boolean.parseBoolean(pCopiesParams.get("BORROWABLE")),
+                admin.getToken());
+    }
+
+    protected void registerLending() {
+        CommandLineInterface.printMessage("Inserisci lo userCode dell'utente che vuole effettuare il prestito: ");
+        searchHirerKeyWords = scanner.nextLine();
+        hirer = getHirer(searchHirerKeyWords, searchHirer());
+        if (hirer == null) {
+            CommandLineInterface.printError("Errore: userCode non esistente.");
+            return;
+        }
+        CommandLineInterface.printMessage("Inserisci l'itemCode dell'articolo che vuole effettuare il prestito: ");
+        itemCode = scanner.nextLine();
+        advanceSearch = false;
+        searchItemParams.put("KEYWORDS", itemCode);
+        item = getItem(itemCode, searchItems());
+        if (item == null) {
+            CommandLineInterface.printError("Errore: itemCode non esistente.");
+            return;
+        }
+
+        LendingController lendingController = new LendingController();
+        try {
+            lendingController.registerLending(hirer, item, admin.getToken());
+            CommandLineInterface.clearScreen();
+        } catch (ActionDeniedException e) {
+            CommandLineInterface.clearScreen();
+            CommandLineInterface.printError(e.getMessage());
+        }
+        searchHirerKeyWords = "";
+        itemCode = "";
+        hirer = null;
+        item = null;
+    }
+
+    protected void modifyItem() {
+        HashMap<String, String> itemParams = getItemParameters();
+        ItemController itemController = new ItemController();
+        try {
+            if (item.getClass() == Book.class) {
+                HashMap<String, String> bookParams = getBookParameters();
+                HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+                itemController.updateBook(
+                        item.getCode(),
+                        itemParams.get("TITLE"),
+                        itemParams.get("PUBLICATIONDATE"),
+                        Boolean.parseBoolean(pCopiesParams.get("BORROWABLE")),
+                        itemParams.get("LANGUAGE"),
+                        itemParams.get("CATEGORY"),
+                        itemParams.get("LINK"),
+                        bookParams.get("ISBN"),
+                        bookParams.get("PUBLISHINGHOUSE"),
+                        Integer.parseInt(itemParams.get("NUMBEROFPAGES")),
+                        bookParams.get("AUTHORS"),
+                        Integer.parseInt(pCopiesParams.get("NUMBEROFCOPIES")),
+                        admin.getToken());
+            }
+            if (item.getClass() == Magazine.class) {
+                HashMap<String, String> magazineParams = getMagazineParameters();
+                HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+                itemController.updateMagazine(
+                        item.getCode(),
+                        itemParams.get("TITLE"),
+                        itemParams.get("PUBLICATIONDATE"),
+                        Boolean.parseBoolean(pCopiesParams.get("BORROWABLE")),
+                        itemParams.get("LANGUAGE"),
+                        itemParams.get("CATEGORY"),
+                        itemParams.get("LINK"),
+                        magazineParams.get("PUBLISHINGHOUSE"),
+                        Integer.parseInt(pCopiesParams.get("NUMBEROFCOPIES")),
+                        admin.getToken(),
+                        Integer.parseInt(itemParams.get("NUMBEROFPAGES")));
+            }
+            if (item.getClass() == Thesis.class) {
+                HashMap<String, String> thesisParams = getThesisParameters();
+                HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+                itemController.updateThesis(
+                        item.getCode(),
+                        itemParams.get("TITLE"),
+                        itemParams.get("PUBLICATIONDATE"),
+                        Boolean.parseBoolean(pCopiesParams.get("BORROWABLE")),
+                        itemParams.get("LANGUAGE"),
+                        itemParams.get("CATEGORY"),
+                        itemParams.get("LINK"),
+                        thesisParams.get("AUTHOR"),
+                        thesisParams.get("SUPERVISORS"),
+                        thesisParams.get("UNIVERSITY"),
+                        Integer.parseInt(pCopiesParams.get("NUMBEROFCOPIES")),
+                        admin.getToken(),
+                        Integer.parseInt(itemParams.get("NUMBEROFPAGES")));
+            }
+            CommandLineInterface.clearScreen();
+        } catch (ActionDeniedException | IdNotFoundException e) {
+            CommandLineInterface.clearScreen();
+            CommandLineInterface.printError(e.getMessage());
+        }
+    }
+
+    protected void deleteItem() {
+        ItemController itemController = new ItemController();
+        try {
+            if (item.getClass() == Book.class) {
+                itemController.removeBook(item.getCode(), admin.getToken());
+            }
+            if (item.getClass() == Magazine.class) {
+                itemController.removeMagazine(item.getCode(), admin.getToken());
+            }
+            if (item.getClass() == Thesis.class) {
+                itemController.removeThesis(item.getCode(), admin.getToken());
+            }
+            CommandLineInterface.clearScreen();
+        } catch (ActionDeniedException e) {
+            CommandLineInterface.clearScreen();
+            CommandLineInterface.printError(e.getMessage());
+        }
+    }
+
+    protected void stampaUtenti(ArrayList<Hirer> hirers) {
+        if (hirers.isEmpty()) {
+            CommandLineInterface.printMessage("Mi dispiace, non ci sono utenti che rispettano le tue richieste, prova a rilassare i vincoli.");
+            return;
+        }
+        String[] header = {"userCode", "Nome", "Cognome", "Email"};
         ArrayList<String[]> data = new ArrayList<>();
         for (Hirer h : hirers) {
-            data.add(new String[] {h.getUserCode(), h.getName(), h.getSurname(), h.getTelephoneNumber(), h.getEmail()});
+            data.add(new String[]{h.getUserCode(), h.getName(), h.getSurname(), h.getEmail()});
         }
         CommandLineInterface.printTable(header, data, 1);
     }
 
-    private void stampaUtente(Hirer hirer, ArrayList<Reservation> reservations, ArrayList<Lending> lendings) {
-        //TODO aggiungi come metodo in Hirer
+    protected void stampaUtente(Hirer hirer, ArrayList<Reservation> reservations, ArrayList<Lending> lendings) {
+        if (hirer == null) {
+            CommandLineInterface.printError("Errore: non hai inserito uno userCode valido.");
+            return;
+        }
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"Codice utente: ", hirer.getUserCode()});
-        data.add(new String[]{"Nome: ", hirer.getName()});
-        data.add(new String[]{"Cognome: ", hirer.getSurname()});
-        data.add(new String[]{"Num. di telefono: ", hirer.getTelephoneNumber()});
-        data.add(new String[]{"Email: ", hirer.getEmail()});
-        if(hirer.getUnbannedDate() == null){
-            data.add(new String[]{"Data di unban: ", "Regolare"});
-        } else {
-            data.add(new String[]{"Data di unban: ", hirer.getUnbannedDate().toString()});
+        data.add(new String[]{"userCode", hirer.getUserCode()});
+        data.add(new String[]{"Nome", hirer.getName()});
+        data.add(new String[]{"Cognome", hirer.getSurname()});
+        data.add(new String[]{"Tel.", hirer.getTelephoneNumber()});
+        data.add(new String[]{"Email", hirer.getEmail()});
+        if (hirer.getUnbannedDate() != null) {
+            data.add(new String[]{"Data sblocco", hirer.getUnbannedDate().toString()});
+        }
+        CommandLineInterface.printCard("Dati utente", data);
+
+        if (!reservations.isEmpty()) {
+            CommandLineInterface.printMessage("Prenotazioni:");
+            stampaPrenotazioni(reservations);
         }
 
-        System.out.println("Prenotazioni:");
-        stampaPrenotazioni(reservations);
-        //TODO stampaPrenotazioni(adminController.getLendings().serchbyHirer(id));
-
-        System.out.println("Prestiti:");
-        stampaPrestiti(lendings);
-        //TODO stampaPrenotazioni(adminController.getLendings().serchbyHirer(id));
-    }
-
-    private void stampaPrenotazioni(ArrayList<Reservation> reservations) { //TODO riguardare il contenuto
-        CommandLineInterface.clearScreen();
-        String[] header = {"Titolo Articolo", "Sede", "Scadenza prenotazione"};
-        ArrayList<String[]> data = new ArrayList<>();
-        for (Reservation r : reservations) {
-            data.add(new String[] {r.getItem().getTitle(), r.getStoragePlace().toString(), r.getReservationDate().plusWeeks(1).toString()});
+        if (!lendings.isEmpty()) {
+            CommandLineInterface.printMessage("Prestiti:");
+            stampaPrestiti(lendings);
         }
-        CommandLineInterface.printTable(header, data, 0);
-    }
-
-    private void stampaPrestiti(ArrayList<Lending> lendings) {//TODO riguardare il contenuto
-        String[] header = {"Titolo Articolo", "Sede", "Scadenza prenotazione"};
-        ArrayList<String[]> data = new ArrayList<>();
-        for (Lending l : lendings) {
-            data.add(new String[] {l.getItem().getTitle(), l.getStoragePlace().toString(), l.getLendingDate().plusMonths(1).toString()});
-        }
-        CommandLineInterface.printTable(header, data, 0);
-    }
-
-    private ArrayList<Item> ricerca() {
-        System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
-        for (Category c : Category.values()) {
-            System.out.print(c + ", ");
-        }
-        System.out.print("\b;");
-
-        Category category = Category.valueOf(scanner.nextLine().toUpperCase());
-
-        System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
-        String keywords = scanner.nextLine().toUpperCase();
-
-        return adminController.searchItem(keywords, category.toString());
-    } //TODO mettere ciclo while che esegue fino a quando i valori sono corretti esegui di continuo in base all'eccezione modifichi il paramtero errato
-
-    private ArrayList<Item> ricercaAvanzata() {
-        CommandLineInterface.clearScreen();
-
-        System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
-        for (Category c : Category.values()) {
-            System.out.print(c + ", ");
-        }
-        System.out.println("\b;");
-        Category category = Category.valueOf(scanner.nextLine());
-
-        System.out.println("Inserisci in quale lingua è scritto l'articolo che stai cercando tra quelli elencati: ");
-        for (Language l : Language.values()) {
-            System.out.print(l + ", ");
-        }
-        System.out.println("\b;");
-        Language language = Language.valueOf(scanner.nextLine());
-
-        System.out.println("Inserisci [Si] se l'articolo deve essere noleggiabile in una nostra biblioteca: ");
-        boolean borrowable = scanner.nextLine().toUpperCase().equals("SI");
-
-        System.out.println("Inserisci l'intervallo in cui è stato pubblicato l'articolo che stai cercando: \n" +
-                "Data inizio: [formato GG/MM/AAAA]");
-        LocalDate startDate = LocalDate.parse(scanner.nextLine());
-        System.out.println("Data fine: [formato GG/MM/AAAA]");
-        LocalDate endDate = LocalDate.parse(scanner.nextLine());
-
-        System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
-        String keywords = scanner.nextLine().toUpperCase();
-        return adminController.advancedSearchItem(keywords, category.toString(), language.toString(), borrowable, startDate, endDate);
-    }
-
-    private void paginaUtenti(ArrayList<Hirer> hirers) {
-        CommandLineInterface.clearScreen();
-        String code;
-        do {
-            stampaUtenti(hirers);
-
-            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                    "[UserCode di un utente]: visualizzare i dettagli di un utente; \n" +
-                    "Esci: tornare alla home page. ");
-            code = scanner.nextLine().toUpperCase();
-            if (!code.equals("ESCI")) {
-                try {
-                    String userCode = scanner.nextLine().toUpperCase();
-                    code = paginaUtente(getHirer(hirers, userCode));
-                } catch (NumberFormatException e) {
-                    CommandLineInterface.clearScreen();
-                    System.out.println("Errore: non hai inserito un codice corretto.");
-                } // catch id inserito non presente
-            }
-        } while (!code.equals("ESCI"));
-    }
-
-    private String paginaUtente(Hirer hirer) {
-        String operazione;
-        do {
-            ArrayList<Reservation> reservations = adminController.getReservations();
-            ArrayList<Lending> lendings = adminController.getLendings();
-            stampaUtente(hirer, reservations, lendings);
-
-            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                    "Ritira: per registrare il ritiro di un articolo di una prenotazione ed il relativo prestito; \n" +
-                    "Restituisci: per registrare la restituzione dell'articolo presente nel prestito; \n" +
-                    "Indietro: tornare alla pagina precedente"); //TODO controllare il codice ESCI/INDIETRO
-
-            operazione = scanner.nextLine().toUpperCase();
-            switch (operazione) {
-                case "RITIRA": {
-                    System.out.println("Inserisci il codice dell'articolo di cui si vuole effettuare il ritiro: ");
-                    String code = scanner.nextLine();
-                    try {
-                        int itemCode = Integer.parseInt(code);
-                        adminController.confirmReservationWithdraw(getReservation(reservations, itemCode, this.workingPlace.toString()));
-                    } catch (NumberFormatException e) {
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito un codice corretto.");
-                    } catch (Exception e) { // TODO ipotetico eccezione oggetto inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: articolo inesistente.");
-                    }
-                    break;
-                }
-
-                case "RESTITUISCI": {
-                    System.out.println("Inserisci il codice dell'articolo di cui si vuole registrare la restituzione: ");
-                    String code = scanner.nextLine();
-                    try {
-                        int itemCode = Integer.parseInt(code);
-                        adminController.registerReturnOfItem(getLending(lendings, itemCode, this.workingPlace.toString()));
-                    } catch (NumberFormatException e) {
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito un codice corretto.");
-                    } catch (Exception e) { // TODO ipotetico eccezione oggetto inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: articolo inesistente.");
-                    }
-                    break;
-                }
-
-                case "INDIETRO": {
-                    return "INDIETRO";
-                }
-
-                default:{
-                    System.out.println("Errore: non hai inserito un operazione corretta.");
-                }
-            }
-        } while (true);
-    }
-
-    private void paginaArticoli(ArrayList<Item> items) {
-        CommandLineInterface.clearScreen();
-        String code;
-        do {
-            stampaArticoli(items);
-
-            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                    "[Un codice di un articolo]: visualizzare i dettagli di un certo articolo; " +
-                    "Esci: tornare alla home page. ");
-            code = scanner.nextLine().toUpperCase();
-            if (!code.equals("ESCI")) {
-                try {
-                    int itemCode = Integer.parseInt(code);
-                    code = paginaArticolo(getItem(items, itemCode));
-                } catch (NumberFormatException e) {
-                    CommandLineInterface.clearScreen();
-                    System.out.println("Errore: non hai inserito un codice corretto.");
-                } // catch id inserito non presente
-            }
-        } while (!code.equals("ESCI"));
-    }
-
-    private String paginaArticolo(Item item) {
-        String operazione;
-        do {
-            System.out.println("Inserisci l'operazione che vuoi eseguire: \n" +
-                    "[Modifica]: per modificare i dati di un articolo; \n" +
-                    "[Elimina]: per eliminare un articolo dalla sede in cui lavori; \n" +
-                    "Indietro: tornare alla pagina precedente");
-            operazione = scanner.nextLine().toUpperCase();
-            switch (operazione) {
-                case "MODIFICA": {
-                    String code = scanner.nextLine();
-                    try {
-                        ArrayList<String> params = getItemParameters();
-                        if(item.getClass() == Book.class) {
-                            params.addAll(getBookParameters());
-                            params.addAll(getPhysicalCopiesParameters());
-                            adminController.updateBook( //TODO riordinare ordine di tutti i parametri
-                                    item.getCode(),
-                                    params.get(0),
-                                    params.get(1),
-                                    params.get(2).equals("SI"),
-                                    params.get(3),
-                                    params.get(4),
-                                    params.get(5),
-                                    params.get(6),
-                                    params.get(7),
-                                    Integer.parseInt(params.get(8)),
-                                    params.get(9),
-                                    Integer.parseInt(params.get(10))
-                            );
-                        }
-                        if (item.getClass() == Magazine.class) {
-                            params.addAll(getMagazineParameters());
-                            params.addAll(getPhysicalCopiesParameters());
-                            adminController.updateMagazine( //TODO riordinare ordine di tutti i parametri
-                                    item.getCode(),
-                                    params.get(0),
-                                    params.get(1),
-                                    params.get(2).equals("SI"),
-                                    params.get(3),
-                                    params.get(4),
-                                    params.get(5),
-                                    params.get(6),
-                                    params.get(7),
-                                    Integer.parseInt(params.get(8))
-                            );
-                        }
-                        if (item.getClass() == Thesis.class) {
-                            params.addAll(getThesisParameters());
-                            params.addAll(getPhysicalCopiesParameters());
-                            adminController.updateThesis( //TODO riordinare ordine di tutti i parametri
-                                    item.getCode(),
-                                    params.get(0),
-                                    params.get(1),
-                                    params.get(2).equals("SI"),
-                                    params.get(3),
-                                    params.get(4),
-                                    params.get(5),
-                                    params.get(6),
-                                    params.get(7),
-                                    params.get(8),
-                                    Integer.parseInt(params.get(9))
-                            );
-                        }
-                    } catch (NumberFormatException e) {
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito un codice corretto.");
-                    } catch (Exception e) { // TODO ipotetico eccezione oggetto inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: articolo inesistente.");
-                    }
-                    break;
-                }
-
-                case "ELIMINA": {
-                    String code = scanner.nextLine();
-                    try {
-                        int itemCode = Integer.parseInt(code);
-                        if (item.getClass() == Book.class) {
-                            adminController.removeBook(itemCode);
-                        }
-                        if (item.getClass() == Magazine.class) {
-                            adminController.removeMagazine(itemCode);
-                        }
-                        if (item.getClass() == Thesis.class) {
-                            adminController.removeThesis(itemCode);
-                        }
-                    } catch (NumberFormatException e) {
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: non hai inserito un codice corretto.");
-                    } catch (Exception e) { // TODO ipotetico eccezione articoli inesistente
-                        CommandLineInterface.clearScreen();
-                        System.out.println("Errore: articolo inesistente.");
-                    }
-                    break;
-
-                }case "INDIETRO": {
-                    return "INDIETRO";
-                }
-
-                default: {
-                    System.out.println("Errore: non hai inserito un operazione corretta.");
-                }
-            }
-        } while (true);
-    }
-
-    private void stampaArticoli(ArrayList<Item> items) {
-        String[] header = {"Titolo Articolo", "Autore", "Categoria", "Data Pubblicazione"}; //TODO moficare item compagnia per passare il code
-        ArrayList<String[]> data = new ArrayList<>();
-        for (Item item : items) {
-            data.add(item.getValues());
-        }
-        CommandLineInterface.printTable(header, data, 0);
-    }
-
-    private void stampaArticolo(Item item) {
-        ArrayList<String[]> data = new ArrayList<>();
-        data = item.toStringValues();//TODO gestire il numero di copie rimaste e numero di copie totali
-        data.add(new String[]{"Num. copie totali: ", Integer.toString(item.getLibraryPhysicalCopies(workingPlace).getNumberOfPhysicalCopies())});
-        data.add(new String[]{"Num. copie disponibili: ", Integer.toString(item.getLibraryPhysicalCopies(workingPlace).getNumberOfAvailableCopies())});
-        data.add(new String[]{"Stato: ", state(item.getLibraryPhysicalCopies(workingPlace).getNumberOfAvailableCopies(), item.isBorrowable())});
-        CommandLineInterface.printCard("Dati articolo", data, 1);
-
-        System.out.println("Prenotazioni:");
-        ArrayList<Reservation> reservations;
-        //TODO Aggiunta in admin controller del get di lendings e reservations.
-        //TODO stampaPrenotazioni(adminController.getLendings().serchbyHirer(id));
-
-
-        System.out.println("Prestiti:");
-        ArrayList<Lending> lendings;
-        //TODO Aggiunta in admin controller del get di lendings e reservations.
-        //TODO stampaPrenotazioni(adminController.getLendings().serchbyHirer(id));
-
-        }
-
-
-    private ArrayList<String> getItemParameters(){
-        ArrayList<String> parameters = new ArrayList<>();
-        System.out.println("Inserisci il titolo: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci la categoria tra quelli elencati: ");
-        for (Category c : Category.values()) {
-            System.out.print(c + ", ");
-        }
-        System.out.println("\b;");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci in quale lingua è scritto l'articolo che stai cercando tra quelli elencati: ");
-        for (Language l : Language.values()) {
-            System.out.print(l + ", ");
-        }
-        System.out.println("\b;");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci il numero di pagine: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci il link dell'articolo: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci l'intervallo in cui è stato pubblicato l'articolo che stai cercando [formato GG/MM/AAAA]: ");
-        parameters.add(scanner.nextLine());
-        return parameters;
     }
 
 
-    private ArrayList<String> getBookParameters(){
-        ArrayList<String> parameters = new ArrayList<>();
-        System.out.println("Inserisci l'ISBN del libro: ");
-
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci la casa editrice del libro: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci gli autori del libro [suddivisi con spazi]: ");
-        parameters.add(scanner.nextLine());
-
-        return parameters;
-    }
-
-
-    private ArrayList<String> getMagazineParameters(){
-        ArrayList<String> parameters = new ArrayList<>();
-
-        System.out.println("Inserisci la casa editrice della rivista: ");
-        parameters.add(scanner.nextLine());
-
-        return parameters;
-    }
-
-
-    private ArrayList<String> getThesisParameters(){
-        ArrayList<String> parameters = new ArrayList<>();
-
-        System.out.println("Inserisci l'autore della tesi: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci i supervisori della tesi [divisi con spazi]: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci l'università della tesi': ");
-        parameters.add(scanner.nextLine());
-
-        return parameters;
-    }
-
-
-    private ArrayList<String> getPhysicalCopiesParameters(){
-        ArrayList<String> parameters = new ArrayList<>();
-
-        System.out.println("Inserisci il numero di copie nella sede in cui lavori: ");
-        parameters.add(scanner.nextLine());
-
-        System.out.println("Inserisci [Si] se è noleggiabile nella sede in cui lavori: ");
-        parameters.add(scanner.nextLine());
-
-        return parameters;
-    }
-
-    private String state(int numberOfCopies, boolean borrowable) {
-        if (!borrowable) {
-            return "Non noleggiabile";
-        }
-        if (numberOfCopies == 0) {
-            return "Esaurito";
-        }
-        return "Prenotabile";
-    }*/
 }

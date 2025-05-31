@@ -41,7 +41,7 @@ public class UniversityAuthenticationSystem {
         try {
             url = "jdbc:postgresql://localhost:5432/University";
             username = "postgres";
-            password = "filipposwe";
+            password = "HU12HUI26TAO";
             connection = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());

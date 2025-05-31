@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public abstract class Item {
-    private int code;
-    private int numberOfPages;
-    private String title;
-    private LocalDate publicationDate;
-    private Language language;
-    private Category category;
-    private String link;
-    private HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
+    protected int code;
+    protected int numberOfPages;
+    protected String title;
+    protected LocalDate publicationDate;
+    protected Language language;
+    protected Category category;
+    protected String link;
+    protected HashMap<Library, PhysicalCopies> physicalCopies = new HashMap<>();
 
     public Item(int code, String title, LocalDate publicationDate, Language language, Category category, String link, int numberOfPages) {
         this.code = code;
@@ -26,7 +26,11 @@ public abstract class Item {
         this.numberOfPages = numberOfPages;
     }
 
+    //Aggiunto equals per Code
     public boolean contains(String keyword){
+        if(Integer.toString(code).equals(keyword)){
+            return true;
+        }
         if(title.toUpperCase().contains(keyword.toUpperCase())){
             return true;
         }
@@ -108,6 +112,27 @@ public abstract class Item {
         return physicalCopies.get(library).getNumberOfPhysicalCopies();
     }
 
+    /**/
+    abstract public ArrayList<String[]> toStringValues();
+
+    public ArrayList<String[]> getPhysicalCopiesData() {
+        ArrayList<String[]> data = new ArrayList<>();
+        for (Library library : physicalCopies.keySet()) {
+            data.add(new String[]{library.toString(), Integer.toString(getNumberOfAvailableCopiesInLibrary(library)), state(getNumberOfAvailableCopiesInLibrary(library), isBorrowable(library))});
+        }
+        return data;
+    }
+
+    public String state(int numberOfCopies, boolean borrowable) {
+        if (!borrowable) {
+            return "Non noleggiabile";
+        }
+        if (numberOfCopies == 0) {
+            return "Esaurito";
+        }
+        return "Prenotabile";
+    }
+    /**/
     public int getCode(){ return this.code;}
     public String getTitle(){ return this.title;}
     public LocalDate getPublicationDate(){ return this.publicationDate;}

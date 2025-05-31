@@ -9,14 +9,15 @@ import java.util.ArrayList;
 
 public class ItemController {
 
-    public ArrayList<Item> searchItem(String keywords, String category) {
+    //TODO da togliere ricerca in base a categoria
+    public ArrayList<Item> searchItem(String keywords) {
         ArrayList<Item> items = getAllItems();
 
         String[] splittedKeyword = keywords.split(" ");
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : items) {
-            for (String keyword : splittedKeyword){
-                if (i.getCategory().equals(Category.valueOf(category)) && i.contains(keyword)) {
+            for (String keyword : splittedKeyword) {
+                if (i.contains(keyword)) {//TODO prima i.getCategory().equals(Category.valueOf(category)) &&
                     result.add(i);
                 }
             }
@@ -35,7 +36,7 @@ public class ItemController {
         items.addAll(thesisDAO.getAllThesis());
 
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
-        for(Item i : items) {
+        for (Item i : items) {
             i.setPhysicalCopies(physicalCopiesDAO.getPhysicalCopies(i.getCode()));
         }
         return items;
@@ -47,7 +48,7 @@ public class ItemController {
         String[] splittedKeyword = keywords.split(" ");
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : items) {
-            for (String keyword : splittedKeyword){
+            for (String keyword : splittedKeyword) {
                 if (i.getCategory().equals(Category.valueOf(category)) &&
                         i.getLanguage().equals(Language.valueOf(language)) &&
                         i.isBorrowable() == borrowable &&
@@ -65,7 +66,7 @@ public class ItemController {
     public void addBook(String title, String publicationDate, String language, String category, String link, String isbn, String publishingHouse,
                         int numberOfPages, String authors, int numberOfCopies, boolean borrowable, Token token) {
 
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
 
@@ -75,7 +76,7 @@ public class ItemController {
 
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
-            if(i.sameField(bookCopy)) {
+            if (i.sameField(bookCopy)) {
                 addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
                 return;
             }
@@ -94,13 +95,13 @@ public class ItemController {
                     publishingHouse,
                     numberOfPages,
                     authors);
-            if(numberOfCopies >= 0) {
+            if (numberOfCopies >= 0) {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.addPhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch(Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -118,7 +119,7 @@ public class ItemController {
                             boolean borrowable,
                             Token token) {
 
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
 
@@ -134,7 +135,7 @@ public class ItemController {
 
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
-            if(i.sameField(magazineCopy)) {
+            if (i.sameField(magazineCopy)) {
                 addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
                 return;
             }
@@ -151,13 +152,13 @@ public class ItemController {
                     link,
                     publishingHouse,
                     numberOfPages);
-            if(numberOfCopies >= 0) {
+            if (numberOfCopies >= 0) {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.addPhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch(Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -177,9 +178,12 @@ public class ItemController {
                           boolean borrowable,
                           Token token) {
 
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
+        if (borrowable) {
+            throw new ActionDeniedException("Errore: un Thesis non può essere noleggiato.");
+        }//TODO borrowable
 
         Thesis thesisCopy = new Thesis(
                 title,
@@ -195,7 +199,7 @@ public class ItemController {
 
         ArrayList<Item> items = getAllItems();
         for (Item i : items) {
-            if(i.sameField(thesisCopy)) {
+            if (i.sameField(thesisCopy)) {
                 addPhysicalCopies(i.getCode(), Library.valueOf(token.getTokenWorkingPlace()), numberOfCopies, borrowable);
                 return;
             }
@@ -215,13 +219,13 @@ public class ItemController {
                     author,
                     supervisors,
                     university);
-            if(numberOfCopies > 0) {
+            if (numberOfCopies > 0) {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.addPhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch(Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -231,17 +235,16 @@ public class ItemController {
     private void addPhysicalCopies(int itemCode, Library storagePlace, int numberOfCopies, boolean borrowable) {
         PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
         int physicalCopies = physicalCopiesDAO.getPhysicalCopies(itemCode).get(storagePlace).getNumberOfPhysicalCopies();
-        if (physicalCopies == 0){
+        if (physicalCopies == 0) {
             physicalCopiesDAO.addPhysicalCopies(itemCode, storagePlace.toString(), numberOfCopies, borrowable);
-        }else {
+        } else {
             physicalCopiesDAO.updatePhysicalCopies(itemCode, storagePlace.toString(), (physicalCopies + numberOfCopies), borrowable);
         }
     }
 
 
-
     public void removeBook(int itemCode, Token token) {
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
         BookDAO bookDAO = new BookDAO();
@@ -256,20 +259,20 @@ public class ItemController {
                 if (book.getLink().isEmpty()) {
                     bookDAO.removeBook(itemCode);
                 }
-                return;
-            }
-            if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
-                throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
-            }
-            if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) !=
-                    book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
-                throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" +
-                        token.getTokenWorkingPlace() + "]");
-            }
-            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
+            } else {//TODO
+                if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
+                    throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+                }
+                if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) !=
+                        book.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
+                    throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" +
+                            token.getTokenWorkingPlace() + "]");
+                }
+                physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
+            }//TODO da modificare sulla relazione
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch (Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -278,7 +281,7 @@ public class ItemController {
 
 
     public void removeMagazine(int itemCode, Token token) {
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
         MagazineDAO magazineDAO = new MagazineDAO();
@@ -292,19 +295,19 @@ public class ItemController {
             if (magazine.getNumberOfLibraries() == 0) {
                 if (magazine.getLink().isEmpty()) {
                     magazineDAO.removeMagazine(itemCode);
-                    return;
                 }
+            } else {
+                if (magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
+                    throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+                }
+                if (magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != magazine.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
+                    throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+                }
+                physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             }
-            if (magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
-                throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
-            }
-            if (magazine.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != magazine.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
-                throw new ActionDeniedException("Errore: questo Magazine con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
-            }
-            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch (Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -313,7 +316,7 @@ public class ItemController {
 
 
     public void removeThesis(int itemCode, Token token) {
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
         ThesisDAO thesisDAO = new ThesisDAO();
@@ -327,25 +330,24 @@ public class ItemController {
             if (thesis.getNumberOfLibraries() == 0) {
                 if (thesis.getLink().isEmpty()) {
                     thesisDAO.removeThesis(itemCode);
-                    return;
                 }
+            } else {
+                if (thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
+                    throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
+                }
+                if (thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != thesis.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
+                    throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
+                }
+                physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             }
-            if (thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
-                throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
-            }
-            if (thesis.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) != thesis.getNumberOfAvailableCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace()))) {
-                throw new ActionDeniedException("Errore: questo Thesis con itemCode [" + itemCode + "] ha ancora prenotazioni/prestiti nella tua sede [" + token.getTokenWorkingPlace() + "]");
-            }
-            physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch (Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
         }
     }
-
 
 
     public void updateBook(int itemCode,
@@ -362,7 +364,7 @@ public class ItemController {
                            int numberOfCopies,
                            Token token) {
 
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
         LocalDate.parse(publicationDate);
@@ -386,14 +388,14 @@ public class ItemController {
                     authors,
                     numberOfPages);
 
-            if(numberOfCopies > 0){
+            if (numberOfCopies > 0) {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.updatePhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
 
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch (Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -412,7 +414,7 @@ public class ItemController {
                                Token token,
                                int numberOfPages) {
 
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
         LocalDate.parse(publicationDate);
@@ -435,14 +437,14 @@ public class ItemController {
                     publishingHouse,
                     numberOfPages);
 
-            if(numberOfCopies > 0){
+            if (numberOfCopies > 0) {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.updatePhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
 
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch (Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;
@@ -462,16 +464,19 @@ public class ItemController {
                              int numberOfCopies,
                              Token token,
                              int numberOfPages) {
-        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+        if (!token.getTokenRole().equals(Hasher.hash("Admin"))) {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
         }
+        if (borrowable) {
+            throw new ActionDeniedException("Errore: un Thesis non può essere noleggiato.");
+        }//TODO borrowable
         LocalDate.parse(publicationDate);
         Language.valueOf(language);
         Category.valueOf(category);
 
         ConnectionManager connectionManager = ConnectionManager.getInstance();
-        try{
-
+        try {
+            connectionManager.closeAutoCommit();
 
             ThesisDAO thesisDAO = new ThesisDAO();
             thesisDAO.updateThesis(
@@ -486,14 +491,14 @@ public class ItemController {
                     univeristy,
                     numberOfPages);
 
-            if(numberOfCopies > 0){
+            if (numberOfCopies > 0) {
                 PhysicalCopiesDAO physicalCopiesDAO = new PhysicalCopiesDAO();
                 physicalCopiesDAO.updatePhysicalCopies(itemCode, token.getTokenWorkingPlace(), numberOfCopies, borrowable);
             }
 
             connectionManager.commit();
             connectionManager.openAutoCommit();
-        } catch (Exception e){
+        } catch (Exception e) {
             connectionManager.rollback();
             connectionManager.openAutoCommit();
             throw e;

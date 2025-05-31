@@ -2,170 +2,118 @@ package com.progetto_swe.CLI;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
 import com.progetto_swe.business_logic.*;
+import com.progetto_swe.business_logic.business_logic_exception.AccessDeniedException;
 import com.progetto_swe.domain_model.*;
+import com.progetto_swe.orm.database_exception.IdNotFoundException;
 
-public class CommandLineInterface {/*
+public class CommandLineInterface {
     static int screenWidth = 90;
     String role = "UTENTE ANONIMO";
     static Scanner scanner = new Scanner(System.in);
+    BaseCLI CLI = new BaseCLI();
+    private static String punctuation = " ,;.:-_\\|!\"£$%&/()=?\'^€+*[]{}§@#°<>«»";
 
     public void start() {
-
+        ArrayList<String[]> menu;
+        String scelta;
         do {
-            switch (role) {
-                case "UTENTE ANONIMO": {
-                    AnonymousCLI anonymousCLI = new AnonymousCLI();
-                    role = anonymousCLI.start();
-                    break;
-                }
-
-                case "NOLEGGIATORE ESTERNO": {
+            menu = CLI.getMenu();
+            menu.add(new String[]{"Esci", "uscire dall'applicazione"});
+            printMenu(menu);
+            scelta = scanner.nextLine().toUpperCase();
+            switch (scelta) {
+                case "LOGIN": {
                     clearScreen();
-                    HirerController hirerController = new HirerController();
-
-                    //ottiene le credenziali
-                    System.out.println("Inserisci il tuo codice utente: ");
-                    String userCode = scanner.nextLine();
-                    System.out.println("Inserisci la tua password: ");
-                    String password = scanner.nextLine();
-
-                    Hirer hirer = hirerController.loginExternalHirer(userCode, password);
-                    if (hirer == null) {
-                        System.out.println("Errore: nome utente o password errati.");
-                    } else {
-                        HirerCLI hirerCLI = new HirerCLI(hirerController);
-                        role = hirerCLI.start();
-                    }
-                    break;
-                }
-
-                case "NOLEGGIATORE UNIVERSITARIO": {
-                    clearScreen();
-                    LoginUniversityHirerController loginUniversityHirer = new LoginUniversityHirerController();
-
-                    //ottiene le credenziali
-                    System.out.println("Inserisci il tuo codice utente: ");
-                    String userCode = scanner.nextLine();
-                    System.out.println("Inserisci la tua password: ");
-                    String password = scanner.nextLine();
-
-                    Hirer hirer = loginUniversityHirer.loginUniversityHirer(userCode, password);
-                    if(hirer == null) {
-                        System.out.println("Errore: nome utente o password errati.");
-                    } else {
-                        HirerCLI hirerCLI = new HirerCLI(new HirerController(hirer));
-                        role = hirerCLI.start();
-                    }
-                    break;
-                }
-
-                case "AMMINISTRATORE BIBLIOTECARIO": {
-                    clearScreen();
-                    LoginAdminController loginAdminController = new LoginAdminController();
-                    System.out.println("Inserisci il tuo codice utente: ");
-                    String userCode = scanner.nextLine();
-                    System.out.println("Inserisci la tua password: ");
-                    String password = scanner.nextLine();
-
-                    Admin admin = loginAdminController.loginAdmin(userCode, password);
-                    if(admin == null) {
-                        System.out.println("Errore: nome utente o password errati.");
-                    } else {
-                        AdminCLI adminCLI = new AdminCLI(new AdminController(admin), admin.getWorkingPlace());
-                        role = adminCLI.start();
-                    }
-                    break;
-                }
-
-                case "LOGIN" : {
-                    System.out.println("Inserisci il ruolo con cui vuoi effettuare l'accesso al sito tra quelli seguenti: \n" +
-                            "[NOLEGGIATORE ESTERNO], [NOLEGGIATORE UNIVERSITARIO], [AMMINISTRATORE BIBLIOTECARIO]; ");
+                    printMessage("Inserisci il ruolo con cui vuoi effettuare l'accesso al sito tra quelli seguenti:");
+                    printMessage("[NOLEGGIATORE ESTERNO], [NOLEGGIATORE UNIVERSITARIO], [AMMINISTRATORE BIBLIOTECARIO]; ");
                     role = scanner.nextLine().toUpperCase();
+                    switch (role) {
+                        case "NOLEGGIATORE ESTERNO": {
+                            HirerController hirerController = new HirerController();
+                            System.out.println("Inserisci il tuo codice utente: ");
+                            String userCode = scanner.nextLine();
+                            System.out.println("Inserisci la tua password: ");
+                            String password = scanner.nextLine();
+
+                            try {
+                                Hirer hirer = hirerController.loginExternalHirer(userCode, password);
+                                CLI = new HirerCLI(hirer);
+                            } catch (AccessDeniedException | IdNotFoundException e) {
+                                clearScreen();
+                                printError(e.getMessage());
+                            }
+                            scelta = "OPERATION";
+                            break;
+                        }
+
+                        case "NOLEGGIATORE UNIVERSITARIO": {
+                            HirerController hirerController = new HirerController();
+                            System.out.println("Inserisci il tuo codice utente: ");
+                            String userCode = scanner.nextLine();
+                            System.out.println("Inserisci la tua password: ");
+                            String password = scanner.nextLine();
+                            try {
+                                Hirer hirer = hirerController.loginUniversityHirer(userCode, password);
+                                CLI = new HirerCLI(hirer);
+                                scelta = "OPERATION";
+                            } catch (AccessDeniedException e) {
+                                clearScreen();
+                                printError(e.getMessage());
+                            }
+                            break;
+                        }
+
+                        case "AMMINISTRATORE BIBLIOTECARIO": {
+                            AdminController adminController = new AdminController();
+                            System.out.println("Inserisci il tuo codice utente: ");
+                            String userCode = scanner.nextLine();
+                            System.out.println("Inserisci la tua password: ");
+                            String password = scanner.nextLine();
+                            try {
+                                Admin admin = adminController.loginAdmin(userCode, password);
+                                CLI = new AdminCLI(admin);
+                                scelta = "OPERATION";
+                            } catch (AccessDeniedException e) {
+                                clearScreen();
+                                printError(e.getMessage());
+                            }
+                            break;
+                        }
+
+                        default: {
+                            clearScreen();
+                            System.out.println("Errore: non hai inserito un ruolo corretto.");
+                            CLI = new BaseCLI();
+                            break;
+                        }
+                    }
+                    break;
+                }
+
+                case "LOGOUT": {
+                    CLI = new BaseCLI();
                     break;
                 }
 
                 default: {
-                    clearScreen();
-                    System.out.println("Errore: non hai inserito un ruolo corretto.");
-                    role = "LOGIN";
+                    CLI.execute(scelta);
                     break;
                 }
             }
-        } while (!role.equals("ESCI"));
+        } while (!scelta.equals("ESCI"));
     }
-
-    //evitare codice duplicato
-    public static HashMap<String, String> getRicercaParam() {
-        HashMap<String, String> ricercaParam = new HashMap<>();
-        System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
-        for (Category c : Category.values()) {
-            System.out.print(c + ", ");
-        }
-        System.out.print("\b;");
-        ricercaParam.put("Category", scanner.nextLine());
-
-        System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
-        ricercaParam.put("Keywords", scanner.nextLine());
-
-        return ricercaParam;
-    }
-
-
-    private ArrayList<Item> getRicercaAvanzataParam() {
-        CommandLineInterface.clearScreen();
-        HashMap<String, String> ricercaParam = new HashMap<>();
-        System.out.println("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
-        for (Category c : Category.values()) {
-            System.out.print(c + ", ");
-        }
-        System.out.println("\b;");
-        ricercaParam.put("Category", scanner.nextLine());
-
-        System.out.println("Inserisci in quale lingua è scritto l'articolo che stai cercando tra quelli elencati: ");
-        for (Language l : Language.values()) {
-            System.out.print(l + ", ");
-        }
-        System.out.println("\b;");
-        ricercaParam.put("Language", scanner.nextLine());
-
-        System.out.println("Inserisci [Si] se l'articolo deve essere noleggiabile in una nostra biblioteca: ");
-        ricercaParam.put("Borrowable", scanner.nextLine());
-
-        System.out.println("Inserisci l'intervallo in cui è stato pubblicato l'articolo che stai cercando: \n" +
-                "Data inizio: [formato GG/MM/AAAA]");
-        ricercaParam.put("StartDate", scanner.nextLine());
-        System.out.println("Data fine: [formato GG/MM/AAAA]");
-        ricercaParam.put("EndDate", scanner.nextLine());
-
-        System.out.println("\n\nInserisci le parole chiavi dell'articolo che vuoi cercare: ");
-        ricercaParam.put("Keywords", scanner.nextLine());
-        ItemController itemController = new ItemController();
-        itemController.advanceSearchItem();
-    }
-
-
-    public static String state(int numberOfCopies, boolean borrowable) {
-        if (!borrowable) {
-            return "Non noleggiabile";
-        }
-        if (numberOfCopies == 0) {
-            return "Esaurito";
-        }
-        return "Prenotabile";
-    }
-
 
 
     //funzioni d stampa
-
-    public static void printBiblioteca() {
-        String biblioteca = "Un uomo entra in una Biblioteca, SPLASH!";
+    private static void printBiblioteca() {
+        String biblioteca = "Benvenuto in Biblioteca!";
         System.out.print("─".repeat((int) Math.floor((screenWidth - biblioteca.length()) / 2.0)));
-        System.out.println(biblioteca);
+        System.out.print(biblioteca);
         System.out.print("─".repeat((int) Math.ceil((screenWidth - biblioteca.length()) / 2.0)));
         System.out.println("\n\n\n");
     }
@@ -181,25 +129,59 @@ public class CommandLineInterface {/*
         printBiblioteca();
     }
 
-
-
+    /*
+        private static void printMenu(ArrayList<String[]> rows) {
+            int[] columnWidths = calculateColumnWidths(rows);
+            int maxCellWidth = screenWidth - columnWidths[0] - 2; //": " e ";"
+            for (int i = 0 ; i < rows.size() ; i++)  {
+                ArrayList<String> splittedString = splitString(rows.get(i)[1] + ";", maxCellWidth);
+                rows.add(i + 1, new String[]{rows.get(i)[0], splittedString.get(0)});
+                for(int j = 1 ; j < splittedString.size() ; j++) {
+                    rows.add(i + 1, new String[] {"", rows.get(i)[1].substring(maxCellWidth - 1)});
+                }
+            }
+            for (String[] row : rows) {
+                System.out.printf("%" + (columnWidths[0]) + "s: ", row[0]);
+                System.out.printf("%-" + (columnWidths[1]) + "s\n", row[1]);
+            }
+            System.out.println();
+        }
+    */
+    private static void printMenu(ArrayList<String[]> rows) {
+        int[] columnWidths = calculateColumnWidths(rows);
+        int maxCellWidth = screenWidth - columnWidths[0] - 2; //": " e ";"
+        for (int i = 0; i < rows.size(); i++) {
+            rows.get(i)[1] += ";";
+            ArrayList<String> splittedString = splitString(rows.get(i)[1], maxCellWidth);
+            rows.get(i)[1] = splittedString.get(0);
+            for (int j = 1; j < splittedString.size(); j++) {
+                rows.add(i + 1, new String[]{"", splittedString.get(j)});
+                i++;
+            }
+        }
+        for (String[] row : rows) {
+            System.out.printf("%" + (columnWidths[0]) + "s: ", row[0]);
+            System.out.printf("%-" + (columnWidths[1]) + "s\n", row[1]);
+        }
+        System.out.println();
+    }
 
     //funzioni di Layout
-    public static void printCard(String title, ArrayList<String[]> rows, int colToTruncate) {
+    public static void printCard(String title, ArrayList<String[]> rows) {
         int[] columnWidths = calculateColumnWidths(rows);
 
-        int maxWidth = calculateRowWidth(columnWidths);
-        if (screenWidth - 2 < maxWidth) {
-            maxWidth = lengthOfLongestStringToTruncate(rows, colToTruncate) - (screenWidth - 2 - maxWidth);
+        int maxWidth = calculateRowWidth(columnWidths, 1, 1, 3);
+        if (screenWidth < maxWidth) {
+            maxWidth = screenWidth;
+            truncate(rows, columnWidths[1] - (maxWidth - screenWidth), 1);
+            columnWidths[1] = maxWidth - screenWidth;
         }
 
-        System.out.println("┌" + title + "─".repeat(maxWidth - title.length() - 2) + "┐\n");
+        System.out.println("┌" + title + "─".repeat(maxWidth - title.length() - 2) + "┐");
         for (String[] row : rows) {
             System.out.print("|");
-            for (int i = 0; i < row.length; i++) {
-                System.out.printf("%-" + columnWidths[i] + "s ", truncate(row[i], maxWidth));
-            }
-            System.out.println("|");
+            System.out.printf("%-" + (columnWidths[0] + 2) + "s", row[0] + ": ");
+            System.out.printf("%-" + (columnWidths[1]) + "s |\n", row[1]);
         }
         System.out.println("└" + "─".repeat(maxWidth - 2) + "┘\n");
     }
@@ -207,35 +189,73 @@ public class CommandLineInterface {/*
     public static void printTable(String[] header, ArrayList<String[]> rows, int colToTruncate) {
         rows.add(0, header);
 
+        //calcolo lunghezza massima ogni colonna
         int[] columnWidths = calculateColumnWidths(rows);
 
-        int maxWidth = calculateRowWidth(columnWidths);
+        //calcolo lunghezza finale per riga contenente simboli per tabella
+        int maxWidth = calculateRowWidth(columnWidths, 1, 1, 3);
         if (screenWidth < maxWidth) {
-            maxWidth = lengthOfLongestStringToTruncate(rows, colToTruncate) - (screenWidth - maxWidth);
+            //se lunghezza massima > lunghezza schermo taglio contenuto della colonna colToTruncate
+            truncate(rows, columnWidths[colToTruncate] - (maxWidth - screenWidth), colToTruncate);
+            columnWidths[colToTruncate] = maxWidth - screenWidth;
+            maxWidth = screenWidth;
         }
 
         for (int i = 0; i < rows.get(0).length; i++) {
-            System.out.printf("%-" + columnWidths[i] + "s ", truncate(rows.get(0)[i], maxWidth));
+            System.out.printf(" %-" + columnWidths[i] + "s |", header[i]);
         }
-
+        System.out.println("\b");
         System.out.println("-".repeat(maxWidth));
-        for (String[] row : rows) {
-            for (int i = 1; i < row.length; i++) {
-                System.out.printf("%-" + columnWidths[i] + "s ", truncate(row[i], maxWidth));
+        for (int i = 1; i < rows.size(); i++) {
+            for (int j = 0; j < rows.get(i).length; j++) {
+                System.out.printf(" %-" + columnWidths[j] + "s |", rows.get(i)[j]);
             }
-            System.out.println();
+            System.out.println("\b");
+        }
+        System.out.println("\n\n");
+    }
+
+    public static void printMessage(String message) {
+        ArrayList<String> rows = splitString(message, screenWidth);
+        for (String row : rows) {
+            System.out.println(row);
         }
     }
 
-    private static int calculateRowWidth(int[] columnWidths) {
-        int totalLength = 0;
+    public static void printError(String message) {
+        ArrayList<String> rows = splitString(message, screenWidth);
+        for (String row : rows) {
+            System.out.println("\u001B[31m" + row + "\u001B[0m");
+        }
+    }
+
+    private static ArrayList<String> splitString(String message, int maxLength) {
+        int i = 0;
+        ArrayList<String> rows = new ArrayList<>();
+        while (message.length() > maxLength + i) {
+            if (isPunctuation(message.charAt(maxLength + i))) {
+                rows.add(message.substring(i, maxLength + i));
+            } else {
+                rows.add(message.substring(i, maxLength + i - 1) + "-");
+                i--;
+            }
+            i = i + maxLength;
+        }
+        rows.add(message.substring(i));
+        return rows;
+    }
+
+    private static int calculateRowWidth(int[] columnWidths, int startSpace, int endSpace, int span) {
+        int totalLength = startSpace + endSpace;
         for (int width : columnWidths) {
             totalLength += width; // Somma la larghezza della colonna
-            totalLength += 1; // Aggiunge uno spazio tra le colonne
+            totalLength += span; // Aggiunge | e uno spazio tra le colonne
         }
-        return totalLength - 1; // Rimuove lo spazio extra alla fine
+        return totalLength - span; // Rimuove lo spazio extra alla fine
     }
 
+
+    //calcolo della larghezza più lunga in ogni colonna
     private static int[] calculateColumnWidths(ArrayList<String[]> rows) {
         int columns = rows.get(0).length;
         int[] columnWidths = new int[columns];
@@ -248,20 +268,16 @@ public class CommandLineInterface {/*
         return columnWidths;
     }
 
-    private static String truncate(String value, int maxWidth) {
-        if (value.length() > maxWidth) {
-            return value.substring(0, maxWidth - 1) + ".";
-        }
-        return value;
-    }
-
-    private static int lengthOfLongestStringToTruncate(ArrayList<String[]> rows, int colToTruncate) {
-        int maxLength = 0;
+    private static ArrayList<String[]> truncate(ArrayList<String[]> rows, int maxWidth, int colToTruncate) {
         for (String[] row : rows) {
-            if (row[colToTruncate].length() > maxLength) {
-                maxLength = row[colToTruncate].length();
+            if (row[colToTruncate].length() > maxWidth) {
+                row[colToTruncate] = row[colToTruncate].substring(0, maxWidth - 1) + ".";
             }
         }
-        return maxLength;
-    }*/
+        return rows;
+    }
+
+    private static boolean isPunctuation(char c) {
+        return punctuation.contains(String.valueOf(c));
+    }
 }

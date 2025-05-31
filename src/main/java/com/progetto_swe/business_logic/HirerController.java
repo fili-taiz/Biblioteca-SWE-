@@ -71,11 +71,19 @@ public class HirerController {
         if(!item.isBorrowable(Library.valueOf(storagePlace))){
             throw new ActionDeniedException("Errore: L'Item con itemCode [" +  item.getCode() + "] non è noleggiabile nella sede [" + storagePlace + "].");
         }
+        if(item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(storagePlace)) > 1) {//TODO aggiunto
+            throw new ActionDeniedException("Errore: L'Item con itemCode [" +  item.getCode() + "] ha abbastanza copie nella sede [" + storagePlace + "], puoi effettuare una prenotazione.");
+        }
+
         WaitingListDAO waitingListDAO = new WaitingListDAO();
         waitingListDAO.addToWaitingList(item.getCode(), storagePlace, mail);
     }
 
-    public ArrayList<Hirer> searchHirer(String keywords) {
+    //TODO aggiungere controllo in searchHirer Relazione
+    public ArrayList<Hirer> searchHirer(String keywords, Token token) {
+        if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
+            throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
+        }
         HirerDAO hirerDAO = new HirerDAO();
         ArrayList<Hirer> hirers = hirerDAO.getHirers_();
         String[] splittedKeywords = keywords.split(" ");
