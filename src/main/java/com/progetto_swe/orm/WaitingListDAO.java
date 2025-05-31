@@ -15,7 +15,6 @@ public class WaitingListDAO {
     public ArrayList<String> getWaitingList(int itemCode, String storagePlace) throws DatabaseConnectionException {
         try {
             ArrayList<String> emails = new ArrayList<>();
-            connection = ConnectionManager.getInstance().getConnection();
             String query = """
                     SELECT W.email 
                     FROM waiting_list W 
@@ -37,7 +36,6 @@ public class WaitingListDAO {
 
     public void addToWaitingList(int itemCode, String storagePlace, String email)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     INSERT INTO waiting_list (code, storage_place, email) 
@@ -57,7 +55,6 @@ public class WaitingListDAO {
     }
 
     public void removeWaitingList(int itemCode, String storagePlace) throws IdNotFoundException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM waiting_list L 

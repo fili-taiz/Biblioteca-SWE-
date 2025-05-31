@@ -19,7 +19,6 @@ public class LendingDAO {
 
     public void addLending(String userCode, int itemCode, String storagePlace)
             throws IdAlreadyExistsException, DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     INSERT INTO lending (user_code, code, storage_place, lending_date, maturity_date) 
@@ -45,7 +44,6 @@ public class LendingDAO {
 
     public void removeLending(String userCode, int itemCode, String storagePlace)
             throws IdNotFoundException, DatabaseConnectionException {
-        connection = ConnectionManager.getInstance().getConnection();
         try {
             String query = """
                     DELETE FROM lending L 
@@ -65,7 +63,6 @@ public class LendingDAO {
 
 
     public ArrayList<Lending> getLendingsByUserCode(String userCode) throws DatabaseConnectionException {
-        this.connection = ConnectionManager.getInstance().getConnection();
         BookDAO bookDAO = new BookDAO();
         MagazineDAO magazineDAO = new MagazineDAO();
         try {
