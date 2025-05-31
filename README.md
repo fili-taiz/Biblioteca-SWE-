@@ -1,4 +1,4 @@
-# Biblioteca universtaria
+# Biblioteca universitaria
 
 progetto per gestione bibliotecaria:
 - Gestire catalogo libri e prestiti da parte di amministratori della biblioteca
