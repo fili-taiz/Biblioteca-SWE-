@@ -84,6 +84,8 @@ public class ReservationControllerTest {
   public void testReserveItem_Success(){
       Book book = bookDAO.getBook(setup());
       pcDAO.addPhysicalCopies(book.getCode(), Library.LIBRARY_1.toString(), 5, true);
+      HashMap<Library, PhysicalCopies> pcs = pcDAO.getPhysicalCopies(1);
+      book.setPhysicalCopies(pcs);
       Hirer hirer = hirerDAO.getHirer("usercode");
 
       Token hirer_token = new Token(hirer);
@@ -124,6 +126,33 @@ public class ReservationControllerTest {
 
       assertThrows(ActionDeniedException.class, () -> reservationController.reserveItem(hirer, book, Library.LIBRARY_1.toString(), hirer_token));
   }
+
+    @Test
+    public void testReserveItem_Fail_3(){
+        Book book = bookDAO.getBook(setup());
+        pcDAO.addPhysicalCopies(book.getCode(), Library.LIBRARY_1.toString(), 5, false);
+        HashMap<Library, PhysicalCopies> pcs = pcDAO.getPhysicalCopies(1);
+        book.setPhysicalCopies(pcs);
+        Hirer hirer = hirerDAO.getHirer("usercode");
+
+        Token hirer_token = new Token(hirer);
+        hirer.setToken(hirer_token);
+
+        assertThrows(ActionDeniedException.class, () -> {reservationController.reserveItem(hirer, book, Library.LIBRARY_1.toString(), hirer_token);});
+    }
+
+    @Test
+    public void testReserveItem_Fail_4(){
+        Book book = bookDAO.getBook(setup());
+        pcDAO.addPhysicalCopies(book.getCode(), Library.LIBRARY_1.toString(), 1, true);
+        HashMap<Library, PhysicalCopies> pcs = pcDAO.getPhysicalCopies(1);
+        book.setPhysicalCopies(pcs);
+        Hirer hirer = hirerDAO.getHirer("usercode");
+        Token hirer_token = new Token(hirer);
+        hirer.setToken(hirer_token);
+
+        assertThrows(ActionDeniedException.class, () -> {reservationController.reserveItem(hirer, book, Library.LIBRARY_1.toString(), hirer_token);});
+    }
 
   @Test
   public void testConfirmReservationWithdraw_Success(){
