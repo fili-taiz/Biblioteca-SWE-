@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 public class ItemController {
 
-    //TODO da togliere ricerca in base a categoria
     public ArrayList<Item> searchItem(String keywords) {
         ArrayList<Item> items = getAllItems();
 
@@ -17,7 +16,7 @@ public class ItemController {
         ArrayList<Item> result = new ArrayList<>();
         for (Item i : items) {
             for (String keyword : splittedKeyword) {
-                if (i.contains(keyword)) {//TODO prima i.getCategory().equals(Category.valueOf(category)) &&
+                if (i.contains(keyword)) {
                     result.add(i);
                 }
             }
@@ -183,7 +182,7 @@ public class ItemController {
         }
         if (borrowable) {
             throw new ActionDeniedException("Errore: un Thesis non può essere noleggiato.");
-        }//TODO borrowable
+        }
 
         Thesis thesisCopy = new Thesis(
                 title,
@@ -259,7 +258,7 @@ public class ItemController {
                 if (book.getLink().isEmpty()) {
                     bookDAO.removeBook(itemCode);
                 }
-            } else {//TODO
+            } else {
                 if (book.getNumberOfCopiesInLibrary(Library.valueOf(token.getTokenWorkingPlace())) == 0) {
                     throw new ActionDeniedException("Errore: questo Book con itemCode [" + itemCode + "] non è presente nella tua sede [" + token.getTokenWorkingPlace() + "]");
                 }
@@ -269,7 +268,7 @@ public class ItemController {
                             token.getTokenWorkingPlace() + "]");
                 }
                 physicalCopiesDAO.removePhysicalCopies(itemCode, token.getTokenWorkingPlace());
-            }//TODO da modificare sulla relazione
+            }
             connectionManager.commit();
             connectionManager.openAutoCommit();
         } catch (Exception e) {
@@ -469,7 +468,7 @@ public class ItemController {
         }
         if (borrowable) {
             throw new ActionDeniedException("Errore: un Thesis non può essere noleggiato.");
-        }//TODO borrowable
+        }
         LocalDate.parse(publicationDate);
         Language.valueOf(language);
         Category.valueOf(category);

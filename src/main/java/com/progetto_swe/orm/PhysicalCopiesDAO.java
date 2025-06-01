@@ -81,7 +81,7 @@ public class PhysicalCopiesDAO {
             ps.setInt(3, itemCode);
             ps.setString(4, storagePlace);
 
-            if(ps.executeUpdate() > 1) { //TODO
+            if(ps.executeUpdate() != 1) {
                 throw new IdNotFoundException("Errore: Item con ItemCode [" + itemCode + "] non ha copie nella sede [" + storagePlace + "].");
             }
         } catch (SQLException e) {

@@ -71,7 +71,7 @@ public class HirerController {
         if(!item.isBorrowable(Library.valueOf(storagePlace))){
             throw new ActionDeniedException("Errore: L'Item con itemCode [" +  item.getCode() + "] non è noleggiabile nella sede [" + storagePlace + "].");
         }
-        if(item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(storagePlace)) > 1) {//TODO aggiunto
+        if(item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(storagePlace)) > 1) {
             throw new ActionDeniedException("Errore: L'Item con itemCode [" +  item.getCode() + "] ha abbastanza copie nella sede [" + storagePlace + "], puoi effettuare una prenotazione.");
         }
 
@@ -79,7 +79,6 @@ public class HirerController {
         waitingListDAO.addToWaitingList(item.getCode(), storagePlace, mail);
     }
 
-    //TODO aggiungere controllo in searchHirer Relazione
     public ArrayList<Hirer> searchHirer(String keywords, Token token) {
         if(!token.getTokenRole().equals(Hasher.hash("Admin"))){
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Admin.");
