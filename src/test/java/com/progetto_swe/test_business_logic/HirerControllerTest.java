@@ -162,8 +162,8 @@ public class HirerControllerTest {
 
    }
 
-   @Test//TODO da aggiornare su relazione
-   public void testSearchHirer_Success() { //TODO prima testSearchHirer()
+   @Test
+   public void testSearchHirer_Success() {
        adminDAO.addAdmin("uc1", "name", "surname", "email", "00000", Library.LIBRARY_1.toString());
        Admin admin = adminDAO.getAdmin("uc1");
        Token admin_token = new Token(admin);
@@ -181,11 +181,11 @@ public class HirerControllerTest {
        notExpected_hirers.add(hirerDAO.getHirer("uc2"));
        notExpected_hirers.add(hirerDAO.getHirer("uc3"));
 
-       assertEquals(expected_hirers, hirerController.searchHirer("Bianchi", admin_token));//TODO aggiorna
-       assertNotEquals(notExpected_hirers, hirerController.searchHirer("Bianchi", admin_token));//TODO aggiorna
+       assertEquals(expected_hirers, hirerController.searchHirer("Bianchi", admin_token));
+       assertNotEquals(notExpected_hirers, hirerController.searchHirer("Bianchi", admin_token));
    }
 
-    @Test//TODO da aggiungere su relazione
+    @Test
     public void testSearchHirer_Fail() {
         hirerDAO.addHirer("E256743", "Marco", "Verdi", "marco.verdi@studuni.com", "00001");
         Hirer hirer = hirerDAO.getHirer("E256743");

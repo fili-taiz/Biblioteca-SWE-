@@ -33,12 +33,14 @@ public class Magazine extends Item {
     @Override
     public ArrayList<String[]> toStringValues() {
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"Codice", Integer.toString(this.getCode())});
-        data.add(new String[]{"Titolo", this.getTitle()});
-        data.add(new String[]{"Casa editrice", this.publishingHouse});
-        data.add(new String[]{"Data pubblicazione", this.getPublicationDate().toString()});
-        data.add(new String[]{"Categoria", this.getCategory().toString()});
-        data.add(new String[]{"Link", this.getLink()});
+        data.add(new String[]{"Codice", Integer.toString(code)});
+        data.add(new String[]{"Titolo", title});
+        data.add(new String[]{"Casa editrice", publishingHouse});
+        data.add(new String[]{"Data pubblicazione", publicationDate.toString()});
+        data.add(new String[]{"Lingua", language.toString()});
+        data.add(new String[]{"Categoria", category.toString()});
+        data.add(new String[]{"Link", link});
+        data.add(new String[]{"Num. pag.", Integer.toString(numberOfPages)});
         return data;
     }
 

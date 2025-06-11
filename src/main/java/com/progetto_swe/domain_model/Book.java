@@ -48,16 +48,16 @@ public class Book extends Item {
     @Override
     public ArrayList<String[]> toStringValues() {
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"Codice", Integer.toString(this.getCode())});
-        data.add(new String[]{"Titolo", this.getTitle()});
-        data.add(new String[]{"Autori", this.authors});
-        data.add(new String[]{"Data pubblicazione", this.getPublicationDate().toString()});
-        data.add(new String[]{"Categoria", this.getCategory().toString()});
-        data.add(new String[]{"Lingua", this.getLanguage().toString()});
-        data.add(new String[]{"Link", this.getLink()});
-        data.add(new String[]{"ISBN", this.isbn});
-        data.add(new String[]{"Casa editrice", this.publishingHouse});
-        data.add(new String[]{"Numero pagine", Integer.toString(this.getNumberOfPages())});
+        data.add(new String[]{"Codice", Integer.toString(code)});
+        data.add(new String[]{"Titolo", title});
+        data.add(new String[]{"Autori", authors});
+        data.add(new String[]{"Data pubblicazione", publicationDate.toString()});
+        data.add(new String[]{"Categoria", category.toString()});
+        data.add(new String[]{"Lingua", language.toString()});
+        data.add(new String[]{"Link", link});
+        data.add(new String[]{"ISBN", isbn});
+        data.add(new String[]{"Casa editrice", publishingHouse});
+        data.add(new String[]{"Num. pag.", Integer.toString(numberOfPages)});
         return data;
     }
 

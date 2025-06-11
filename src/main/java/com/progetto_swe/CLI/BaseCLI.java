@@ -88,6 +88,7 @@ public class BaseCLI {
         for (String[] option : menuOption) {
             if (option[0].equalsIgnoreCase(scelta)) {
                 optionExist = true;
+                break;
             }
         }
         if (!optionExist) {
@@ -195,23 +196,6 @@ public class BaseCLI {
 
     protected void getSearchItemParameters() {
         CommandLineInterface.clearScreen();
-        /*CommandLineInterface.printMessage("Inserisci a quale categoria appartiene l'articolo che stai cercando tra quelli elencati: ");
-        for (Category c : Category.values()) {
-            System.out.print(c + ", ");
-        }
-        System.out.print("\b\b;\n");
-        searchItemParams.put("CATEGORY", scanner.nextLine().toUpperCase());
-        do {
-            try {
-                Category.valueOf(searchItemParams.get("CATEGORY"));
-                break;
-            } catch (IllegalArgumentException e) {
-                CommandLineInterface.printError("Errore: non hai inserito una categoria corretta, riprova per favore:");
-                searchItemParams.put("CATEGORY", scanner.nextLine().toUpperCase());
-            }
-        } while (true);
-
-        System.out.println();*/
         CommandLineInterface.printMessage("Inserisci le parole chiavi dell'articolo che vuoi cercare: ");
         searchItemParams.put("KEYWORDS", scanner.nextLine().toUpperCase());
     }

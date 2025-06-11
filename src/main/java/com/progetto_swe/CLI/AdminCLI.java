@@ -1,20 +1,16 @@
 package com.progetto_swe.CLI;
 
 import com.progetto_swe.MailSender.MailSender;
-import com.progetto_swe.business_logic.AdminController;
 import com.progetto_swe.business_logic.*;
 import com.progetto_swe.business_logic.business_logic_exception.ActionDeniedException;
 import com.progetto_swe.domain_model.*;
-import com.progetto_swe.orm.BookDAO;
 import com.progetto_swe.orm.database_exception.IdAlreadyExistsException;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -207,7 +203,7 @@ public class AdminCLI extends BaseCLI {
                 } else {
                     CommandLineInterface.printError("Errore: codice di verifica non corretto");
                     CommandLineInterface.printMessage("Inserisci [Si] se vuoi inserire una nuova mail");
-                    if (scanner.nextLine().toUpperCase().equals("SI")) {
+                    if (scanner.nextLine().equalsIgnoreCase("SI")) {
                         email = "";
                     }
                 }
@@ -387,7 +383,7 @@ public class AdminCLI extends BaseCLI {
         } while (true);
 
         System.out.println("Inserisci [Si] se è noleggiabile nella sede in cui lavori: ");
-        parameters.put("BORROWABLE", Boolean.toString(scanner.nextLine().toUpperCase().equals("SI")));
+        parameters.put("BORROWABLE", Boolean.toString(scanner.nextLine().equalsIgnoreCase("SI")));
         return parameters;
     }
 

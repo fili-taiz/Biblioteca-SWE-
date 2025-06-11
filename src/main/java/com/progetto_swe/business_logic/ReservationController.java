@@ -17,7 +17,7 @@ public class ReservationController {
 
 
     public void removeReservation(Hirer hirer, Item item, String storagePlace, Token token) {
-        if(!token.getTokenWorkingPlace().equals("NONE") && !token.getTokenWorkingPlace().equals(storagePlace)){//TODO
+        if(!token.getTokenWorkingPlace().equals("NONE") && !token.getTokenWorkingPlace().equals(storagePlace)){
             throw new ActionDeniedException("Errore: Non puoi registrare questa operazione, il libro non è stato prenotato nella sede in cui lavori.");
         }
         Library.valueOf(storagePlace);
@@ -41,7 +41,7 @@ public class ReservationController {
             throw new ActionDeniedException("Errore: l'Hirer con userCode [" + hirer.getUserCode() +"] è bannato non può eseguire un prestito.");
         }
 
-        //TODO aggiungere
+
         if (!item.isBorrowable(Library.valueOf(storagePlace))) {//
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non è noleggiabile, non può essere eseguita la prenotazione.");
         }
@@ -49,7 +49,7 @@ public class ReservationController {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" +
                     storagePlace + "].");
         }
-        //TODO aggiungere
+
 
         Library.valueOf(storagePlace);
         ReservationDAO reservationDAO = new ReservationDAO();

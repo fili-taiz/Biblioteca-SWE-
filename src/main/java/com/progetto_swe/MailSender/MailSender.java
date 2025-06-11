@@ -82,7 +82,6 @@ public class MailSender {
                 + verificationCode;
         String html = createhtml(subject, "", content);
         sendMail(recepient, subject, html);
-        System.out.println(verificationCode);//TODO to delete
     }
 
     public static void sendRegisterCredentials(String recepient, String userCode, String password) {

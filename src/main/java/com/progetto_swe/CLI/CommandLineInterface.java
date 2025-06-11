@@ -2,8 +2,6 @@ package com.progetto_swe.CLI;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Scanner;
 
 import com.progetto_swe.business_logic.*;
@@ -12,11 +10,11 @@ import com.progetto_swe.domain_model.*;
 import com.progetto_swe.orm.database_exception.IdNotFoundException;
 
 public class CommandLineInterface {
-    static int screenWidth = 90;
-    String role = "UTENTE ANONIMO";
-    static Scanner scanner = new Scanner(System.in);
-    BaseCLI CLI = new BaseCLI();
-    private static String punctuation = " ,;.:-_\\|!\"£$%&/()=?\'^€+*[]{}§@#°<>«»";
+    private static int screenWidth = 90;
+    private String role = "UTENTE ANONIMO";
+    private static Scanner scanner = new Scanner(System.in);
+    private BaseCLI CLI = new BaseCLI();
+    private static final String punctuation = " ,;.:-_\\|!\"£$%&/()=?'^€+*[]{}§@#°<>«»";
 
     public void start() {
         ArrayList<String[]> menu;
@@ -159,9 +157,9 @@ public class CommandLineInterface {
 
         int maxWidth = calculateRowWidth(columnWidths, 1, 1, 3);
         if (screenWidth < maxWidth) {
+            rows = truncate(rows, columnWidths[1] - (maxWidth - screenWidth), 1);
+            columnWidths[1] = columnWidths[1] - (maxWidth - screenWidth);
             maxWidth = screenWidth;
-            truncate(rows, columnWidths[1] - (maxWidth - screenWidth), 1);
-            columnWidths[1] = maxWidth - screenWidth;
         }
 
         System.out.println("┌" + title + "─".repeat(maxWidth - title.length() - 2) + "┐");
@@ -190,7 +188,7 @@ public class CommandLineInterface {
             }
             int lengthToCut = (int) Math.ceil((maxWidth - screenWidth)/3.0);
             //se lunghezza massima > lunghezza schermo taglio contenuto della colonna colToTruncate
-            truncate(rows, columnWidths[colToTruncate] - lengthToCut, colToTruncate);
+            rows = truncate(rows, columnWidths[colToTruncate] - lengthToCut, colToTruncate);
             columnWidths[colToTruncate] = columnWidths[colToTruncate] - lengthToCut;
             maxWidth -= lengthToCut;
         }
