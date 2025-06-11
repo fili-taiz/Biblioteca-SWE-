@@ -314,7 +314,7 @@ public class BaseCLI {
         for (Item item : items) {
             data.add(item.getValues());
         }
-        CommandLineInterface.printTable(header, data, 1);
+        CommandLineInterface.printTable(header, data);
     }
 
     protected void stampaArticolo(Item item) {
@@ -326,7 +326,7 @@ public class BaseCLI {
         if (item.getNumberOfLibraries() != 0) {
             CommandLineInterface.printMessage("Biblioteche:");
             String[] header = {"Sede", "Num. copie", "Stato"};
-            CommandLineInterface.printTable(header, item.getPhysicalCopiesData(), 0);
+            CommandLineInterface.printTable(header, item.getPhysicalCopiesData());
         }
     }
 
@@ -340,7 +340,7 @@ public class BaseCLI {
         for (Reservation r : reservations) {
             data.add(new String[]{Integer.toString(r.getItem().getCode()), r.getItem().getTitle(), r.getStoragePlace().toString(), r.getReservationDate().plusWeeks(1).toString()});
         }
-        CommandLineInterface.printTable(header, data, 1);
+        CommandLineInterface.printTable(header, data);
     }
 
     protected void stampaPrestiti(ArrayList<Lending> lendings) {
@@ -353,6 +353,6 @@ public class BaseCLI {
         for (Lending l : lendings) {
             data.add(new String[]{Integer.toString(l.getItem().getCode()), l.getItem().getTitle(), l.getStoragePlace().toString(), l.getLendingDate().plusMonths(1).toString()});
         }
-        CommandLineInterface.printTable(header, data, 1);
+        CommandLineInterface.printTable(header, data);
     }
 }

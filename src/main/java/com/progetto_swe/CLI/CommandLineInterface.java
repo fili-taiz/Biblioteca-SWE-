@@ -101,7 +101,12 @@ public class CommandLineInterface {
                 }
 
                 default: {
-                    CLI.execute(scelta);
+                    try {
+                        CLI.execute(scelta);
+                    } catch (Exception e) {
+                        printError(e.getMessage());
+                        scelta = "ESCI";
+                    }
                     break;
                 }
             }
@@ -129,24 +134,6 @@ public class CommandLineInterface {
         printBiblioteca();
     }
 
-    /*
-        private static void printMenu(ArrayList<String[]> rows) {
-            int[] columnWidths = calculateColumnWidths(rows);
-            int maxCellWidth = screenWidth - columnWidths[0] - 2; //": " e ";"
-            for (int i = 0 ; i < rows.size() ; i++)  {
-                ArrayList<String> splittedString = splitString(rows.get(i)[1] + ";", maxCellWidth);
-                rows.add(i + 1, new String[]{rows.get(i)[0], splittedString.get(0)});
-                for(int j = 1 ; j < splittedString.size() ; j++) {
-                    rows.add(i + 1, new String[] {"", rows.get(i)[1].substring(maxCellWidth - 1)});
-                }
-            }
-            for (String[] row : rows) {
-                System.out.printf("%" + (columnWidths[0]) + "s: ", row[0]);
-                System.out.printf("%-" + (columnWidths[1]) + "s\n", row[1]);
-            }
-            System.out.println();
-        }
-    */
     private static void printMenu(ArrayList<String[]> rows) {
         int[] columnWidths = calculateColumnWidths(rows);
         int maxCellWidth = screenWidth - columnWidths[0] - 2; //": " e ";"
@@ -186,7 +173,7 @@ public class CommandLineInterface {
         System.out.println("└" + "─".repeat(maxWidth - 2) + "┘\n");
     }
 
-    public static void printTable(String[] header, ArrayList<String[]> rows, int colToTruncate) {
+    public static void printTable(String[] header, ArrayList<String[]> rows) {
         rows.add(0, header);
 
         //calcolo lunghezza massima ogni colonna
@@ -194,11 +181,18 @@ public class CommandLineInterface {
 
         //calcolo lunghezza finale per riga contenente simboli per tabella
         int maxWidth = calculateRowWidth(columnWidths, 1, 1, 3);
-        if (screenWidth < maxWidth) {
+        while (screenWidth < maxWidth) {
+            int colToTruncate = 0;
+            for(int i = 0 ; i < columnWidths.length ; i++) {
+                if(columnWidths[i] > columnWidths[colToTruncate]) {
+                    colToTruncate = i;
+                }
+            }
+            int lengthToCut = (int) Math.ceil((maxWidth - screenWidth)/3.0);
             //se lunghezza massima > lunghezza schermo taglio contenuto della colonna colToTruncate
-            truncate(rows, columnWidths[colToTruncate] - (maxWidth - screenWidth), colToTruncate);
-            columnWidths[colToTruncate] = maxWidth - screenWidth;
-            maxWidth = screenWidth;
+            truncate(rows, columnWidths[colToTruncate] - lengthToCut, colToTruncate);
+            columnWidths[colToTruncate] = columnWidths[colToTruncate] - lengthToCut;
+            maxWidth -= lengthToCut;
         }
 
         for (int i = 0; i < rows.get(0).length; i++) {

@@ -47,7 +47,7 @@ public class ReservationController {
         }
         if (item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(storagePlace)) <= 1) {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" +
-                    token.getTokenWorkingPlace() + "].");
+                    storagePlace + "].");
         }
         //TODO aggiungere
 

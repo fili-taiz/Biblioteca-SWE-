@@ -552,7 +552,13 @@ public class AdminCLI extends BaseCLI {
         try {
             if (item.getClass() == Book.class) {
                 HashMap<String, String> bookParams = getBookParameters();
-                HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+                HashMap<String, String> pCopiesParams = new HashMap<>();
+                if(item.getNumberOfCopiesInLibrary(admin.getWorkingPlace()) > 0){
+                    pCopiesParams = getPhysicalCopiesParameters();
+                } else {
+                    pCopiesParams.put("NUMBEROFCOPIES", "0");
+                    pCopiesParams.put("BORROWABLE", "false");
+                }
                 itemController.updateBook(
                         item.getCode(),
                         itemParams.get("TITLE"),
@@ -570,7 +576,13 @@ public class AdminCLI extends BaseCLI {
             }
             if (item.getClass() == Magazine.class) {
                 HashMap<String, String> magazineParams = getMagazineParameters();
-                HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+                HashMap<String, String> pCopiesParams = new HashMap<>();
+                if(item.getNumberOfCopiesInLibrary(admin.getWorkingPlace()) > 0){
+                    pCopiesParams = getPhysicalCopiesParameters();
+                } else {
+                    pCopiesParams.put("NUMBEROFCOPIES", "0");
+                    pCopiesParams.put("BORROWABLE", "false");
+                }
                 itemController.updateMagazine(
                         item.getCode(),
                         itemParams.get("TITLE"),
@@ -586,7 +598,13 @@ public class AdminCLI extends BaseCLI {
             }
             if (item.getClass() == Thesis.class) {
                 HashMap<String, String> thesisParams = getThesisParameters();
-                HashMap<String, String> pCopiesParams = getPhysicalCopiesParameters();
+                HashMap<String, String> pCopiesParams = new HashMap<>();
+                if(item.getNumberOfCopiesInLibrary(admin.getWorkingPlace()) > 0){
+                    pCopiesParams = getPhysicalCopiesParameters();
+                } else {
+                    pCopiesParams.put("NUMBEROFCOPIES", "0");
+                    pCopiesParams.put("BORROWABLE", "false");
+                }
                 itemController.updateThesis(
                         item.getCode(),
                         itemParams.get("TITLE"),
@@ -638,7 +656,7 @@ public class AdminCLI extends BaseCLI {
         for (Hirer h : hirers) {
             data.add(new String[]{h.getUserCode(), h.getName(), h.getSurname(), h.getEmail()});
         }
-        CommandLineInterface.printTable(header, data, 1);
+        CommandLineInterface.printTable(header, data);
     }
 
     protected void stampaUtente(Hirer hirer, ArrayList<Reservation> reservations, ArrayList<Lending> lendings) {
