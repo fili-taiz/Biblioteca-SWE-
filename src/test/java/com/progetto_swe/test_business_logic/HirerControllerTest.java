@@ -130,7 +130,7 @@ public class HirerControllerTest {
    }
 
    @Test
-   public void testAddToWaitingList_Fail(){
+   public void testAddToWaitingList_Fail_1(){
        hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
        int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
                Category.CATEGORY_1.toString(),
@@ -138,6 +138,17 @@ public class HirerControllerTest {
 
        assertThrows(ActionDeniedException.class, () -> hirerController.addToWaitingList(bookDAO.getBook(book_code), "mail", Library.LIBRARY_1.toString()));
    }
+
+    @Test
+    public void testAddToWaitingList_Fail_2(){
+        hirerDAO.addHirer("usercode", "name", "surname", "mail", "00001");
+        int book_code = bookDAO.addBook("titolo", LocalDate.of(2000, 6,3).toString(), Language.LANGUAGE_1.toString(),
+                Category.CATEGORY_1.toString(),
+                "link", "isbn", "publishing house", 200, "authors");
+        physicalCopiesDAO.addPhysicalCopies(book_code, Library.LIBRARY_1.toString(), 2, true);
+
+        assertThrows(ActionDeniedException.class, () -> hirerController.addToWaitingList(bookDAO.getBook(book_code), "mail", Library.LIBRARY_1.toString()));
+    }
 
    @Test
    public void testRegisterExternalHirer_Success(){

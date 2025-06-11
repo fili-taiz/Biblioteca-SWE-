@@ -38,18 +38,17 @@ public class ReservationController {
             throw new ActionDeniedException("Errore: Questa operazione è eseguibile solo da un Hirer.");
         }
         if(hirer.getUnbannedDate() != null){
-            throw new ActionDeniedException("Errore: l'Hirer con userCode [" + hirer.getUserCode() +"] è bannato non può eseguire un prestito.");
+            throw new ActionDeniedException("Errore: l'Hirer con userCode [" + hirer.getUserCode() +"] è bannato, non può eseguire un prestito.");
         }
 
-
-        if (!item.isBorrowable(Library.valueOf(storagePlace))) {//
+        if (!item.isBorrowable(Library.valueOf(storagePlace))) {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non è noleggiabile, non può essere eseguita la prenotazione.");
         }
+
         if (item.getNumberOfAvailableCopiesInLibrary(Library.valueOf(storagePlace)) <= 1) {
             throw new ActionDeniedException("Errore: l'articolo con itemCode [" + item.getCode() +"] non ha abbastanza copie nella sede [" +
                     storagePlace + "].");
         }
-
 
         Library.valueOf(storagePlace);
         ReservationDAO reservationDAO = new ReservationDAO();
